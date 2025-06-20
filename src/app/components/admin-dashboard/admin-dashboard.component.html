@@ -1,0 +1,80 @@
+<nz-layout style="height: 100vh">
+  <nz-sider nzCollapsible [(nzCollapsed)]="isCollapsed" [nzTrigger]="null">
+    <div class="logo">
+      <a
+        class="navbar-brand fw-bold text-white"
+        [ngStyle]="{ 'font-size': isCollapsed ? '7px' : '14px' }"
+        >Admin Panel</a
+      >
+    </div>
+    <ul nz-menu nzTheme="dark" nzMode="inline">
+      <li nz-menu-item routerLink="/admin-dashboard/users" nzMatchRouter>
+        <nz-icon nzType="user" />
+        <span>Manage Users</span>
+      </li>
+      <li nz-menu-item>
+        <nz-icon nzType="bell" nzTheme="outline" />
+        <span>Notifications</span>
+      </li>
+      <li nz-menu-item>
+        <nz-icon nzType="search" nzTheme="outline" />
+        <span>Audit</span>
+      </li>
+      <li nz-menu-item>
+        <nz-icon nzType="bar-chart" nzTheme="outline" />
+        <span>Report</span>
+      </li>
+      <li
+        nz-menu-item
+        routerLink="/admin-dashboard/help-resource"
+        nzMatchRouter
+      >
+        <nz-icon nzType="question-circle" nzTheme="outline" />
+        <span>Help Resources</span>
+      </li>
+      <li
+        nz-menu-item
+        routerLink="/admin-dashboard/management-form-template"
+        nzMatchRouter
+      >
+        <nz-icon nzType="appstore" nzTheme="outline" />
+        <span>Manage Forms</span>
+      </li>
+      <li
+        style="
+          position: absolute;
+          bottom: 0;
+          background-color: rgba(255, 255, 255, 0.2);
+        "
+        nz-menu-item
+        (click)="logout()"
+      >
+        <nz-icon nzType="logout" nzTheme="outline" />
+        <span>Logout</span>
+      </li>
+    </ul>
+  </nz-sider>
+  <nz-layout>
+    <nz-header>
+      <div nz-flex nzAlign="center" nzJustify="space-between">
+        <i
+          nz-icon
+          class="trigger"
+          [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"
+          (click)="isCollapsed = !isCollapsed"
+        ></i>
+        <h4 class="fw-bold">Admin Dashboard</h4>
+        <a
+          class="nav-link me-3"
+          (click)="openProfileModal()"
+          style="cursor: pointer"
+        >
+          <i class="bi bi-person-circle fs-4"></i>
+        </a>
+      </div>
+    </nz-header>
+    <nz-content class="main-content">
+      <router-outlet></router-outlet>
+    </nz-content>
+  </nz-layout>
+</nz-layout>

@@ -1,0 +1,35 @@
+<nz-table #basicTable [nzData]="userRoles">
+  <thead>
+    <tr>
+      <th>User Number</th>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Role</th>
+      <th>Approved</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let data of basicTable.data">
+      <td>{{ data.user?.usernumber }}</td>
+      <td>{{ data.user?.firstName }} {{ data.user?.lastName }}</td>
+      <td>{{ data.user?.email }}</td>
+      <td>{{ data.user?.role }}</td>
+      <td>{{ data.approved }}</td>
+      <td>
+        <button
+          nz-popconfirm
+          nzPopconfirmTitle="Are you sure?"
+          (nzOnConfirm)="update(data)"
+          nzPopconfirmPlacement="topCenter"
+          [nzDanger]="data.approved"
+          nz-button
+          nzType="primary"
+        >
+          {{ data.approved ? "Revoke" : "Approve" }}
+        </button>
+        <nz-divider nzType="vertical"></nz-divider>
+      </td>
+    </tr>
+  </tbody>
+</nz-table>

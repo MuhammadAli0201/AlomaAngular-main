@@ -1,0 +1,199 @@
+@if (loading) {
+<nz-skeleton [nzLoading]="true"></nz-skeleton>
+<nz-skeleton [nzLoading]="true"></nz-skeleton>
+<nz-skeleton [nzLoading]="true"></nz-skeleton>
+<nz-skeleton [nzLoading]="true"></nz-skeleton>
+} @else if (!loading && !patient) {
+<div
+  nz-flex
+  nzAlign="center"
+  nzJustify="center"
+  style="height: 100%; width: 100%"
+>
+  <nz-empty nzNotFoundContent="Patient Not Found"></nz-empty>
+</div>
+} @else {
+<div class="form-container">
+  <form [formGroup]="motherForm">
+    <h2>Maternal</h2>
+
+    <nz-form-item>
+      <nz-form-control nzErrorTip="Hospital number is required">
+        <nz-form-label nzRequired>Hospital number</nz-form-label>
+        <input
+          nz-input
+          formControlName="hospitalNumber"
+          placeholder="Enter hospital number"
+        />
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+      <nz-form-control nzErrorTip="Name number is required"> 
+        <nz-form-label nzRequired>Name</nz-form-label>
+        <input nz-input formControlName="name" placeholder="Enter name" />
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+      <nz-form-control nzErrorTip="Surname number is required">
+        <nz-form-label nzRequired>Surname</nz-form-label>
+        <input nz-input formControlName="surname" placeholder="Enter surname" />
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+      <nz-form-control nzErrorTip="Age number is required">
+        <nz-form-label nzRequired>Age</nz-form-label>
+        <input
+          nz-input
+          type="number"
+          formControlName="age"
+          placeholder="Enter age"
+        />
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+      <nz-form-control nzErrorTip="Race number is required">
+        <nz-form-label nzRequired>Race</nz-form-label>
+        <nz-select formControlName="race" nzPlaceHolder="Select race">
+          <nz-option
+            *ngFor="let option of raceOptions"
+            [nzValue]="option.value"
+            [nzLabel]="option.label"
+          ></nz-option>
+        </nz-select>
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+      <nz-form-control>
+        <nz-form-label>Parity</nz-form-label>
+        <input nz-input formControlName="parity" placeholder="Enter parity" />
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+      <nz-form-control>
+        <nz-form-label>Gravidity</nz-form-label>
+        <input
+          nz-input
+          formControlName="gravidity"
+          placeholder="Enter gravidity"
+        />
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+      <nz-form-control>
+        <nz-form-label>Initial diagnosis</nz-form-label>
+        <nz-select
+          formControlName="initialDiagnosis"
+          nzPlaceHolder="Select diagnosis"
+        >
+          <nz-option
+            *ngFor="let option of yesNoUnknown"
+            [nzValue]="option.value"
+            [nzLabel]="option.label"
+          ></nz-option>
+        </nz-select>
+      </nz-form-control>
+    </nz-form-item>
+
+    <div nz-row [nzGutter]="12">
+      <div
+        *ngFor="
+          let field of [
+            'antenatalCare',
+            'antenatalSteroid',
+            'antenatalMgSulfate',
+            'chorioamnionitis',
+            'hypertension',
+            'maternalHiv',
+            'hivProphylaxis',
+            'haartBegun',
+            'syphilis',
+            'syphilisTreated',
+            'diabetes',
+            'tb',
+            'tbTreatment',
+            'teenageMother',
+            'abandonedBaby',
+            'neonatalAbstinence'
+          ]
+        "
+        nz-col
+        [nzXs]="24"
+        [nzLg]="12"
+      >
+        <nz-form-item>
+          <nz-form-control>
+            <nz-form-label>{{ field | titlecase }}</nz-form-label>
+            <nz-select [formControlName]="field" nzPlaceHolder="Select">
+              <nz-option
+                *ngFor="
+                  let option of field.includes('Steroid') ||
+                  field.includes('MgSulfate')
+                    ? yesNoNaUnknown
+                    : yesNoUnknown
+                "
+                [nzValue]="option.value"
+                [nzLabel]="option.label"
+              ></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    </div>
+
+    <nz-form-item>
+      <nz-form-control>
+        <nz-form-label>Other maternal information</nz-form-label>
+        <input
+          nz-input
+          formControlName="otherInfo"
+          placeholder="Enter other info"
+        />
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+      <nz-form-control>
+        <nz-form-label>Multiple gestations</nz-form-label>
+        <nz-select formControlName="multipleGestations" nzPlaceHolder="Select">
+          <nz-option
+            *ngFor="let option of multipleGestationOptions"
+            [nzValue]="option.value"
+            [nzLabel]="option.label"
+          ></nz-option>
+        </nz-select>
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+      <nz-form-control>
+        <nz-form-label>Number of babies</nz-form-label>
+        <input
+          nz-input
+          type="number"
+          formControlName="numberOfBabies"
+          placeholder="Enter number of babies"
+        />
+      </nz-form-control>
+    </nz-form-item>
+
+    <div style="text-align: right; margin-top: 24px">
+      <button
+        nz-button
+        nzType="primary"
+        [nzLoading]="btnLoading"
+        (click)="onSubmit()"
+        [disabled]="motherForm.invalid"
+      >
+        Next (2/3)
+      </button>
+    </div>
+  </form>
+</div>
+}

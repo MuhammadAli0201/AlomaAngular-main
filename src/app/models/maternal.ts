@@ -1,0 +1,33 @@
+export interface Maternal {
+  id?: string;
+  patientId: string;
+  parity?: string;
+  gravidity?: string;
+  initialDiagnosis?: string;
+  antenatalCare?: string;
+  antenatalSteroid?: string;
+  antenatalMgSulfate?: string;
+  chorioamnionitis?: string;
+  hypertension?: string;
+  maternalHiv?: string;
+  hivProphylaxis?: string;
+  haartBegun?: string;
+  syphilis?: string;
+  syphilisTreated?: string;
+  diabetes?: string;
+  tb?: string;
+  tbTreatment?: string;
+  teenageMother?: string;
+  abandonedBaby?: string;
+  neonatalAbstinence?: string;
+  otherInfo?: string;
+  multipleGestations?: string;
+  numberOfBabies?: number;
+  createdByUserId?: number;
+  createdAt?: string;
+  hospitalNumber: string;
+  name: string;
+  surname: string;
+  age: number;
+  race: string;
+}

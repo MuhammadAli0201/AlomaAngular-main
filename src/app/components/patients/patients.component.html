@@ -1,0 +1,26 @@
+<nz-table #basicTable [nzData]="patients">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Date Of Birth</th>
+      <th>Hospital Number</th>
+      <th>Gender</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (data of basicTable.data; track data) {
+    <tr>
+      <td>{{ data.name | uppercase }}</td>
+      <td>{{ data.dateOfBirth }}</td>
+      <td>{{ data.hospitalNumber }}</td>
+      <td>{{ data.gender }}</td>
+      <td>
+        <button (click)="edit(data.id!)" nz-button nzType="primary">
+          Update
+        </button>
+      </td>
+    </tr>
+    }
+  </tbody>
+</nz-table>

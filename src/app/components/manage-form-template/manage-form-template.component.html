@@ -1,0 +1,596 @@
+<div class="container mt-4" style="max-width: 800px;">
+  <h2 class="mb-4 text-center">Manage Form Template</h2>
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+      <button class="btn btn-outline-secondary" (click)="goBack()">← Back</button>
+    </div>
+
+  <!-- Global Success Message -->
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i>
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="clearMessages()"></button>
+  </div>
+
+  <!-- Global Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="clearMessages()"></button>
+  </div>
+
+  <!-- Tab Navigation -->
+  <ul class="nav nav-tabs mb-4">
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'organism'" (click)="setActiveTab('organism')" href="javascript:void(0)">
+        Organisms
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'fungalOrganism'" (click)="setActiveTab('fungalOrganism')" href="javascript:void(0)">
+        Fungal Organisms
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'antimicrobial'" (click)="setActiveTab('antimicrobial')" href="javascript:void(0)">
+        Antimicrobials
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'congenitalInfectionOrganism'" (click)="setActiveTab('congenitalInfectionOrganism')" href="javascript:void(0)">
+        Congenital Infection Organisms
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'sonarFinding'" (click)="setActiveTab('sonarFinding')" href="javascript:void(0)">
+        Sonar Findings
+      </a>
+    </li>
+  </ul>
+
+  <!-- Organism Tab Content -->
+  <div *ngIf="activeTab === 'organism'">
+    <!-- Organism Form -->
+    <form (ngSubmit)="saveOrganism()" #organismFormRef="ngForm" class="mb-4" novalidate>
+      <div class="mb-3">
+        <div class="input-group">
+          <input
+            type="text"
+            name="organismName"
+            #organismName="ngModel"
+            [(ngModel)]="organismForm.organismName"
+            class="form-control"
+            [class.is-invalid]="organismName.invalid && (organismName.dirty || organismName.touched)"
+            [class.is-valid]="organismName.valid && (organismName.dirty || organismName.touched)"
+            placeholder="Enter organism name"
+            required
+            maxlength="100"
+            minlength="2"
+          />
+          <button class="btn btn-primary" type="submit" [disabled]="organismFormRef.invalid || isSubmitting">
+            <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+            {{ editingOrganism ? 'Update' : 'Create' }}
+          </button>
+          <button
+            *ngIf="editingOrganism"
+            class="btn btn-secondary"
+            type="button"
+            (click)="resetOrganismForm()"
+          >
+            Cancel
+          </button>
+        </div>
+        
+        <!-- Field-specific validation messages -->
+        <div *ngIf="organismName.invalid && (organismName.dirty || organismName.touched)" class="invalid-feedback d-block">
+          <div *ngIf="organismName.errors?.['required']">
+            <i class="bi bi-exclamation-circle me-1"></i>Organism name is required.
+          </div>
+          <div *ngIf="organismName.errors?.['minlength']">
+            <i class="bi bi-exclamation-circle me-1"></i>Organism name must be at least 2 characters long.
+          </div>
+          <div *ngIf="organismName.errors?.['maxlength']">
+            <i class="bi bi-exclamation-circle me-1"></i>Organism name cannot exceed 100 characters.
+          </div>
+        </div>
+        
+        <!-- Character counter -->
+        <small class="form-text text-muted">
+          {{ organismForm.organismName.length || 0 }}/100 characters
+        </small>
+      </div>
+    </form>
+
+    <!-- Search Input -->
+    <input type="text" [(ngModel)]="organismSearchTerm" placeholder="Search organisms..." class="form-control mb-2">
+    
+    <!-- Search Results List -->
+    <ul *ngIf="organismSearchTerm" class="list-unstyled mb-3">
+      <li *ngFor="let organism of filteredOrganisms()" class="p-2 border-bottom">
+        <span [innerHTML]="organism.organismName | highlight:organismSearchTerm"></span>
+      </li>
+    </ul>
+
+    <!-- Organism List -->
+    <div class="card">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">Organisms</h5>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Organism Name</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let organism of filteredOrganisms()">
+              <td>{{ organism.organismName }}</td>
+              <td>
+                <button
+                  class="btn btn-sm btn-outline-warning me-2"
+                  (click)="editOrganism(organism)"
+                  title="Edit"
+                  [disabled]="isSubmitting"
+                >
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="deleteOrganism(organism.organismID!)"
+                  title="Delete"
+                  [disabled]="isSubmitting"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="filteredOrganisms().length === 0">
+              <td colspan="2" class="text-center text-muted py-3">
+                No organisms found.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fungal Organism Tab Content -->
+  <div *ngIf="activeTab === 'fungalOrganism'">
+    <!-- Fungal Organism Form -->
+    <form (ngSubmit)="saveFungalOrganism()" #fungalOrganismFormRef="ngForm" class="mb-4" novalidate>
+      <div class="mb-3">
+        <div class="input-group">
+          <input
+            type="text"
+            name="fungalOrganismName"
+            #fungalOrganismName="ngModel"
+            [(ngModel)]="fungalOrganismForm.fungalOrganismName"
+            class="form-control"
+            [class.is-invalid]="fungalOrganismName.invalid && (fungalOrganismName.dirty || fungalOrganismName.touched)"
+            [class.is-valid]="fungalOrganismName.valid && (fungalOrganismName.dirty || fungalOrganismName.touched)"
+            placeholder="Enter fungal organism name"
+            required
+            maxlength="100"
+            minlength="2"
+          />
+          <button class="btn btn-primary" type="submit" [disabled]="fungalOrganismFormRef.invalid || isSubmitting">
+            <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+            {{ editingFungalOrganism ? 'Update' : 'Create' }}
+          </button>
+          <button
+            *ngIf="editingFungalOrganism"
+            class="btn btn-secondary"
+            type="button"
+            (click)="resetFungalOrganismForm()"
+          >
+            Cancel
+          </button>
+        </div>
+        
+        <!-- Field-specific validation messages -->
+        <div *ngIf="fungalOrganismName.invalid && (fungalOrganismName.dirty || fungalOrganismName.touched)" class="invalid-feedback d-block">
+          <div *ngIf="fungalOrganismName.errors?.['required']">
+            <i class="bi bi-exclamation-circle me-1"></i>Fungal organism name is required.
+          </div>
+          <div *ngIf="fungalOrganismName.errors?.['minlength']">
+            <i class="bi bi-exclamation-circle me-1"></i>Fungal organism name must be at least 2 characters long.
+          </div>
+          <div *ngIf="fungalOrganismName.errors?.['maxlength']">
+            <i class="bi bi-exclamation-circle me-1"></i>Fungal organism name cannot exceed 100 characters.
+          </div>
+        </div>
+        
+        <!-- Character counter -->
+        <small class="form-text text-muted">
+          {{ fungalOrganismForm.fungalOrganismName.length || 0 }}/100 characters
+        </small>
+      </div>
+    </form>
+
+    <!-- Search Input -->
+    <input type="text" [(ngModel)]="fungalOrganismSearchTerm" placeholder="Search fungal organisms..." class="form-control mb-2">
+    
+    <!-- Search Results List -->
+    <ul *ngIf="fungalOrganismSearchTerm" class="list-unstyled mb-3">
+      <li *ngFor="let fungalOrganism of filteredFungalOrganisms()" class="p-2 border-bottom">
+        <span [innerHTML]="fungalOrganism.fungalOrganismName | highlight:fungalOrganismSearchTerm"></span>
+      </li>
+    </ul>
+
+    <!-- Fungal Organism List -->
+    <div class="card">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">Fungal Organisms</h5>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Fungal Organism Name</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let fungalOrganism of filteredFungalOrganisms()">
+              <td>{{ fungalOrganism.fungalOrganismName }}</td>
+              <td>
+                <button
+                  class="btn btn-sm btn-outline-warning me-2"
+                  (click)="editFungalOrganism(fungalOrganism)"
+                  title="Edit"
+                  [disabled]="isSubmitting"
+                >
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="deleteFungalOrganism(fungalOrganism.fungalOrganismID!)"
+                  title="Delete"
+                  [disabled]="isSubmitting"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="filteredFungalOrganisms().length === 0">
+              <td colspan="2" class="text-center text-muted py-3">
+                No fungal organisms found.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Antimicrobial Tab Content -->
+  <div *ngIf="activeTab === 'antimicrobial'"> 
+    <!-- Antimicrobial Form -->
+    <form (ngSubmit)="saveAntimicrobial()" #antimicrobialFormRef="ngForm" class="mb-4" novalidate>
+      <div class="mb-3">
+        <div class="input-group">
+          <input
+            type="text"
+            name="antimicrobialName"
+            #antimicrobialName="ngModel"
+            [(ngModel)]="antimicrobialForm.antimicrobialName"
+            class="form-control"
+            [class.is-invalid]="antimicrobialName.invalid && (antimicrobialName.dirty || antimicrobialName.touched)"
+            [class.is-valid]="antimicrobialName.valid && (antimicrobialName.dirty || antimicrobialName.touched)"
+            placeholder="Enter antimicrobial name"
+            required
+            maxlength="100"
+            minlength="2"
+          />
+          <button class="btn btn-primary" type="submit" [disabled]="antimicrobialFormRef.invalid || isSubmitting">
+            <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+            {{ editingAntimicrobial ? 'Update' : 'Create' }}
+          </button>
+          <button
+            *ngIf="editingAntimicrobial"
+            class="btn btn-secondary"
+            type="button"
+            (click)="resetAntimicrobialForm()"
+          >
+            Cancel
+          </button>
+        </div>
+        
+        <!-- Field-specific validation messages -->
+        <div *ngIf="antimicrobialName.invalid && (antimicrobialName.dirty || antimicrobialName.touched)" class="invalid-feedback d-block">
+          <div *ngIf="antimicrobialName.errors?.['required']">
+            <i class="bi bi-exclamation-circle me-1"></i>Antimicrobial name is required.
+          </div>
+          <div *ngIf="antimicrobialName.errors?.['minlength']">
+            <i class="bi bi-exclamation-circle me-1"></i>Antimicrobial name must be at least 2 characters long.
+          </div>
+          <div *ngIf="antimicrobialName.errors?.['maxlength']">
+            <i class="bi bi-exclamation-circle me-1"></i>Antimicrobial name cannot exceed 100 characters.
+          </div>
+        </div>
+        
+        <!-- Character counter -->
+        <small class="form-text text-muted">
+          {{ antimicrobialForm.antimicrobialName.length || 0 }}/100 characters
+        </small>
+      </div>
+    </form>
+
+    <!-- Search Input -->
+    <input type="text" [(ngModel)]="antimicrobialSearchTerm" placeholder="Search antimicrobials..." class="form-control mb-2">
+    
+    <!-- Search Results List -->
+    <ul *ngIf="antimicrobialSearchTerm" class="list-unstyled mb-3">
+      <li *ngFor="let antimicrobial of filteredAntimicrobials()" class="p-2 border-bottom">
+        <span [innerHTML]="antimicrobial.antimicrobialName | highlight:antimicrobialSearchTerm"></span>
+      </li>
+    </ul>
+
+    <!-- Antimicrobial List -->
+    <div class="card">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">Antimicrobials</h5>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Antimicrobial Name</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let antimicrobial of filteredAntimicrobials()">
+              <td>{{ antimicrobial.antimicrobialName }}</td>
+              <td>
+                <button
+                  class="btn btn-sm btn-outline-warning me-2"
+                  (click)="editAntimicrobial(antimicrobial)"
+                  title="Edit"
+                  [disabled]="isSubmitting"
+                >
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="deleteAntimicrobial(antimicrobial.antimicrobialID!)"
+                  title="Delete"
+                  [disabled]="isSubmitting"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="filteredAntimicrobials().length === 0">
+              <td colspan="2" class="text-center text-muted py-3">
+                No antimicrobials found.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Congenital Infection Organism Tab Content -->
+  <div *ngIf="activeTab === 'congenitalInfectionOrganism'"> 
+    <!-- Congenital Infection Organism Form -->
+    <form (ngSubmit)="saveCongenitalInfectionOrganism()" #congenitalInfectionOrganismFormRef="ngForm" class="mb-4" novalidate>
+      <div class="mb-3">
+        <div class="input-group">
+          <input
+            type="text"
+            name="congenitalInfectionOrganismName"
+            #congenitalInfectionOrganismName="ngModel"
+            [(ngModel)]="congenitalInfectionOrganismForm.congenitalInfectionOrganismName"
+            class="form-control"
+            [class.is-invalid]="congenitalInfectionOrganismName.invalid && (congenitalInfectionOrganismName.dirty || congenitalInfectionOrganismName.touched)"
+            [class.is-valid]="congenitalInfectionOrganismName.valid && (congenitalInfectionOrganismName.dirty || congenitalInfectionOrganismName.touched)"
+            placeholder="Enter congenital infection organism name"
+            required
+            maxlength="100"
+            minlength="2"
+          />
+          <button class="btn btn-primary" type="submit" [disabled]="congenitalInfectionOrganismFormRef.invalid || isSubmitting">
+            <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+            {{ editingCongenitalInfectionOrganism ? 'Update' : 'Create' }}
+          </button>
+          <button
+            *ngIf="editingCongenitalInfectionOrganism"
+            class="btn btn-secondary"
+            type="button"
+            (click)="resetCongenitalInfectionOrganismForm()"
+          >
+            Cancel
+          </button>
+        </div>
+        
+        <!-- Field-specific validation messages -->
+        <div *ngIf="congenitalInfectionOrganismName.invalid && (congenitalInfectionOrganismName.dirty || congenitalInfectionOrganismName.touched)" class="invalid-feedback d-block">
+          <div *ngIf="congenitalInfectionOrganismName.errors?.['required']">
+            <i class="bi bi-exclamation-circle me-1"></i>Congenital infection organism name is required.
+          </div>
+          <div *ngIf="congenitalInfectionOrganismName.errors?.['minlength']">
+            <i class="bi bi-exclamation-circle me-1"></i>Congenital infection organism name must be at least 2 characters long.
+          </div>
+          <div *ngIf="congenitalInfectionOrganismName.errors?.['maxlength']">
+            <i class="bi bi-exclamation-circle me-1"></i>Congenital infection organism name cannot exceed 100 characters.
+          </div>
+        </div>
+        
+        <!-- Character counter -->
+        <small class="form-text text-muted">
+          {{ congenitalInfectionOrganismForm.congenitalInfectionOrganismName.length || 0 }}/100 characters
+        </small>
+      </div>
+    </form>
+
+    <!-- Search Input -->
+    <input type="text" [(ngModel)]="congenitalInfectionOrganismSearchTerm" placeholder="Search congenital infection organisms..." class="form-control mb-2">
+    
+    <!-- Search Results List -->
+    <ul *ngIf="congenitalInfectionOrganismSearchTerm" class="list-unstyled mb-3">
+      <li *ngFor="let congenitalInfectionOrganism of filteredCongenitalInfectionOrganisms()" class="p-2 border-bottom">
+        <span [innerHTML]="congenitalInfectionOrganism.congenitalInfectionOrganismName | highlight:congenitalInfectionOrganismSearchTerm"></span>
+      </li>
+    </ul>
+
+    <!-- Congenital Infection Organism List -->
+    <div class="card">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">Congenital Infection Organisms</h5>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Congenital Infection Organism Name</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let congenitalInfectionOrganism of filteredCongenitalInfectionOrganisms()">
+              <td>{{ congenitalInfectionOrganism.congenitalInfectionOrganismName }}</td>
+              <td>
+                <button
+                  class="btn btn-sm btn-outline-warning me-2"
+                  (click)="editCongenitalInfectionOrganism(congenitalInfectionOrganism)"
+                  title="Edit"
+                  [disabled]="isSubmitting"
+                >
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="deleteCongenitalInfectionOrganism(congenitalInfectionOrganism.congenitalInfectionOrganismID!)"
+                  title="Delete"
+                  [disabled]="isSubmitting"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="filteredCongenitalInfectionOrganisms().length === 0">
+              <td colspan="2" class="text-center text-muted py-3">
+                No congenital infection organisms found.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sonar Finding Tab Content -->
+  <div *ngIf="activeTab === 'sonarFinding'"> 
+    <!-- Sonar Finding Form -->
+    <form (ngSubmit)="saveSonarFinding()" #sonarFindingFormRef="ngForm" class="mb-4" novalidate>
+      <div class="mb-3">
+        <div class="input-group">
+          <input
+            type="text"
+            name="sonarFindingName"
+            #sonarFindingName="ngModel"
+            [(ngModel)]="sonarFindingForm.sonarFindingName"
+            class="form-control"
+            [class.is-invalid]="sonarFindingName.invalid && (sonarFindingName.dirty || sonarFindingName.touched)"
+            [class.is-valid]="sonarFindingName.valid && (sonarFindingName.dirty || sonarFindingName.touched)"
+            placeholder="Enter sonar finding name"
+            required
+            maxlength="100"
+            minlength="2"
+          />
+          <button class="btn btn-primary" type="submit" [disabled]="sonarFindingFormRef.invalid || isSubmitting">
+            <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+            {{ editingSonarFinding ? 'Update' : 'Create' }}
+          </button>
+          <button
+            *ngIf="editingSonarFinding"
+            class="btn btn-secondary"
+            type="button"
+            (click)="resetSonarFindingForm()"
+          >
+            Cancel
+          </button>
+        </div>
+        
+        <!-- Field-specific validation messages -->
+        <div *ngIf="sonarFindingName.invalid && (sonarFindingName.dirty || sonarFindingName.touched)" class="invalid-feedback d-block">
+          <div *ngIf="sonarFindingName.errors?.['required']">
+            <i class="bi bi-exclamation-circle me-1"></i>Sonar finding name is required.
+          </div>
+          <div *ngIf="sonarFindingName.errors?.['minlength']">
+            <i class="bi bi-exclamation-circle me-1"></i>Sonar finding name must be at least 2 characters long.
+          </div>
+          <div *ngIf="sonarFindingName.errors?.['maxlength']">
+            <i class="bi bi-exclamation-circle me-1"></i>Sonar finding name cannot exceed 100 characters.
+          </div>
+        </div>
+        
+        <!-- Character counter -->
+        <small class="form-text text-muted">
+          {{ sonarFindingForm.sonarFindingName.length || 0 }}/100 characters
+        </small>
+      </div>
+    </form>
+
+    <!-- Search Input -->
+    <input type="text" [(ngModel)]="sonarFindingSearchTerm" placeholder="Search sonar findings..." class="form-control mb-2">
+    
+    <!-- Search Results List -->
+    <ul *ngIf="sonarFindingSearchTerm" class="list-unstyled mb-3">
+      <li *ngFor="let sonarFinding of filteredSonarFindings()" class="p-2 border-bottom">
+        <span [innerHTML]="sonarFinding.sonarFindingName | highlight:sonarFindingSearchTerm"></span>
+      </li>
+    </ul>
+
+    <!-- Sonar Finding List -->
+    <div class="card">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">Sonar Findings</h5>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Sonar Finding Name</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let sonarFinding of filteredSonarFindings()">
+              <td>{{ sonarFinding.sonarFindingName }}</td>
+              <td>
+                <button
+                  class="btn btn-sm btn-outline-warning me-2"
+                  (click)="editSonarFinding(sonarFinding)"
+                  title="Edit"
+                  [disabled]="isSubmitting"
+                >
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="deleteSonarFinding(sonarFinding.sonarFindingID!)"
+                  title="Delete"
+                  [disabled]="isSubmitting"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="filteredSonarFindings().length === 0">
+              <td colspan="2" class="text-center text-muted py-3">
+                No sonar findings found.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>

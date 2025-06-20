@@ -1,0 +1,17 @@
+<div *nzModalTitle>
+  <h5 class="modal-title">My Profile</h5>
+</div>
+<div>
+  <div class="modal-body">
+    <p><strong>First Name:</strong> {{ user?.firstName }}</p>
+    <p><strong>Last Name:</strong> {{ user?.lastName }}</p>
+    <p><strong>Email:</strong> {{ user?.email }}</p>
+    <p><strong>HPCSA Number:</strong> {{ user?.usernumber }}</p>
+    <p><strong>Role:</strong> {{ user?.role }}</p>
+  </div>
+</div>
+
+<div *nzModalFooter class="modal-footer">
+  <button nz-button (click)="close()">Close</button>
+  <button nz-button nzType="primary">Edit</button>
+</div>

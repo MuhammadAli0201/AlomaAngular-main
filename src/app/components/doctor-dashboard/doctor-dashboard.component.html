@@ -1,0 +1,60 @@
+<nz-layout style="height: 100vh">
+  <nz-sider nzCollapsible [(nzCollapsed)]="isCollapsed" [nzTrigger]="null">
+    <div class="logo">
+      <a *ngIf="!isCollapsed" class="navbar-brand fw-bold text-white"
+        >Doctor Dashboard</a
+      >
+    </div>
+    <ul nz-menu nzTheme="dark" nzMode="inline">
+      <li nz-submenu nzOpen nzTitle="Patient" nzIcon="user">
+        <ul>
+          <li
+            nz-menu-item
+            routerLink="/doctor-dashboard/patients"
+            nzMatchRouter
+          >
+            All
+          </li>
+          <li nz-menu-item routerLink="/doctor-dashboard/patient" nzMatchRouter>
+            Create
+          </li>
+        </ul>
+      </li>
+      <li
+        style="
+          position: absolute;
+          bottom: 0;
+          background-color: rgba(255, 255, 255, 0.2);
+        "
+        nz-menu-item
+        (click)="logout()"
+      >
+        <nz-icon nzType="logout" nzTheme="outline" />
+        <span>Logout</span>
+      </li>
+    </ul>
+  </nz-sider>
+  <nz-layout>
+    <nz-header>
+      <div nz-flex nzAlign="center" nzJustify="space-between">
+        <i
+          nz-icon
+          class="trigger"
+          [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"
+          (click)="isCollapsed = !isCollapsed"
+        ></i>
+        <h4 class="fw-bold">Doctor Dashboard</h4>
+        <a
+          class="nav-link me-3"
+          (click)="openProfileModal()"
+          style="cursor: pointer"
+        >
+          <i class="bi bi-person-circle fs-4"></i>
+        </a>
+      </div>
+    </nz-header>
+    <nz-content class="main-content p-3" style="overflow: auto">
+      <router-outlet></router-outlet>
+    </nz-content>
+  </nz-layout>
+</nz-layout>

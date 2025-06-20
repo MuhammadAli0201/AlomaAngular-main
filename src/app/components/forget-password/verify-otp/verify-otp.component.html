@@ -1,0 +1,46 @@
+<div class="outer">
+  <div class="container">
+    <div class="row">
+      <div class="offset-md-2 col-lg-5 col-md-7 offset-lg-4 o ffset-md-3">
+        <div class="panel border bg-white">
+          <div class="panel-heading">
+            <h3 class="pt-3 font-weight-bold">Verify Otp</h3>
+          </div>
+          <div class="panel-body p-3">
+            <form [formGroup]="otpForm">
+              <div class="form-group pt-3">
+                <p class="text-muted">We've sent an Otp to your email ({{email}}). Please enter otp here.</p>
+                <nz-form-item>
+                  <nz-form-control [nzErrorTip]="errorTpl">
+                    <div class="input-field">
+                      <span class="fa fa-user pt-2"></span>
+                      <input
+                        nz-input
+                        formControlName="otp"
+                        type="text"
+                        placeholder="Enter your Otp"
+                      />
+                    </div>
+
+                    <ng-template #errorTpl let-control>
+                      <ng-container *ngIf="control.hasError('required')">
+                        <span class="text-danger">Otp is required</span>
+                      </ng-container>
+                    </ng-template>
+                  </nz-form-control>
+                </nz-form-item>
+              </div>
+              <button
+                (click)="verifyOtp()"
+                type="submit"
+                class="btn btn-primary btn-block mt-4 w-100"
+              >
+                Verify
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
