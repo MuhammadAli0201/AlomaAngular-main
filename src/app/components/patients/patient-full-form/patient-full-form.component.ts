@@ -8,6 +8,7 @@ import { ActivatedRoute, TitleStrategy } from '@angular/router';
 import { Patient } from '../../../models/patient';
 import { PatientService } from '../../../services/patient.service';
 import { finalize, mergeMap, switchMap, tap } from 'rxjs';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-patient-full-form',
@@ -253,7 +254,7 @@ export class PatientFullFormComponent implements OnInit {
     { label: 'Breastmilk and formula', value: 'Mixed' }
   ];
 
-  constructor(private fb: FormBuilder, private patientCompleteInfoService: PatientCompleteInfoService,
+  constructor(private fb: FormBuilder, private patientCompleteInfoService: PatientCompleteInfoService, private authService:AuthService,
     private nzNotificationService: NzNotificationService, private activatedRoute: ActivatedRoute, private patientService: PatientService
   ) { }
 
@@ -411,6 +412,9 @@ export class PatientFullFormComponent implements OnInit {
         .subscribe({});
     }
   }
+
+  //UI LOGIC
+    isAdmin = (): boolean => this.authService.getRole()?.toLowerCase() === 'admin';
 
   onSubmit(): void {
     if (this.diagnosisForm.valid) {

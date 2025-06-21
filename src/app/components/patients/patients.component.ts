@@ -31,11 +31,14 @@ export class PatientsComponent implements OnInit {
 
   //NAVIGATIONS
   edit(id: string): void {
-    if (this.authService.getRole()?.toLocaleLowerCase() === 'doctor') {
+    if (this.authService.getRole()?.toLowerCase() === 'doctor') {
       this.router.navigate([`/doctor-dashboard/patient/${id}`]);
     }
-    else {
+    else if (this.authService.getRole()?.toLowerCase() === 'intern') {
       this.router.navigate([`/intern-dashboard/patient/${id}`]);
+    }
+    else {
+      this.router.navigate([`/admin-dashboard/patient/${id}`]);
     }
   }
 }

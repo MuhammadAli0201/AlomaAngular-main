@@ -100,7 +100,8 @@ const routes: Routes = [
         path: 'users', component: ManageUsersComponent,
         canActivate: [authGuard, roleGuard],
         data: { expectedRole: 'Admin' }
-      }
+      },
+      ...patientRoutes
     ]
   },
 

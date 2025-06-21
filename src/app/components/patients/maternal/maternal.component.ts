@@ -113,7 +113,15 @@ export class MaternalComponent implements OnInit {
 
   }
 
+  //UI LOGIC
+  isAdmin = (): boolean => this.authService.getRole()?.toLowerCase() === 'admin';
+
   onSubmit(): void {
+    if (this.isAdmin()) {
+      this.router.navigate(["admin-dashboard", "patient", this.patient.id, "full"]);
+      return;
+    }
+
     if (this.motherForm.valid) {
       this.btnLoading = true;
       this.maternalService.createOrUpdateMaternal(this.motherForm.getRawValue()).subscribe({
@@ -123,7 +131,7 @@ export class MaternalComponent implements OnInit {
           if (this.authService.getRole()?.toLowerCase() === "doctor") {
             this.router.navigate(["doctor-dashboard", "patient", this.patient.id, "full"]);
           }
-          else {
+          else if (this.authService.getRole()?.toLowerCase() === "intern") {
             this.router.navigate(["intern-dashboard", "patient", this.patient.id, "full"]);
           }
         },

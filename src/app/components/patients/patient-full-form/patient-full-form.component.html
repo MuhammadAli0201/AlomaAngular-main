@@ -1542,6 +1542,7 @@
         nzType="primary"
         (click)="onSubmit()"
         [nzLoading]="btnLoading"
+        [disabled]="isAdmin()"
       >
         Save
       </button>

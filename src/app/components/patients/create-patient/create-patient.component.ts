@@ -110,10 +110,10 @@ export class CreatePatientComponent {
       birthHivPcr: [null, Validators.required],
       headCircumference: [null, [strictDecimalValidator()]],
       footLength: [null, [strictDecimalValidator()]],
-      lengthAtBirth: [null,[strictDecimalValidator()]],
+      lengthAtBirth: [null, [strictDecimalValidator()]],
       diedInDeliveryRoom: [null, Validators.required],
       diedWithin12Hours: [null, Validators.required],
-      initialTemperature: [null,[strictDecimalValidator()]]
+      initialTemperature: [null, [strictDecimalValidator()]]
     });
 
     const id = this.activeRoute.parent?.snapshot.params['id'];
@@ -141,8 +141,14 @@ export class CreatePatientComponent {
 
   //UI LOGIC
   disableDate = (date: Date): boolean => date > new Date();
+  isAdmin = (): boolean => this.authService.getRole()?.toLowerCase() === 'admin';
 
   onSubmit(): void {
+    if (this.isAdmin()) {
+      this.router.navigate(['admin-dashboard', 'patient', this.patient.id, 'maternal'])
+      return;
+    }
+
     if (this.patientForm.valid) {
       this.btnLoading = true;
       this.patientService.createPatient(this.patientForm.getRawValue())
@@ -151,9 +157,10 @@ export class CreatePatientComponent {
             if (this.authService.getRole()?.toLowerCase() === "doctor") {
               this.router.navigate(['doctor-dashboard', 'patient', res.id, 'maternal'])
             }
-            else {
+            else if (this.authService.getRole()?.toLowerCase() === "intern") {
               this.router.navigate(['intern-dashboard', 'patient', res.id, 'maternal'])
             }
+
             this.btnLoading = false
           },
           error: (err) => {

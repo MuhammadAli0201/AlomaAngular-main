@@ -8,6 +8,20 @@
       >
     </div>
     <ul nz-menu nzTheme="dark" nzMode="inline">
+      <li nz-submenu nzOpen nzTitle="Patient" nzIcon="user">
+        <ul>
+          <li
+            nz-menu-item
+            routerLink="/admin-dashboard/patients"
+            nzMatchRouter
+          >
+            All
+          </li>
+          <li nz-menu-item routerLink="/admin-dashboard/patient" nzMatchRouter>
+            Create
+          </li>
+        </ul>
+      </li>
       <li nz-menu-item routerLink="/admin-dashboard/users" nzMatchRouter>
         <nz-icon nzType="user" />
         <span>Manage Users</span>
