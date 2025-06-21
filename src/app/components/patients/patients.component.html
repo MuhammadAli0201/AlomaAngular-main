@@ -12,7 +12,7 @@
     @for (data of basicTable.data; track data) {
     <tr>
       <td>{{ data.name | uppercase }}</td>
-      <td>{{ data.dateOfBirth }}</td>
+      <td>{{ data.dateOfBirth | date }}</td>
       <td>{{ data.hospitalNumber }}</td>
       <td>{{ data.gender }}</td>
       <td>

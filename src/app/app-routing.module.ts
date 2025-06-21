@@ -10,18 +10,38 @@ import { InternDashboardComponent } from './components/intern-dashboard/intern-d
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
 import { ManageFormTemplateComponent } from './components/manage-form-template/manage-form-template.component';
 import { HelpResourceComponent } from './components/help-resource/help-resource.component';
-import { AdminWelcomeComponent } from './components/admin-welcome/admin-welcome.component';
+import { AdminWelcomeComponent } from './components/admin-dashboard/admin-welcome/admin-welcome.component';
 import { ManageUsersComponent } from './components/manage-users/manage-users.component';
 import { ForgetPasswordComponent } from './components/forget-password/forget-password.component';
 import { VerifyOtpComponent } from './components/forget-password/verify-otp/verify-otp.component';
 import { NewPasswordComponent } from './components/forget-password/new-password/new-password.component';
-import { DoctorWelcomeComponent } from './components/doctor-welcome/doctor-welcome.component';
+import { DoctorWelcomeComponent } from './components/doctor-dashboard/doctor-welcome/doctor-welcome.component';
 import { PatientsComponent } from './components/patients/patients.component';
 import { PatientComponent } from './components/patients/patient/patient.component';
 import { MaternalComponent } from './components/patients/maternal/maternal.component';
 import { CreatePatientComponent } from './components/patients/create-patient/create-patient.component';
 import { PatientFullFormComponent } from './components/patients/patient-full-form/patient-full-form.component';
+import { InternWelcomeComponent } from './components/intern-dashboard/intern-welcome/intern-welcome.component';
 
+const patientRoutes: Routes = [
+  { path: 'patients', component: PatientsComponent },
+  {
+    path: 'patient', component: PatientComponent,
+    children: [
+      { path: '', redirectTo: 'create', pathMatch: 'full' },
+      { path: 'create', component: CreatePatientComponent }
+    ]
+  },
+  {
+    path: 'patient/:id', component: PatientComponent,
+    children: [
+      { path: '', redirectTo: 'create', pathMatch: 'full' },
+      { path: 'create', component: CreatePatientComponent },
+      { path: 'maternal', component: MaternalComponent },
+      { path: 'full', component: PatientFullFormComponent },
+    ]
+  },
+];
 
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -39,30 +59,18 @@ const routes: Routes = [
     children: [
       { path: '', redirectTo: 'welcome', pathMatch: 'full' },
       { path: 'welcome', component: DoctorWelcomeComponent, },
-      { path: 'patients', component: PatientsComponent },
-      {
-        path: 'patient', component: PatientComponent,
-        children: [
-          { path: '', redirectTo: 'create', pathMatch: 'full' },
-          { path: 'create', component: CreatePatientComponent }
-        ]
-      },
-      {
-        path: 'patient/:id', component: PatientComponent,
-        children: [
-          { path: '', redirectTo: 'create', pathMatch: 'full' },
-          { path: 'create', component: CreatePatientComponent },
-          { path: 'maternal', component: MaternalComponent },
-          { path: 'full', component: PatientFullFormComponent },
-        ]
-      },
+      ...patientRoutes
     ]
   },
   {
     path: 'intern-dashboard',
     component: InternDashboardComponent,
     canActivate: [authGuard, roleGuard],
-    data: { expectedRole: 'Intern' }
+    data: { expectedRole: 'Intern' },
+    children: [
+      { path: "", component: InternWelcomeComponent },
+      ...patientRoutes
+    ]
   },
   {
     path: 'admin-dashboard',

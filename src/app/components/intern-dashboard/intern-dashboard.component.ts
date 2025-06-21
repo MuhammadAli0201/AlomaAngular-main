@@ -12,15 +12,16 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 })
 export class InternDashboardComponent implements OnInit {
   private user: any;
+  isCollapsed: boolean = false;
   constructor(private auth: AuthService, private modalService: NzModalService) { }
 
   ngOnInit(): void {
     this.auth.getCurrentUser().subscribe({
       next: (data: any) => {
-        this.user = data; 
+        this.user = data;
       },
       error: (err: any) => console.error(err)
-    }); 
+    });
   }
 
   logout() {

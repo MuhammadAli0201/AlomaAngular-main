@@ -63,40 +63,52 @@
     </div>
 
     <nz-form-item>
-      <nz-form-control nzErrorTip="Age is required">
-        <nz-form-label nzRequired>Age on admission</nz-form-label>
-        <input
-          nz-input
-          type="number"
-          formControlName="ageOnAdmission"
-          placeholder="Enter age on admission"
-        />
+      <nz-form-control [nzErrorTip]="ageOnAdmissionErrorTpl">
+        <nz-form-label [nzFor]="'ageOnAdmission'" nzRequired
+          >Age on Admission</nz-form-label
+        >
+        <input nz-input formControlName="ageOnAdmission" />
       </nz-form-control>
     </nz-form-item>
+    <ng-template #ageOnAdmissionErrorTpl let-control>
+      <span *ngIf="control.hasError('required')"
+        >Age on admission is required.</span
+      >
+      <span *ngIf="control.hasError('invalidDecimal')"
+        >Please enter a valid number.</span
+      >
+    </ng-template>
 
     <nz-form-item>
-      <nz-form-control nzErrorTip="Birth weight is required">
-        <nz-form-label nzRequired>Birth weight (g)</nz-form-label>
-        <input
-          nz-input
-          type="number"
-          formControlName="birthWeight"
-          placeholder="Enter birth weight in grams"
-        />
+      <nz-form-control [nzErrorTip]="birthWeightErrorTpl">
+        <nz-form-label [nzFor]="'birthWeight'" nzRequired
+          >Birth Weight</nz-form-label
+        >
+        <input nz-input formControlName="birthWeight" id="birthWeight" />
       </nz-form-control>
     </nz-form-item>
+    <ng-template #birthWeightErrorTpl let-control>
+      <span *ngIf="control.hasError('required')"
+        >Birth weight is required.</span
+      >
+      <span *ngIf="control.hasError('invalidDecimal')"
+        >Please enter a valid number.</span
+      >
+    </ng-template>
 
     <nz-form-item>
-      <nz-form-control>
-        <nz-form-label>Gestational age (weeks)</nz-form-label>
-        <input
-          nz-input
-          type="number"
-          formControlName="gestationalAge"
-          placeholder="Enter gestational age"
-        />
+      <nz-form-control [nzErrorTip]="gestationalAgeErrorTpl">
+        <nz-form-label [nzFor]="'gestationalAge'"
+          >Gestational Age</nz-form-label
+        >
+        <input nz-input formControlName="gestationalAge" id="gestationalAge" />
       </nz-form-control>
     </nz-form-item>
+    <ng-template #gestationalAgeErrorTpl let-control>
+      <span *ngIf="control.hasError('invalidDecimal')"
+        >Please enter a valid number.</span
+      >
+    </ng-template>
 
     <div nz-row [nzGutter]="12">
       <div nz-col [nzSpan]="12">
@@ -233,39 +245,51 @@
     </nz-form-item>
 
     <nz-form-item>
-      <nz-form-control>
+      <nz-form-control [nzErrorTip]="headCircumferenceErrorTpl">
         <nz-form-label>Head circumference at birth (cm)</nz-form-label>
         <input
           nz-input
-          type="number"
           formControlName="headCircumference"
           placeholder="Enter head circumference"
         />
       </nz-form-control>
+      <ng-template #headCircumferenceErrorTpl let-control>
+        <span *ngIf="control.hasError('invalidDecimal')"
+          >Please enter a valid number.</span
+        >
+      </ng-template>
     </nz-form-item>
 
     <nz-form-item>
-      <nz-form-control>
+      <nz-form-control [nzErrorTip]="footLengthErrorTpl">
         <nz-form-label>Foot length at birth (cm)</nz-form-label>
         <input
           nz-input
-          type="number"
           formControlName="footLength"
           placeholder="Enter foot length"
         />
       </nz-form-control>
+      <ng-template #footLengthErrorTpl let-control>
+        <span *ngIf="control.hasError('invalidDecimal')"
+          >Please enter a valid number.</span
+        >
+      </ng-template>
     </nz-form-item>
 
     <nz-form-item>
-      <nz-form-control>
+      <nz-form-control [nzErrorTip]="lengthAtBirthErrorTpl">
         <nz-form-label>Length / height at birth (cm)</nz-form-label>
         <input
           nz-input
-          type="number"
           formControlName="lengthAtBirth"
           placeholder="Enter length/height at birth"
         />
       </nz-form-control>
+      <ng-template #lengthAtBirthErrorTpl let-control>
+        <span *ngIf="control.hasError('invalidDecimal')"
+          >Please enter a valid number.</span
+        >
+      </ng-template>
     </nz-form-item>
 
     <div nz-row [nzGutter]="12">
@@ -309,7 +333,7 @@
     </div>
 
     <nz-form-item>
-      <nz-form-control>
+      <nz-form-control [nzErrorTip]="initialTemperatureErrorTpl">
         <nz-form-label>Initial temperature in first hour</nz-form-label>
         <input
           nz-input
@@ -317,6 +341,11 @@
           placeholder="Enter initial temperature"
         />
       </nz-form-control>
+      <ng-template #initialTemperatureErrorTpl let-control>
+      <span *ngIf="control.hasError('invalidDecimal')"
+        >Please enter a valid number.</span
+      >
+    </ng-template>
     </nz-form-item>
 
     <div style="text-align: right; margin-top: 24px">

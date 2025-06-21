@@ -5,6 +5,8 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Patient } from '../../../models/patient';
 import { PatientService } from '../../../services/patient.service';
 import { EMPTY_GUID } from '../../../constants/constants';
+import { AuthService } from '../../../services/auth.service';
+import { strictDecimalValidator } from '../../../validators/strict-decimal';
 
 @Component({
   selector: 'app-create-patient',
@@ -85,7 +87,7 @@ export class CreatePatientComponent {
 
   //LIFE CYCLES
   constructor(private fb: FormBuilder, private patientService: PatientService, private router: Router,
-    private activeRoute: ActivatedRoute, private notificationService: NzNotificationService) { }
+    private activeRoute: ActivatedRoute, private notificationService: NzNotificationService, private authService: AuthService) { }
 
   ngOnInit(): void {
     this.patientForm = this.fb.group({
@@ -95,9 +97,9 @@ export class CreatePatientComponent {
       surname: ['', Validators.required],
       dateOfBirth: [null, Validators.required],
       dateOfAdmission: [null, Validators.required],
-      ageOnAdmission: [null, Validators.required],
-      birthWeight: [null, Validators.required],
-      gestationalAge: [null],
+      ageOnAdmission: [null, [Validators.required, strictDecimalValidator()]],
+      birthWeight: [null, [Validators.required, strictDecimalValidator()]],
+      gestationalAge: [null, strictDecimalValidator()],
       gender: [null, Validators.required],
       placeOfBirth: [null, Validators.required],
       modeOfDelivery: [null, Validators.required],
@@ -106,12 +108,12 @@ export class CreatePatientComponent {
       outcomeStatus: [null, Validators.required],
       transferHospital: [''],
       birthHivPcr: [null, Validators.required],
-      headCircumference: [null],
-      footLength: [null],
-      lengthAtBirth: [null],
+      headCircumference: [null, [strictDecimalValidator()]],
+      footLength: [null, [strictDecimalValidator()]],
+      lengthAtBirth: [null,[strictDecimalValidator()]],
       diedInDeliveryRoom: [null, Validators.required],
       diedWithin12Hours: [null, Validators.required],
-      initialTemperature: [null]
+      initialTemperature: [null,[strictDecimalValidator()]]
     });
 
     const id = this.activeRoute.parent?.snapshot.params['id'];
@@ -141,13 +143,17 @@ export class CreatePatientComponent {
   disableDate = (date: Date): boolean => date > new Date();
 
   onSubmit(): void {
-    console.log(this.patientForm.value)
     if (this.patientForm.valid) {
       this.btnLoading = true;
       this.patientService.createPatient(this.patientForm.getRawValue())
         .subscribe({
           next: (res) => {
-            this.router.navigate(['doctor-dashboard', 'patient', res.id, 'maternal'])
+            if (this.authService.getRole()?.toLowerCase() === "doctor") {
+              this.router.navigate(['doctor-dashboard', 'patient', res.id, 'maternal'])
+            }
+            else {
+              this.router.navigate(['intern-dashboard', 'patient', res.id, 'maternal'])
+            }
             this.btnLoading = false
           },
           error: (err) => {

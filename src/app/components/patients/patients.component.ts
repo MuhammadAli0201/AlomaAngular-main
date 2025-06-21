@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Patient } from '../../models/patient';
 import { PatientService } from '../../services/patient.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-patients',
@@ -14,7 +15,8 @@ export class PatientsComponent implements OnInit {
   patients: Patient[] = [];
 
   //LIFE CYCLE HOOKS
-  constructor(private router: Router, private patientService: PatientService, private notificationService: NzNotificationService) { }
+  constructor(private router: Router, private patientService: PatientService,
+    private notificationService: NzNotificationService, private authService: AuthService) { }
 
   ngOnInit(): void {
     this.patientService.getAllPatients().subscribe({
@@ -28,7 +30,12 @@ export class PatientsComponent implements OnInit {
   }
 
   //NAVIGATIONS
-  edit(id:string): void {
-    this.router.navigate([`/doctor-dashboard/patient/${id}`]);
+  edit(id: string): void {
+    if (this.authService.getRole()?.toLocaleLowerCase() === 'doctor') {
+      this.router.navigate([`/doctor-dashboard/patient/${id}`]);
+    }
+    else {
+      this.router.navigate([`/intern-dashboard/patient/${id}`]);
+    }
   }
 }

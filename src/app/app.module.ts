@@ -18,7 +18,7 @@ import { ManageFormTemplateComponent } from './components/manage-form-template/m
 import { ProfileModalComponent } from './components/profile-modal/profile-modal.component';
 import { HelpResourceComponent } from './components/help-resource/help-resource.component';
 import { HighlightPipe } from './pipes/highlight.pipe';
-import { AdminWelcomeComponent } from './components/admin-welcome/admin-welcome.component';
+import { AdminWelcomeComponent } from './components/admin-dashboard/admin-welcome/admin-welcome.component';
 import { provideNzI18n } from 'ng-zorro-antd/i18n';
 import { en_US } from 'ng-zorro-antd/i18n';
 import { registerLocaleData } from '@angular/common';
@@ -35,6 +35,7 @@ import { PatientComponent } from './components/patients/patient/patient.componen
 import { MaternalComponent } from './components/patients/maternal/maternal.component'; 
 import { CreatePatientComponent } from './components/patients/create-patient/create-patient.component';
 import { PatientFullFormComponent } from './components/patients/patient-full-form/patient-full-form.component';
+import { InternWelcomeComponent } from './components/intern-dashboard/intern-welcome/intern-welcome.component';
 
 registerLocaleData(en);
 
@@ -59,7 +60,8 @@ registerLocaleData(en);
     PatientComponent, 
     MaternalComponent,
     CreatePatientComponent,
-    PatientFullFormComponent
+    PatientFullFormComponent,
+    InternWelcomeComponent
   ],
   imports: [
     BrowserModule,

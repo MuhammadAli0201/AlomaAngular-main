@@ -8,6 +8,8 @@ import { MaternalService } from '../../../services/maternal.service';
 import { Maternal } from '../../../models/maternal';
 import { tap, switchMap, finalize } from 'rxjs';
 import { EMPTY_GUID } from '../../../constants/constants';
+import { AuthService } from '../../../services/auth.service';
+import { strictDecimalValidator } from '../../../validators/strict-decimal';
 
 @Component({
   selector: 'app-maternal',
@@ -51,7 +53,7 @@ export class MaternalComponent implements OnInit {
   //LIFE CYCLES
   constructor(private activatedRoute: ActivatedRoute, private notificationService: NzNotificationService,
     private fb: FormBuilder, private patientService: PatientService, private maternalService: MaternalService,
-  private router:Router) { }
+    private router: Router, private authService: AuthService) { }
 
   ngOnInit(): void {
     this.motherForm = this.fb.group({
@@ -60,7 +62,7 @@ export class MaternalComponent implements OnInit {
       hospitalNumber: ['', [Validators.required]],
       name: ['', [Validators.required]],
       surname: ['', [Validators.required]],
-      age: [null, [Validators.required]],
+      age: [null, [Validators.required, strictDecimalValidator()]],
       race: [null, [Validators.required]],
       parity: [''],
       gravidity: [''],
@@ -83,7 +85,7 @@ export class MaternalComponent implements OnInit {
       neonatalAbstinence: [null],
       otherInfo: [''],
       multipleGestations: [null],
-      numberOfBabies: [null]
+      numberOfBabies: [null, [strictDecimalValidator()]]
     });
 
     const id = this.activatedRoute.parent?.snapshot.params["id"];
@@ -118,7 +120,12 @@ export class MaternalComponent implements OnInit {
         next: res => {
           this.motherForm.patchValue(res),
             this.btnLoading = false;
-            this.router.navigate(["doctor-dashboard","patient", this.patient.id, "full"]);
+          if (this.authService.getRole()?.toLowerCase() === "doctor") {
+            this.router.navigate(["doctor-dashboard", "patient", this.patient.id, "full"]);
+          }
+          else {
+            this.router.navigate(["intern-dashboard", "patient", this.patient.id, "full"]);
+          }
         },
         error: err => {
           this.notificationService.error('Error', err.message),

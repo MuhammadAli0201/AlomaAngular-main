@@ -29,7 +29,7 @@
     </nz-form-item>
 
     <nz-form-item>
-      <nz-form-control nzErrorTip="Name number is required"> 
+      <nz-form-control nzErrorTip="Name number is required">
         <nz-form-label nzRequired>Name</nz-form-label>
         <input nz-input formControlName="name" placeholder="Enter name" />
       </nz-form-control>
@@ -43,15 +43,16 @@
     </nz-form-item>
 
     <nz-form-item>
-      <nz-form-control nzErrorTip="Age number is required">
+      <nz-form-control [nzErrorTip]="ageErrorTpl">
         <nz-form-label nzRequired>Age</nz-form-label>
-        <input
-          nz-input
-          type="number"
-          formControlName="age"
-          placeholder="Enter age"
-        />
+        <input nz-input formControlName="age" placeholder="Enter age" />
       </nz-form-control>
+      <ng-template #ageErrorTpl let-control>
+        <span *ngIf="control.hasError('required')">Age is required.</span>
+        <span *ngIf="control.hasError('invalidDecimal')"
+          >Please enter a valid number.</span
+        >
+      </ng-template>
     </nz-form-item>
 
     <nz-form-item>
@@ -172,15 +173,19 @@
     </nz-form-item>
 
     <nz-form-item>
-      <nz-form-control>
+      <nz-form-control [nzErrorTip]="numberOfBabiesErrorTpl">
         <nz-form-label>Number of babies</nz-form-label>
         <input
           nz-input
-          type="number"
           formControlName="numberOfBabies"
           placeholder="Enter number of babies"
         />
       </nz-form-control>
+      <ng-template #numberOfBabiesErrorTpl let-control>
+        <span *ngIf="control.hasError('invalidDecimal')"
+          >Please enter a valid number.</span
+        >
+      </ng-template>
     </nz-form-item>
 
     <div style="text-align: right; margin-top: 24px">
