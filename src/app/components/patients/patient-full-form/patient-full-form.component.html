@@ -61,8 +61,8 @@
           >
             <nz-option
               *ngFor="let o of congenitalOrganisms"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.congenitalInfectionOrganismID"
+              [nzLabel]="o.congenitalInfectionOrganismName"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -112,8 +112,8 @@
           >
             <nz-option
               *ngFor="let o of bacterialOrganisms"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.organismID"
+              [nzLabel]="o.organismName"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -128,8 +128,8 @@
           <nz-select formControlName="earlyAntibiotics" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of earlyAbxOptions"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.antimicrobialID"
+              [nzLabel]="o.antimicrobialName"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -302,8 +302,8 @@
           >
             <nz-option
               *ngFor="let o of fungalOrganisms"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.fungalOrganismID"
+              [nzLabel]="o.fungalOrganismName"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -322,8 +322,8 @@
           >
             <nz-option
               *ngFor="let o of lateAbxOptions"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.antimicrobialID"
+              [nzLabel]="o.antimicrobialName"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -542,8 +542,8 @@
           >
             <nz-option
               *ngFor="let o of sonarFindingsOptions"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.sonarFindingID"
+              [nzLabel]="o.sonarFindingName"
             ></nz-option>
           </nz-select>
         </nz-form-control>

@@ -7,8 +7,13 @@ import { EMPTY_GUID } from '../../../constants/constants';
 import { ActivatedRoute, TitleStrategy } from '@angular/router';
 import { Patient } from '../../../models/patient';
 import { PatientService } from '../../../services/patient.service';
-import { finalize, mergeMap, switchMap, tap } from 'rxjs';
+import { catchError, finalize, forkJoin, mergeMap, of, subscribeOn, switchMap, tap } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
+import { CongenitalInfectionOrganism, CongenitalInfectionOrganismService } from '../../../services/congenitalinfectionorganism.service';
+import { Antimicrobial, AntimicrobialService } from '../../../services/antimicrobial.service';
+import { Organism, OrganismService } from '../../../services/organism.service';
+import { FungalOrganism, FungalOrganismService } from '../../../services/fungalorganism.service';
+import { SonarFinding, SonarFindingService } from '../../../services/sonarfinding.service';
 
 @Component({
   selector: 'app-patient-full-form',
@@ -22,6 +27,12 @@ export class PatientFullFormComponent implements OnInit {
   loading: boolean = false;
   patient!: Patient;
   patientCompleteInfo!: PatientCompleteInfo;
+  congenitalOrganisms: CongenitalInfectionOrganism[] = [];
+  bacterialOrganisms: Organism[] = [];
+  sonarFindingsOptions: SonarFinding[] = [];
+  earlyAbxOptions: Antimicrobial[] = [];
+  lateAbxOptions: Antimicrobial[] = [];
+  fungalOrganisms: FungalOrganism[] = [];
 
   yesNoUnknown = [
     { label: 'Yes', value: 'Yes' },
@@ -40,51 +51,6 @@ export class PatientFullFormComponent implements OnInit {
     { label: 'Other Hospital', value: 'OtherHospital' },
     { label: 'Both', value: 'Both' }
   ];
-  congenitalOrganisms = [
-    { label: 'Toxoplasmosis', value: 'Toxoplasmosis' },
-    { label: 'Rubella', value: 'Rubella' },
-    { label: 'Syphilis', value: 'Syphilis' },
-    { label: 'CMV', value: 'CMV' },
-    { label: 'Herpes Simplex', value: 'HerpesSimplex' },
-    { label: 'Parvovirus B19', value: 'ParvovirusB19' },
-    { label: 'Zika Virus', value: 'ZikaVirus' },
-    { label: 'Varicella Zoster', value: 'VaricellaZoster' },
-    { label: 'Listeria monocytogenes', value: 'Listeria' },
-    { label: 'Other', value: 'Other' }
-  ];
-  bacterialOrganisms = [
-    { label: 'Group B Streptococcus', value: 'GBS' },
-    { label: 'Staphylococcus Aureus', value: 'StaphAureus' },
-    { label: 'MRSA', value: 'MRSA' },
-    { label: 'Staphylococcus Epidermidis/CONS', value: 'CONS' },
-    { label: 'Streptococcus Viridans', value: 'Viridans' },
-    { label: 'Escherichia Coli', value: 'EColi' },
-    { label: 'Klebsiella pneumonia', value: 'Klebsiella' },
-    { label: 'ESBL Klebsiella', value: 'ESBL' },
-    { label: 'Enterococcus faecalis', value: 'EFaecalis' },
-    { label: 'Enterococcus faecium', value: 'EFaecium' },
-    { label: 'Acinetobacter spp.', value: 'Acinetobacter' },
-    { label: 'Pseudomonas spp.', value: 'Pseudomonas' },
-    { label: 'Stenotrophomonas spp.', value: 'Stenotrophomonas' },
-    { label: 'Listeria spp.', value: 'ListeriaSpp' },
-    { label: 'Burkholderia spp.', value: 'Burkholderia' },
-    { label: 'Serratia marcescens', value: 'Serratia' },
-    { label: 'Campylobacter spp.', value: 'Campylobacter' },
-    { label: 'Citrobacter spp.', value: 'Citrobacter' },
-    { label: 'Enterobacter spp.', value: 'Enterobacter' },
-    { label: 'Carbapenem resistant enterobacter', value: 'CRE' },
-    { label: 'Moraxella spp.', value: 'Moraxella' },
-    { label: 'Neisseria spp.', value: 'Neisseria' },
-    { label: 'Haemophilus spp.', value: 'Haemophilus' },
-    { label: 'Other', value: 'Other' }
-  ];
-  earlyAbxOptions = [
-    { label: 'None', value: 'None' },
-    { label: 'Yes – empiric only', value: 'EmpiricOnly' },
-    { label: 'Yes – directed only', value: 'DirectedOnly' },
-    { label: 'Yes – empiric & directed', value: 'Both' },
-    { label: 'Unknown', value: 'Unknown' }
-  ];
   sepsisSites = [
     { label: 'Blood', value: 'Blood' },
     { label: 'Urine', value: 'Urine' },
@@ -100,28 +66,6 @@ export class PatientFullFormComponent implements OnInit {
     { label: 'Base hospital', value: 'Base' },
     { label: 'Other hospital', value: 'OtherHospital' },
     { label: 'Both', value: 'Both' }
-  ];
-  fungalOrganisms = [
-    { label: 'Candida Albicans', value: 'CandidaAlbicans' },
-    { label: 'Candida auris', value: 'CandidaAuris' },
-    { label: 'Non albicans candida', value: 'NonAlbicans' },
-    { label: 'Other', value: 'Other' }
-  ];
-  lateAbxOptions = [
-    { label: 'Ampicillin', value: 'Ampicillin' },
-    { label: 'Gentamicin', value: 'Gentamicin' },
-    { label: 'Meropenem', value: 'Meropenem' },
-    { label: 'Vancomycin', value: 'Vancomycin' },
-    { label: 'Colistin', value: 'Colistin' },
-    { label: 'Amikacin', value: 'Amikacin' },
-    { label: 'Tazocin', value: 'Tazocin' },
-    { label: 'Trimethoprim Sulphamethoxazole', value: 'TMP_SMZ' },
-    { label: 'Azithromycin', value: 'Azithromycin' },
-    { label: 'Amphotericin', value: 'Amphotericin' },
-    { label: 'Nystatin', value: 'Nystatin' },
-    { label: 'Micafungin', value: 'Micafungin' },
-    { label: 'Fluconazole', value: 'Fluconazole' },
-    { label: 'Other', value: 'Other' }
   ];
   respDiagnosisOptions = [
     { label: 'Transient tachypnoea of the newborn', value: 'TTN' },
@@ -151,22 +95,6 @@ export class PatientFullFormComponent implements OnInit {
     { label: '2', value: '2' },
     { label: '3', value: '3' },
     { label: '4', value: '4' }
-  ];
-  sonarFindingsOptions = [
-    { label: 'No Abnormality Detected', value: 'None' },
-    { label: 'PVL', value: 'PVL' },
-    { label: 'Cerebral Oedema', value: 'Oedema' },
-    { label: 'Ventricular Dilation', value: 'Dilation' },
-    { label: 'Intracerebral bleed', value: 'Bleed' },
-    { label: 'Hydrocephalus', value: 'Hydrocephalus' },
-    { label: 'Subdural Haemorrhage', value: 'Subdural' },
-    { label: 'Normal', value: 'Normal' },
-    { label: 'Grade 1', value: 'Grade1' },
-    { label: 'Grade 2', value: 'Grade2' },
-    { label: 'Grade 3', value: 'Grade3' },
-    { label: 'Grade 4', value: 'Grade4' },
-    { label: 'Other', value: 'Other' },
-    { label: 'Not Known', value: 'NotKnown' }
   ];
   eosRecOptions = [
     { label: 'No culture, No Antibiotics', value: 'NoCulture' },
@@ -254,8 +182,10 @@ export class PatientFullFormComponent implements OnInit {
     { label: 'Breastmilk and formula', value: 'Mixed' }
   ];
 
-  constructor(private fb: FormBuilder, private patientCompleteInfoService: PatientCompleteInfoService, private authService:AuthService,
-    private nzNotificationService: NzNotificationService, private activatedRoute: ActivatedRoute, private patientService: PatientService
+  constructor(private fb: FormBuilder, private patientCompleteInfoService: PatientCompleteInfoService, private authService: AuthService,
+    private nzNotificationService: NzNotificationService, private activatedRoute: ActivatedRoute, private patientService: PatientService,
+    private congenitalInfectionOrganismService: CongenitalInfectionOrganismService, private antiMicrobialService: AntimicrobialService,
+    private oragnismService: OrganismService, private fungalOragnismService: FungalOrganismService, private sonarFindingService: SonarFindingService
   ) { }
 
   ngOnInit(): void {
@@ -411,10 +341,42 @@ export class PatientFullFormComponent implements OnInit {
         )
         .subscribe({});
     }
+
+
+    this.congenitalInfectionOrganismService.getAll().subscribe({
+      next: (res: CongenitalInfectionOrganism[]) => {
+        this.congenitalOrganisms = res;
+      }
+    });
+
+    this.antiMicrobialService.getAll().subscribe({
+      next: (res: Antimicrobial[]) => {
+        this.earlyAbxOptions = res;
+        this.lateAbxOptions = res;
+      }
+    });
+
+    this.oragnismService.getAll().subscribe({
+      next: (res: Organism[]) => {
+        this.bacterialOrganisms = res;
+      }
+    });
+
+    this.fungalOragnismService.getAll().subscribe({
+      next: (res: FungalOrganism[]) => {
+        this.fungalOrganisms = res;
+      }
+    });
+
+    this.sonarFindingService.getAll().subscribe({
+      next: (res: SonarFinding[]) => {
+        this.sonarFindingsOptions = res;
+      }
+    });
   }
 
   //UI LOGIC
-    isAdmin = (): boolean => this.authService.getRole()?.toLowerCase() === 'admin';
+  isAdmin = (): boolean => this.authService.getRole()?.toLowerCase() === 'admin';
 
   onSubmit(): void {
     if (this.diagnosisForm.valid) {
