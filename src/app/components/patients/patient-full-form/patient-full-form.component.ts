@@ -342,35 +342,23 @@ export class PatientFullFormComponent implements OnInit {
         .subscribe({});
     }
 
-
-    this.congenitalInfectionOrganismService.getAll().subscribe({
-      next: (res: CongenitalInfectionOrganism[]) => {
-        this.congenitalOrganisms = res;
-      }
+    const dropdownCalls = forkJoin({
+      congenitalOrganisms: this.congenitalInfectionOrganismService.getAll(),
+      earlyAndLateAbx: this.antiMicrobialService.getAll(),
+      bacterialOrganisms: this.oragnismService.getAll(),
+      fungalOrganisms: this.fungalOragnismService.getAll(),
+      sonarFindingsOptions: this.sonarFindingService.getAll(),
     });
 
-    this.antiMicrobialService.getAll().subscribe({
-      next: (res: Antimicrobial[]) => {
-        this.earlyAbxOptions = res;
-        this.lateAbxOptions = res;
-      }
-    });
-
-    this.oragnismService.getAll().subscribe({
-      next: (res: Organism[]) => {
-        this.bacterialOrganisms = res;
-      }
-    });
-
-    this.fungalOragnismService.getAll().subscribe({
-      next: (res: FungalOrganism[]) => {
-        this.fungalOrganisms = res;
-      }
-    });
-
-    this.sonarFindingService.getAll().subscribe({
-      next: (res: SonarFinding[]) => {
-        this.sonarFindingsOptions = res;
+    dropdownCalls.subscribe({
+      next: (res: any) => {
+        this.congenitalOrganisms = res.congenitalOrganisms;
+        this.earlyAbxOptions = res.earlyAndLateAbx;
+        this.lateAbxOptions = res.earlyAndLateAbx;
+        this.bacterialOrganisms = res.bacterialOrganisms;
+        this.fungalOrganisms = res.fungalOrganisms;
+        this.sonarFindingsOptions = res.sonarFindingsOptions;
+        this.loading = false;
       }
     });
   }
