@@ -92,7 +92,7 @@
       </nz-form-control>
     </nz-form-item>
 
-    <h3 class='text-center m-5'>Intital Diagnosis</h3>
+    <h3 class="text-center m-5">Intital Diagnosis</h3>
 
     <div nz-row [nzGutter]="12">
       <div
@@ -189,7 +189,7 @@
           nzType="primary"
           [nzLoading]="btnLoading"
           (click)="onSubmit()"
-          [disabled]="motherForm.invalid"
+          [disabled]="motherForm.invalid && !isAdmin()"
         >
           Next (2/3)
         </button>

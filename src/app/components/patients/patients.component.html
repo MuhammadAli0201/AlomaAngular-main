@@ -1,3 +1,20 @@
+<div class="mb-2" nz-flex nzJustify="end">
+  <nz-input-group nz-col nzSpan="6" nzSuffixIcon="search">
+    <input
+      class="text-left"
+      type="text"
+      nz-input
+      [disabled]="loading"
+      [placeholder]="
+        'search ' + (loading ? '' : (patients.length | number) + ' record(s)')
+      "
+      autocomplete="off"
+      [(ngModel)]="filter"
+      (ngModelChange)="search($event)"
+    />
+  </nz-input-group>
+</div>
+
 <nz-table #basicTable [nzData]="patients" [nzLoading]="loading">
   <thead>
     <tr>
@@ -11,7 +28,7 @@
   <tbody>
     @for (data of basicTable.data; track data; let i = $index) {
     <tr>
-      <td>{{ data.name | uppercase }}</td>
+      <td>{{ data.name + " " + data.surname | uppercase }}</td>
       <td>{{ data.dateOfBirth | date }}</td>
       <td>{{ data.hospitalNumber }}</td>
       <td>{{ data.gender }}</td>
@@ -22,14 +39,17 @@
           nzType="primary"
           [nzLoading]="btnLoading[i]"
         >
-          Update
+          {{ isAdmin() ? "View" : "Update" }}
         </button>
         <button
           class="ms-2"
-          (click)="delete(data.id!, i)"
           nz-button
           [nzLoading]="btnLoading[i]"
           nzDanger
+          nz-popconfirm
+          nzPopconfirmTitle="Are you sure delete this task?"
+          nzPopconfirmPlacement="topRight"
+          (nzOnConfirm)="delete(data.id!, i)"
         >
           Delete
         </button>

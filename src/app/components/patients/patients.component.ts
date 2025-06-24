@@ -4,6 +4,7 @@ import { Patient } from '../../models/patient';
 import { PatientService } from '../../services/patient.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { AuthService } from '../../services/auth.service';
+import { debounceTime } from 'rxjs';
 
 @Component({
   selector: 'app-patients',
@@ -15,6 +16,7 @@ export class PatientsComponent implements OnInit {
   patients: Patient[] = [];
   btnLoading: boolean[] = [];
   loading: boolean = false;
+  filter: string = '';
 
   //LIFE CYCLE HOOKS
   constructor(private router: Router, private patientService: PatientService,
@@ -34,6 +36,20 @@ export class PatientsComponent implements OnInit {
     });
 
     this.btnLoading.fill(false, 0, this.patients.length);
+  }
+
+  //UI LOGIC
+  search(text: string) {
+    this.patientService.search(text).pipe(debounceTime(1000)).subscribe({
+      next: (res: Patient[]) => {
+        const updated = [...res];
+        this.patients = updated;
+      }
+    });
+  }
+
+  isAdmin(): boolean {
+    return this.authService.getRole()?.toLowerCase() === 'admin';
   }
 
   delete(id: string, index: number): void {

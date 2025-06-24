@@ -1541,15 +1541,19 @@
     </div>
 
     <div nz-flex nzAlign="center" nzJustify="end">
-      <button
-        nz-button
-        nzType="primary"
-        (click)="onSubmit()"
-        [nzLoading]="btnLoading"
-        [disabled]="isAdmin()"
-      >
-        Save
-      </button>
+      <div>
+        <button nz-button (click)="close()">Close</button>
+        <button
+          class="ms-2"
+          nz-button
+          nzType="primary"
+          (click)="onSubmit()"
+          [nzLoading]="btnLoading"
+          [disabled]="isAdmin()"
+        >
+          Save
+        </button>
+      </div>
     </div>
   </form>
 </div>
