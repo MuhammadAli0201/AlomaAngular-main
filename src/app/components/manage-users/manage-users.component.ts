@@ -11,16 +11,18 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 })
 export class ManageUsersComponent implements OnInit {
   userRoles: UserRole[] = [];
+  loading: boolean = false;
 
   constructor(private userService: AuthService, private notifications: NzNotificationService) { }
 
   async ngOnInit(): Promise<void> {
+    this.loading = true;
     this.userRoles = await this.userService.userRoles();
+    this.loading = false;
   }
 
   //LOGIC
-  update(role: UserRole): void {
-    role.approved = !role.approved;
+  private update(role: UserRole): void {
     this.userService.updateUserRole(role).subscribe({
       next: (res) => {
         const index = this.userRoles.findIndex(r => r.userRoleId === role.userRoleId);
@@ -32,5 +34,15 @@ export class ManageUsersComponent implements OnInit {
       error: (err) => {
       }
     });
+  }
+
+  reject(role: UserRole): void {
+    role.approved = false;
+    this.update(role);
+  }
+
+  approve(role: UserRole): void {
+    role.approved = true;
+    this.update(role);
   }
 }
