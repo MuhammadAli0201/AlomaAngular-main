@@ -64,11 +64,6 @@ export class CreatePatientComponent {
     { label: 'N/A', value: 'N/A' },
     { label: 'Unknown', value: 'Unknown' }
   ];
-  apgarTimeOptions = [
-    { label: '1 minute', value: 'apgar1' },
-    { label: '5 minutes', value: 'apgar5' },
-    { label: '10 minutes', value: 'apgar10' }
-  ];
   birthHivPcrOptions = [
     { label: 'Not applicable', value: 'Not applicable' },
     { label: 'Not done', value: 'Not done' },
@@ -85,6 +80,14 @@ export class CreatePatientComponent {
     { label: 'No', value: false }
   ];
 
+  rolesPath = {
+    admin: 'admin-dashboard',
+    intern: 'intern-dashboard',
+    doctor: 'doctor-dashboard'
+  }
+
+  currentRolePath: string = '';
+
   //LIFE CYCLES
   constructor(private fb: FormBuilder, private patientService: PatientService, private router: Router,
     private activeRoute: ActivatedRoute, private notificationService: NzNotificationService, private authService: AuthService) { }
@@ -99,12 +102,15 @@ export class CreatePatientComponent {
       dateOfAdmission: [null, Validators.required],
       ageOnAdmission: [null, [Validators.required, strictDecimalValidator()]],
       birthWeight: [null, [Validators.required, strictDecimalValidator()]],
+      gestationalUnit: [null],
       gestationalAge: [null, strictDecimalValidator()],
       gender: [null, Validators.required],
       placeOfBirth: [null, Validators.required],
       modeOfDelivery: [null, Validators.required],
       initialResuscitation: [[]],
-      apgarTimes: [[]],
+      oneMinuteApgar: [null],
+      fiveMinuteApgar: [null],
+      tenMinuteApgar: [null],
       outcomeStatus: [null, Validators.required],
       transferHospital: [''],
       birthHivPcr: [null, Validators.required],
@@ -132,6 +138,7 @@ export class CreatePatientComponent {
       });
     }
 
+    this.setCurrentRole();
   }
 
   //GETTERS
@@ -140,12 +147,24 @@ export class CreatePatientComponent {
   }
 
   //UI LOGIC
+  setCurrentRole(): void {
+    if (this.authService.getRole()?.toLowerCase() === "doctor") {
+      this.currentRolePath = this.rolesPath.doctor;
+    }
+    else if (this.authService.getRole()?.toLowerCase() === "intern") {
+      this.currentRolePath = this.rolesPath.intern;
+    }
+    else if (this.authService.getRole()?.toLowerCase() === 'admin') {
+      this.currentRolePath = this.rolesPath.admin;
+    }
+  }
+
   disableDate = (date: Date): boolean => date > new Date();
-  isAdmin = (): boolean => this.authService.getRole()?.toLowerCase() === 'admin';
+  isAdmin = (): boolean => this.currentRolePath === this.rolesPath.admin;
 
   onSubmit(): void {
     if (this.isAdmin()) {
-      this.router.navigate(['admin-dashboard', 'patient', this.patient.id, 'maternal'])
+      this.router.navigate([this.currentRolePath, 'patient', this.patient.id, 'maternal'])
       return;
     }
 
@@ -154,13 +173,7 @@ export class CreatePatientComponent {
       this.patientService.createPatient(this.patientForm.getRawValue())
         .subscribe({
           next: (res) => {
-            if (this.authService.getRole()?.toLowerCase() === "doctor") {
-              this.router.navigate(['doctor-dashboard', 'patient', res.id, 'maternal'])
-            }
-            else if (this.authService.getRole()?.toLowerCase() === "intern") {
-              this.router.navigate(['intern-dashboard', 'patient', res.id, 'maternal'])
-            }
-
+            this.router.navigate([this.currentRolePath, 'patient', res.id, 'maternal'])
             this.btnLoading = false
           },
           error: (err) => {
@@ -175,5 +188,10 @@ export class CreatePatientComponent {
 
   openPpipForm(): void {
     alert('PPIP form should open here.');
+  }
+
+  //NAVIGATIONS
+  close(): void {
+    this.router.navigate([this.currentRolePath, 'patients'])
   }
 }

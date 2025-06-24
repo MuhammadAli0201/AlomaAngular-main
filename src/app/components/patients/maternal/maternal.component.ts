@@ -9,6 +9,7 @@ import { Maternal } from '../../../models/maternal';
 import { tap, switchMap, finalize } from 'rxjs';
 import { EMPTY_GUID } from '../../../constants/constants';
 import { AuthService } from '../../../services/auth.service';
+import { Location } from '@angular/common';
 import { strictDecimalValidator } from '../../../validators/strict-decimal';
 
 @Component({
@@ -50,8 +51,16 @@ export class MaternalComponent implements OnInit {
     { label: 'No', value: 'No' }
   ];
 
+  rolesPath = {
+    admin: 'admin-dashboard',
+    intern: 'intern-dashboard',
+    doctor: 'doctor-dashboard'
+  }
+
+  currentRolePath: string = '';
+
   //LIFE CYCLES
-  constructor(private activatedRoute: ActivatedRoute, private notificationService: NzNotificationService,
+  constructor(private activatedRoute: ActivatedRoute, private notificationService: NzNotificationService, private location: Location,
     private fb: FormBuilder, private patientService: PatientService, private maternalService: MaternalService,
     private router: Router, private authService: AuthService) { }
 
@@ -65,8 +74,7 @@ export class MaternalComponent implements OnInit {
       age: [null, [Validators.required, strictDecimalValidator()]],
       race: [null, [Validators.required]],
       parity: [''],
-      gravidity: [''],
-      initialDiagnosis: [null],
+      gravidity: [''], 
       antenatalCare: [null],
       antenatalSteroid: [null],
       antenatalMgSulfate: [null],
@@ -111,14 +119,26 @@ export class MaternalComponent implements OnInit {
       });
     }
 
+    this.setCurrentRole();
   }
 
   //UI LOGIC
-  isAdmin = (): boolean => this.authService.getRole()?.toLowerCase() === 'admin';
+  setCurrentRole(): void {
+    if (this.authService.getRole()?.toLowerCase() === "doctor") {
+      this.currentRolePath = this.rolesPath.doctor;
+    }
+    else if (this.authService.getRole()?.toLowerCase() === "intern") {
+      this.currentRolePath = this.rolesPath.intern;
+    }
+    else if (this.authService.getRole()?.toLowerCase() === 'admin') {
+      this.currentRolePath = this.rolesPath.admin;
+    }
+  }
+  isAdmin = (): boolean => this.currentRolePath === this.rolesPath.admin;
 
   onSubmit(): void {
     if (this.isAdmin()) {
-      this.router.navigate(["admin-dashboard", "patient", this.patient.id, "full"]);
+      this.router.navigate([this.currentRolePath, "patient", this.patient.id, "full"]);
       return;
     }
 
@@ -128,12 +148,7 @@ export class MaternalComponent implements OnInit {
         next: res => {
           this.motherForm.patchValue(res),
             this.btnLoading = false;
-          if (this.authService.getRole()?.toLowerCase() === "doctor") {
-            this.router.navigate(["doctor-dashboard", "patient", this.patient.id, "full"]);
-          }
-          else if (this.authService.getRole()?.toLowerCase() === "intern") {
-            this.router.navigate(["intern-dashboard", "patient", this.patient.id, "full"]);
-          }
+          this.router.navigate([this.currentRolePath, "patient", this.patient.id, "full"]);
         },
         error: err => {
           this.notificationService.error('Error', err.message),
@@ -144,5 +159,14 @@ export class MaternalComponent implements OnInit {
       this.motherForm.markAllAsTouched();
       this.btnLoading = false;
     }
+  }
+
+  //NAVIGATION
+  back() {
+    this.location.back();
+  }
+
+  close(): void {
+    this.router.navigate([this.currentRolePath, 'patients']);
   }
 }

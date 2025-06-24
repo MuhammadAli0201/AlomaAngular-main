@@ -2,8 +2,7 @@ export interface Maternal {
   id?: string;
   patientId: string;
   parity?: string;
-  gravidity?: string;
-  initialDiagnosis?: string;
+  gravidity?: string; 
   antenatalCare?: string;
   antenatalSteroid?: string;
   antenatalMgSulfate?: string;

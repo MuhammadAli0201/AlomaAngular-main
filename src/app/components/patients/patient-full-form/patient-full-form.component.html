@@ -17,7 +17,13 @@
   <form [formGroup]="diagnosisForm">
     <!-- 1. Discharge diagnosis and treatment -->
     <div class="section-box">
-      <h3>1. Discharge diagnosis and treatment</h3>
+      <div class="mb-3" nz-flex nzAlign="center" nzJustify="space-between">
+        <button nzSize="small" nz-button (click)="back()" nzType="primary">
+          <i nz-icon nzType="arrow-left"></i>
+        </button>
+        <h3>1. Discharge diagnosis and treatment</h3>
+        <div></div>
+      </div>
 
       <!-- Neonatal Sepsis -->
       <nz-form-item>
@@ -138,9 +144,7 @@
       <!-- Sepsis after day 3 -->
       <nz-form-item>
         <nz-form-control>
-          <nz-form-label 
-            >Sepsis after day 3</nz-form-label
-          >
+          <nz-form-label>Sepsis after day 3</nz-form-label>
           <nz-select nzPlaceHolder="Select" formControlName="sepsisAfterDay3">
             <nz-option
               *ngFor="let o of yesNoUnknown"

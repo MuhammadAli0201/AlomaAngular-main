@@ -7,12 +7,15 @@ export interface Patient {
   dateOfAdmission?: string;
   ageOnAdmission?: number;
   birthWeight?: number;
+  gestationalUnit?:string;
   gestationalAge?: number;
   gender?: string;
   placeOfBirth?: string;
   modeOfDelivery?: string;
   initialResuscitation?: string[];
-  apgarTimes?: string[];
+  oneMinuteApgar:string,
+  fiveMinuteApgar:string,
+  tenMinuteApgar:string,
   outcomeStatus?: string;
   transferHospital?: string;
   birthHivPcr?: string;

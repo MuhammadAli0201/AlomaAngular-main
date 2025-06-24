@@ -15,7 +15,13 @@
 } @else {
 <div class="form-container">
   <form [formGroup]="motherForm">
-    <h2>Maternal</h2>
+    <div class="mb-3" nz-flex nzAlign="center" nzJustify="space-between">
+      <button nz-button nzType="primary" nzSize="small" (click)="back()">
+        <i nz-icon nzType="arrow-left"></i>
+      </button>
+      <h2>Maternal</h2>
+      <div></div>
+    </div>
 
     <nz-form-item>
       <nz-form-control nzErrorTip="Hospital number is required">
@@ -86,21 +92,7 @@
       </nz-form-control>
     </nz-form-item>
 
-    <nz-form-item>
-      <nz-form-control>
-        <nz-form-label>Initial diagnosis</nz-form-label>
-        <nz-select
-          formControlName="initialDiagnosis"
-          nzPlaceHolder="Select diagnosis"
-        >
-          <nz-option
-            *ngFor="let option of yesNoUnknown"
-            [nzValue]="option.value"
-            [nzLabel]="option.label"
-          ></nz-option>
-        </nz-select>
-      </nz-form-control>
-    </nz-form-item>
+    <h3 class='text-center m-5'>Intital Diagnosis</h3>
 
     <div nz-row [nzGutter]="12">
       <div
@@ -189,15 +181,19 @@
     </nz-form-item>
 
     <div style="text-align: right; margin-top: 24px">
-      <button
-        nz-button
-        nzType="primary"
-        [nzLoading]="btnLoading"
-        (click)="onSubmit()"
-        [disabled]="motherForm.invalid"
-      >
-        Next (2/3)
-      </button>
+      <div>
+        <button nz-button (click)="close()">Close</button>
+        <button
+          class="ms-2"
+          nz-button
+          nzType="primary"
+          [nzLoading]="btnLoading"
+          (click)="onSubmit()"
+          [disabled]="motherForm.invalid"
+        >
+          Next (2/3)
+        </button>
+      </div>
     </div>
   </form>
 </div>

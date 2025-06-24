@@ -4,7 +4,7 @@ import { PatientCompleteInfoService } from '../../../services/patient-complete-i
 import { PatientCompleteInfo } from '../../../models/patient-complete-info';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { EMPTY_GUID } from '../../../constants/constants';
-import { ActivatedRoute, TitleStrategy } from '@angular/router';
+import { ActivatedRoute, Router, TitleStrategy } from '@angular/router';
 import { Patient } from '../../../models/patient';
 import { PatientService } from '../../../services/patient.service';
 import { catchError, finalize, forkJoin, mergeMap, of, subscribeOn, switchMap, tap } from 'rxjs';
@@ -14,6 +14,7 @@ import { Antimicrobial, AntimicrobialService } from '../../../services/antimicro
 import { Organism, OrganismService } from '../../../services/organism.service';
 import { FungalOrganism, FungalOrganismService } from '../../../services/fungalorganism.service';
 import { SonarFinding, SonarFindingService } from '../../../services/sonarfinding.service';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-patient-full-form',
@@ -182,8 +183,16 @@ export class PatientFullFormComponent implements OnInit {
     { label: 'Breastmilk and formula', value: 'Mixed' }
   ];
 
-  constructor(private fb: FormBuilder, private patientCompleteInfoService: PatientCompleteInfoService, private authService: AuthService,
-    private nzNotificationService: NzNotificationService, private activatedRoute: ActivatedRoute, private patientService: PatientService,
+  rolesPath = {
+    admin: 'admin-dashboard',
+    intern: 'intern-dashboard',
+    doctor: 'doctor-dashboard'
+  }
+
+  currentRolePath: string = '';
+
+  constructor(private fb: FormBuilder, private patientCompleteInfoService: PatientCompleteInfoService, private authService: AuthService, private location: Location,
+    private nzNotificationService: NzNotificationService, private activatedRoute: ActivatedRoute, private patientService: PatientService, private router: Router,
     private congenitalInfectionOrganismService: CongenitalInfectionOrganismService, private antiMicrobialService: AntimicrobialService,
     private oragnismService: OrganismService, private fungalOragnismService: FungalOrganismService, private sonarFindingService: SonarFindingService
   ) { }
@@ -350,7 +359,9 @@ export class PatientFullFormComponent implements OnInit {
       sonarFindingsOptions: this.sonarFindingService.getAll(),
     });
 
-    dropdownCalls.subscribe({
+    dropdownCalls.pipe(
+      tap((res: any) => this.loading = true)
+    ).subscribe({
       next: (res: any) => {
         this.congenitalOrganisms = res.congenitalOrganisms;
         this.earlyAbxOptions = res.earlyAndLateAbx;
@@ -361,10 +372,23 @@ export class PatientFullFormComponent implements OnInit {
         this.loading = false;
       }
     });
+
+    this.setCurrentRole();
   }
 
   //UI LOGIC
-  isAdmin = (): boolean => this.authService.getRole()?.toLowerCase() === 'admin';
+  setCurrentRole(): void {
+    if (this.authService.getRole()?.toLowerCase() === "doctor") {
+      this.currentRolePath = this.rolesPath.doctor;
+    }
+    else if (this.authService.getRole()?.toLowerCase() === "intern") {
+      this.currentRolePath = this.rolesPath.intern;
+    }
+    else if (this.authService.getRole()?.toLowerCase() === 'admin') {
+      this.currentRolePath = this.rolesPath.admin;
+    }
+  }
+  isAdmin = (): boolean => this.currentRolePath === this.rolesPath.admin;
 
   onSubmit(): void {
     if (this.diagnosisForm.valid) {
@@ -374,6 +398,7 @@ export class PatientFullFormComponent implements OnInit {
           this.patientCompleteInfo = res;
           this.diagnosisForm.patchValue(res);
           this.nzNotificationService.success("Success", "Patient Form has been saved successfully");
+          this.close();
           this.btnLoading = false;
         },
         error: (err: Error) => {
@@ -384,5 +409,14 @@ export class PatientFullFormComponent implements OnInit {
     } else {
       this.diagnosisForm.markAllAsTouched();
     }
+  }
+
+  //NAVIGATIONS
+  back() {
+    this.location.back();
+  }
+
+  close(): void {
+    this.router.navigate([this.currentRolePath, 'patients'])
   }
 }
