@@ -1,4 +1,4 @@
-<nz-table #basicTable [nzData]="patients">
+<nz-table #basicTable [nzData]="patients" [nzLoading]="loading">
   <thead>
     <tr>
       <th>Name</th>
@@ -9,15 +9,29 @@
     </tr>
   </thead>
   <tbody>
-    @for (data of basicTable.data; track data) {
+    @for (data of basicTable.data; track data; let i = $index) {
     <tr>
       <td>{{ data.name | uppercase }}</td>
       <td>{{ data.dateOfBirth | date }}</td>
       <td>{{ data.hospitalNumber }}</td>
       <td>{{ data.gender }}</td>
       <td>
-        <button (click)="edit(data.id!)" nz-button nzType="primary">
+        <button
+          (click)="edit(data.id!)"
+          nz-button
+          nzType="primary"
+          [nzLoading]="btnLoading[i]"
+        >
           Update
+        </button>
+        <button
+          class="ms-2"
+          (click)="delete(data.id!, i)"
+          nz-button
+          [nzLoading]="btnLoading[i]"
+          nzDanger
+        >
+          Delete
         </button>
       </td>
     </tr>

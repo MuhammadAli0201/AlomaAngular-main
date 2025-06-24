@@ -32,6 +32,12 @@ export class PatientService {
     });
   }
 
+  delete(id:string): Observable<boolean> {
+    return this.http.delete<boolean>(`${this.baseUrl}/${id}`, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
   getPatientById(id: number): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/${id}`, {
       headers: this.getAuthHeaders()
