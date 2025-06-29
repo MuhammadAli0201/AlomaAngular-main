@@ -31,7 +31,12 @@
     <div class="container">
       <div>
         <ng-container *ngIf="!editMode">
-          <img *ngIf="user?.profileImagePath" [src]="backendUrl + user.profileImagePath" alt="Profile Avatar" class="profile-avatar" style="width: 150px; height: 150px;" />
+          @if(user?.profileImagePath){
+            <img [src]="backendUrl + user.profileImagePath" alt="Profile Avatar" class="profile-avatar" style="width: 150px; height: 150px;" />
+          }
+          @else {
+            <img src="images/avatar-placeholder.png" alt="No Profile Avatar" class="profile-avatar" style="width: 100px; height: 100px; opacity: 0.5;" />
+          }
         </ng-container>
         <ng-container *ngIf="editMode">
           <nz-upload
