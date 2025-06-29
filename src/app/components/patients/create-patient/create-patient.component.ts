@@ -142,7 +142,7 @@ export class CreatePatientComponent {
 
     this.setCurrentRole();
     this.sharedService.editable$.subscribe(editable => {
-      if (editable && !this.isAdmin()) {
+      if ((editable || !id) && !this.isAdmin()) {
         this.patientForm.enable();
       } else {
         this.patientForm.disable();
@@ -183,6 +183,9 @@ export class CreatePatientComponent {
         .subscribe({
           next: (res) => {
             this.sharedService.setEditable(false);
+            if(!this.patient){
+              this.router.navigate([this.currentRolePath, 'patient', res.id, 'maternal'])
+            }
             this.btnLoading = false
           },
           error: (err) => {

@@ -347,10 +347,17 @@ export class PatientFullFormComponent implements OnInit {
           tap((res: PatientCompleteInfo) => {
             this.patientCompleteInfo = res;
             this.diagnosisForm.patchValue(res)
+            if(!res){
+              this.sharedService.setEditable(true);
+            }
           }),
           finalize(() => this.loading = false)
         )
-        .subscribe({});
+        .subscribe({
+          error: (err: Error) => {
+          this.nzNotificationService.error("Error", err.message);
+        }
+        });
     }
 
     const dropdownCalls = forkJoin({

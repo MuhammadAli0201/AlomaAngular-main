@@ -111,6 +111,9 @@ export class MaternalComponent implements OnInit {
         tap((maternal: Maternal) => {
           this.motherForm.patchValue(maternal);
           this.maternal = maternal;
+          if(!maternal){
+            this.sharedService.setEditable(true);
+          }
         }),
         finalize(() => this.loading = false)
       ).subscribe({
@@ -145,11 +148,6 @@ export class MaternalComponent implements OnInit {
   isAdmin = (): boolean => this.currentRolePath === this.rolesPath.admin;
 
   markAsComplete(): void {
-    if (this.isAdmin()) {
-      this.router.navigate([this.currentRolePath, "patient", this.patient.id, "full"]);
-      return;
-    }
-
     if (this.motherForm.valid) {
       this.btnLoading = true;
       this.maternalService.createOrUpdateMaternal(this.motherForm.getRawValue()).subscribe({
