@@ -3,15 +3,58 @@
 </div>
 <div>
   <div class="modal-body">
-    <p><strong>First Name:</strong> {{ user?.firstName }}</p>
-    <p><strong>Last Name:</strong> {{ user?.lastName }}</p>
-    <p><strong>Email:</strong> {{ user?.email }}</p>
-    <p><strong>HPCSA Number:</strong> {{ user?.usernumber }}</p>
-    <p><strong>Role:</strong> {{ user?.role }}</p>
+    <p>
+      <strong>First Name:</strong>
+      <span *ngIf="!editMode">{{ user?.firstName }}</span>
+      <input *ngIf="editMode" [(ngModel)]="user.firstName" class="form-control" />
+    </p>
+    <p>
+      <strong>Last Name:</strong>
+      <span *ngIf="!editMode">{{ user?.lastName }}</span>
+      <input *ngIf="editMode" [(ngModel)]="user.lastName" class="form-control" />
+    </p>
+    <p>
+      <strong>Email:</strong>
+      <span *ngIf="!editMode">{{ user?.email }}</span>
+      <input *ngIf="editMode" [(ngModel)]="user.email" class="form-control" />
+    </p>
+    <p>
+      <strong>HPCSA Number:</strong>
+      <span *ngIf="!editMode">{{ user?.usernumber }}</span>
+      <input *ngIf="editMode" [(ngModel)]="user.usernumber" class="form-control" />
+    </p>
+    <p>
+      <strong>Role:</strong>
+      <span *ngIf="!editMode">{{ user?.role }}</span>
+      <input *ngIf="editMode" [(ngModel)]="user.role" class="form-control" />
+    </p>
+    <div class="container">
+      <div>
+        <ng-container *ngIf="!editMode">
+          <img *ngIf="user?.profileImagePath" [src]="backendUrl + user.profileImagePath" alt="Profile Avatar" class="profile-avatar" style="width: 150px; height: 150px;" />
+        </ng-container>
+        <ng-container *ngIf="editMode">
+          <nz-upload
+            nzListType="picture-card"
+            [(nzFileList)]="fileList"
+            [nzShowButton]="fileList.length < 1"
+            [nzPreview]="handlePreview"
+            [nzCustomRequest]="handleUpload"
+          >
+            <div>
+              <nz-icon nzType="plus" />
+              <div style="margin-top: 8px">Upload pic</div>
+            </div>
+          </nz-upload>
+        </ng-container>
+      </div>
+    </div>
   </div>
 </div>
 
 <div *nzModalFooter class="modal-footer">
   <button nz-button (click)="close()">Close</button>
-  <button nz-button nzType="primary">Edit</button>
+  <button *ngIf="!editMode" nz-button nzType="primary" (click)="toggleEdit()">Edit</button>
+  <button *ngIf="editMode" nz-button nzType="primary" (click)="saveUser()">Save</button>
+  <button *ngIf="editMode" nz-button (click)="toggleEdit()">Cancel</button>
 </div>

@@ -6,6 +6,7 @@ import { UserRole } from '../models/user-roles';
 import { firstValueFrom } from 'rxjs';
 import { OtpVerifyRequest } from '../models/otp-verify-request';
 import { PasswordUpdateRequest } from '../models/password-update-request';
+import { User } from '../models/user';
 
 @Injectable({
   providedIn: 'root'
@@ -72,6 +73,23 @@ export class AuthService {
       Authorization: `Bearer ${token}`
     };
     return this.http.post<UserRole>(`${this.baseUrl}update-role`, role, { headers });
+  }
+
+  async updateUserProfile(user: User) {
+    console.log("Inside save user")
+    const token = this.getToken();
+    const headers = {
+      Authorization: `Bearer ${token}`
+    };
+    return await firstValueFrom(this.http.put<any>(`${this.baseUrl}`, user, { headers }));
+  }
+
+  UploadProfilePic(formData: FormData) {
+    const token = this.getToken();
+    const headers = {
+      Authorization: `Bearer ${token}`
+    };
+    return this.http.post(`${this.baseUrl}upload-profile-pic`, formData, { headers });
   }
 
   sendOtp(email: string) {

@@ -19,6 +19,7 @@ export class AdminDashboardComponent implements OnInit {
     this.auth.getCurrentUser().subscribe({
       next: (data: any) => {
         this.user = data; 
+        console.log(this.user);
       }, 
     });
   }
