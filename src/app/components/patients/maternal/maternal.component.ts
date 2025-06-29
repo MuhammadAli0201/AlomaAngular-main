@@ -122,7 +122,7 @@ export class MaternalComponent implements OnInit {
 
     this.setCurrentRole();
     this.sharedService.editable$.subscribe(editable => {
-      if (editable) {
+      if (editable && !this.isAdmin()) {
         this.motherForm.enable();
       } else {
         this.motherForm.disable();

@@ -377,7 +377,7 @@ export class PatientFullFormComponent implements OnInit {
 
     this.setCurrentRole();
     this.sharedService.editable$.subscribe(editable => {
-      if (editable) {
+      if (editable && !this.isAdmin()) {
         this.diagnosisForm.enable();
       } else {
         this.diagnosisForm.disable();

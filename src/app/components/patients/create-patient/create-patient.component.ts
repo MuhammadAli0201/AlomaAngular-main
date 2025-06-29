@@ -142,7 +142,7 @@ export class CreatePatientComponent {
 
     this.setCurrentRole();
     this.sharedService.editable$.subscribe(editable => {
-      if (editable) {
+      if (editable && !this.isAdmin()) {
         this.patientForm.enable();
       } else {
         this.patientForm.disable();

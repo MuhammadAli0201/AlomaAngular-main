@@ -184,6 +184,7 @@
       <div>
         <button nz-button (click)="close()">Close</button>
         <button
+          *ngIf="!isAdmin()"
           class="ms-2"
           [nzLoading]="btnLoading"
           (click)="motherForm.disabled ? setEditable() : markAsComplete()"
