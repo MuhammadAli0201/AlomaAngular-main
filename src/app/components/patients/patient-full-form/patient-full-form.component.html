@@ -1545,11 +1545,21 @@
         <button nz-button (click)="close()">Close</button>
         <button
           class="ms-2"
+          [nzLoading]="btnLoading"
+          (click)="diagnosisForm.disabled ? setEditable() : markAsComplete()"
           nz-button
           nzType="primary"
-          (click)="onSubmit()"
+          [disabled]="diagnosisForm.invalid  && !isAdmin()"
+        >
+        {{diagnosisForm.disabled ? "Update" : "Mark as Complete"}}
+        </button>
+        <button
+          class="ms-2"
+          nz-button
+          nzType="primary"
+          (click)="close()"
           [nzLoading]="btnLoading"
-          [disabled]="isAdmin()"
+          [disabled]="isAdmin() || !diagnosisForm.disabled"
         >
           Save
         </button>

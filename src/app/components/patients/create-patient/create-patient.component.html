@@ -391,10 +391,20 @@
         <button
           class="ms-2"
           [nzLoading]="btnLoading"
-          (click)="onSubmit()"
+          (click)="patientForm.disabled ? setEditable() : markAsComplete()"
           nz-button
           nzType="primary"
           [disabled]="patientForm.invalid"
+        >
+        {{patientForm.disabled ? "Update" : "Mark as Complete"}}
+        </button>
+        <button
+          class="ms-2"
+          [nzLoading]="btnLoading"
+          (click)="navToNext()"
+          nz-button
+          nzType="primary"
+          [disabled]="patientForm.invalid || !patientForm.disabled"
         >
           Next (1/3)
         </button>

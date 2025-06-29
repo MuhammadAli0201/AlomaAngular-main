@@ -7,6 +7,7 @@ import { PatientService } from '../../../services/patient.service';
 import { EMPTY_GUID } from '../../../constants/constants';
 import { AuthService } from '../../../services/auth.service';
 import { strictDecimalValidator } from '../../../validators/strict-decimal';
+import { SharedService } from '../../../services/shared.service';
 
 @Component({
   selector: 'app-create-patient',
@@ -90,7 +91,8 @@ export class CreatePatientComponent {
 
   //LIFE CYCLES
   constructor(private fb: FormBuilder, private patientService: PatientService, private router: Router,
-    private activeRoute: ActivatedRoute, private notificationService: NzNotificationService, private authService: AuthService) { }
+    private activeRoute: ActivatedRoute, private notificationService: NzNotificationService, private authService: AuthService,
+    private sharedService: SharedService) { }
 
   ngOnInit(): void {
     this.patientForm = this.fb.group({
@@ -139,6 +141,13 @@ export class CreatePatientComponent {
     }
 
     this.setCurrentRole();
+    this.sharedService.editable$.subscribe(editable => {
+      if (editable) {
+        this.patientForm.enable();
+      } else {
+        this.patientForm.disable();
+      }
+    })
   }
 
   //GETTERS
@@ -162,7 +171,7 @@ export class CreatePatientComponent {
   disableDate = (date: Date): boolean => date > new Date();
   isAdmin = (): boolean => this.currentRolePath === this.rolesPath.admin;
 
-  onSubmit(): void {
+  markAsComplete(): void {
     if (this.isAdmin()) {
       this.router.navigate([this.currentRolePath, 'patient', this.patient.id, 'maternal'])
       return;
@@ -173,7 +182,7 @@ export class CreatePatientComponent {
       this.patientService.createPatient(this.patientForm.getRawValue())
         .subscribe({
           next: (res) => {
-            this.router.navigate([this.currentRolePath, 'patient', res.id, 'maternal'])
+            this.sharedService.setEditable(false);
             this.btnLoading = false
           },
           error: (err) => {
@@ -184,6 +193,14 @@ export class CreatePatientComponent {
     } else {
       this.patientForm.markAllAsTouched();
     }
+  }
+
+  navToNext(){
+    this.router.navigate([this.currentRolePath, 'patient', this.patient.id, 'maternal'])
+  }
+
+  setEditable(){
+    this.sharedService.setEditable(true)
   }
 
   openPpipForm(): void {
