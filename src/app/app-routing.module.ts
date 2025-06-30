@@ -13,7 +13,7 @@ import { HelpResourceComponent } from './components/help-resource/help-resource.
 import { AdminWelcomeComponent } from './components/admin-dashboard/admin-welcome/admin-welcome.component';
 import { ManageUsersComponent } from './components/manage-users/manage-users.component';
 import { ForgetPasswordComponent } from './components/forget-password/forget-password.component';
-import { VerifyOtpComponent } from './components/forget-password/verify-otp/verify-otp.component';
+import { VerifyOtpComponent } from './components/verify-otp/verify-otp.component';
 import { NewPasswordComponent } from './components/forget-password/new-password/new-password.component';
 import { DoctorWelcomeComponent } from './components/doctor-dashboard/doctor-welcome/doctor-welcome.component';
 import { PatientsComponent } from './components/patients/patients.component';

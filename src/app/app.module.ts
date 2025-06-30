@@ -28,7 +28,7 @@ import { antdIcons, AntdModule } from './antd.module';
 import { NZ_ICONS } from 'ng-zorro-antd/icon';
 import { ManageUsersComponent } from './components/manage-users/manage-users.component';
 import { ForgetPasswordComponent } from './components/forget-password/forget-password.component';
-import { VerifyOtpComponent } from './components/forget-password/verify-otp/verify-otp.component';
+import { VerifyOtpComponent } from './components/verify-otp/verify-otp.component';
 import { NewPasswordComponent } from './components/forget-password/new-password/new-password.component';
 import { PatientsComponent } from './components/patients/patients.component';
 import { PatientComponent } from './components/patients/patient/patient.component'; 
