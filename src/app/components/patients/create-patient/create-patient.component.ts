@@ -131,6 +131,9 @@ export class CreatePatientComponent {
         next: (val: Patient) => {
           this.patientForm.patchValue(val);
           this.patient = val;
+          if(val){
+            this.sharedService.setEditable(false);
+          }
           this.loading = false
         },
         error: (err: any) => {
@@ -142,7 +145,7 @@ export class CreatePatientComponent {
 
     this.setCurrentRole();
     this.sharedService.editable$.subscribe(editable => {
-      if ((editable || !id) && !this.isAdmin()) {
+      if ((editable || this.patientForm.get('id')!.value === EMPTY_GUID) && !this.isAdmin()) {
         this.patientForm.enable();
       } else {
         this.patientForm.disable();
@@ -182,10 +185,9 @@ export class CreatePatientComponent {
       this.patientService.createPatient(this.patientForm.getRawValue())
         .subscribe({
           next: (res) => {
+            this.patientForm.patchValue(res);
+            this.patient = res;
             this.sharedService.setEditable(false);
-            if(!this.patient){
-              this.router.navigate([this.currentRolePath, 'patient', res.id, 'maternal'])
-            }
             this.btnLoading = false
           },
           error: (err) => {
