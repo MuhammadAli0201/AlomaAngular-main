@@ -121,7 +121,15 @@ export class CreatePatientComponent {
       lengthAtBirth: [null, [strictDecimalValidator()]],
       diedInDeliveryRoom: [null, Validators.required],
       diedWithin12Hours: [null, Validators.required],
-      initialTemperature: [null, [strictDecimalValidator()]]
+      initialTemperature: [null, [strictDecimalValidator()]],
+      mothersGtNumber: [''],
+      dateOfDeath: [null],
+      conditionAtBirth: [''],
+      syphilisSerology: [''],
+      singleOrMultipleBirths: [''],
+      obstetricCauseOfDeath: [''],
+      neonatalCauseOfDeath: [''],
+      avoidableFactors: [''],
     });
 
     const id = this.activeRoute.parent?.snapshot.params['id'];
@@ -156,6 +164,14 @@ export class CreatePatientComponent {
   //GETTERS
   get outcomeStatus() {
     return this.patientForm.get('outcomeStatus')?.value;
+  }
+
+  get diedInDeliveryRoom() {
+    return this.patientForm.get('diedInDeliveryRoom')?.value;
+  }
+
+  get diedWithin12Hours() {
+    return this.patientForm.get('diedWithin12Hours')?.value;
   }
 
   //UI LOGIC

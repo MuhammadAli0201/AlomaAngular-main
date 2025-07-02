@@ -251,125 +251,6 @@
             [nzLabel]="hospital"
           ></nz-option>
         </nz-select>
-        <div class="mt-3" *ngIf="outcomeStatus === 'Died'">
-          <!-- <button nz-button nzType="default" (click)="openPpipForm()">
-            Open PPIP Form
-          </button> -->
-          <nz-form-item>
-            <nz-form-control nzErrorTip="Mothers GT Number is required">
-              <nz-form-label nzRequired>Mothers GT Number</nz-form-label>
-              <input nz-input formControlName="mothersGtNumber" placeholder="Enter Mothers GT Number" />
-            </nz-form-control>
-          </nz-form-item>
-
-          <nz-form-item>
-            <nz-form-control nzErrorTip="Date of Death is required">
-              <nz-form-label nzRequired>Date of Death</nz-form-label>
-              <nz-date-picker
-                style="width: 100%"
-                formControlName="dateOfDeath"
-                nzFormat="yyyy-MM-dd"
-                [nzDisabledDate]="disableDate"
-              ></nz-date-picker>
-            </nz-form-control>
-          </nz-form-item>
-          
-          <nz-form-item>
-            <nz-form-control nzErrorTip="Condition at birth is required">
-              <nz-form-label nzRequired>Condition at birth</nz-form-label>
-              <nz-select
-                formControlName="conditionAtBirth"
-                nzPlaceHolder="Select condition at birth"
-              >
-                <nz-option
-                  *ngFor="let option of birthHivPcrOptions"
-                  [nzValue]="option.value"
-                  [nzLabel]="option.label"
-                ></nz-option>
-              </nz-select>
-            </nz-form-control>
-          </nz-form-item>
-
-          <nz-form-item>
-            <nz-form-control nzErrorTip="Syphilis Serology is required">
-              <nz-form-label nzRequired>Syphilis Serology</nz-form-label>
-              <nz-select
-                formControlName="syphilisSerology"
-                nzPlaceHolder="Select syphilis serology"
-              >
-                <nz-option
-                  *ngFor="let option of birthHivPcrOptions"
-                  [nzValue]="option.value"
-                  [nzLabel]="option.label"
-                ></nz-option>
-              </nz-select>
-            </nz-form-control>
-          </nz-form-item>
-
-          <nz-form-item>
-            <nz-form-control nzErrorTip="Single / Multiple Births is required">
-              <nz-form-label nzRequired>Single / Multiple Births</nz-form-label>
-              <nz-select
-                formControlName="singleOrMultipleBirths"
-                nzPlaceHolder="Select single / multiple births"
-              >
-                <nz-option
-                  *ngFor="let option of birthHivPcrOptions"
-                  [nzValue]="option.value"
-                  [nzLabel]="option.label"
-                ></nz-option>
-              </nz-select>
-            </nz-form-control>
-          </nz-form-item>
-          
-          <nz-form-item>
-            <nz-form-control nzErrorTip="Obstetric cause of death is required">
-              <nz-form-label nzRequired>Obstetric cause of death</nz-form-label>
-              <nz-select
-                formControlName="obstetricCauseOfDeath"
-                nzPlaceHolder="Select Obstetric cause of death"
-              >
-                <nz-option
-                  *ngFor="let option of birthHivPcrOptions"
-                  [nzValue]="option.value"
-                  [nzLabel]="option.label"
-                ></nz-option>
-              </nz-select>
-            </nz-form-control>
-          </nz-form-item>
-
-          <nz-form-item>
-            <nz-form-control nzErrorTip="Neonatal cause of death is required">
-              <nz-form-label nzRequired>Neonatal cause of death</nz-form-label>
-              <nz-select
-                formControlName="neonatalCauseOfDeath"
-                nzPlaceHolder="Select Neonatal cause of death"
-              >
-                <nz-option
-                  *ngFor="let option of birthHivPcrOptions"
-                  [nzValue]="option.value"
-                  [nzLabel]="option.label"
-                ></nz-option>
-              </nz-select>
-            </nz-form-control>
-          </nz-form-item>
-          
-          <nz-form-item>
-            <nz-form-control nzErrorTip="Avoidable Factors is required">
-              <nz-form-label nzRequired>Avoidable Factors</nz-form-label>
-              <nz-select
-                formControlName="avoidableFactors"
-                nzPlaceHolder="Select Avoidable Factors"
-              >
-                <nz-option
-                  *ngFor="let option of birthHivPcrOptions"
-                  [nzValue]="option.value"
-                  [nzLabel]="option.label"
-                ></nz-option>
-              </nz-select>
-            </nz-form-control>
-          </nz-form-item>
-        </div>
       </nz-form-control>
     </nz-form-item>
 
@@ -492,6 +373,126 @@
         >
       </ng-template>
     </nz-form-item>
+
+    <div class="mt-3" *ngIf="outcomeStatus === 'Died' || diedInDeliveryRoom === true || diedWithin12Hours === true">
+      <!-- <button nz-button nzType="default" (click)="openPpipForm()">
+        Open PPIP Form
+      </button> -->
+      <nz-form-item>
+        <nz-form-control nzErrorTip="Mothers GT Number is required">
+          <nz-form-label nzRequired>Mothers GT Number</nz-form-label>
+          <input nz-input formControlName="mothersGtNumber" placeholder="Enter Mothers GT Number" />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-control nzErrorTip="Date of Death is required">
+          <nz-form-label nzRequired>Date of Death</nz-form-label>
+          <nz-date-picker
+            style="width: 100%"
+            formControlName="dateOfDeath"
+            nzFormat="yyyy-MM-dd"
+            [nzDisabledDate]="disableDate"
+          ></nz-date-picker>
+        </nz-form-control>
+      </nz-form-item>
+      
+      <nz-form-item>
+        <nz-form-control nzErrorTip="Condition at birth is required">
+          <nz-form-label nzRequired>Condition at birth</nz-form-label>
+          <nz-select
+            formControlName="conditionAtBirth"
+            nzPlaceHolder="Select condition at birth"
+          >
+            <nz-option
+              *ngFor="let option of birthHivPcrOptions"
+              [nzValue]="option.value"
+              [nzLabel]="option.label"
+            ></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-control nzErrorTip="Syphilis Serology is required">
+          <nz-form-label nzRequired>Syphilis Serology</nz-form-label>
+          <nz-select
+            formControlName="syphilisSerology"
+            nzPlaceHolder="Select syphilis serology"
+          >
+            <nz-option
+              *ngFor="let option of birthHivPcrOptions"
+              [nzValue]="option.value"
+              [nzLabel]="option.label"
+            ></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-control nzErrorTip="Single / Multiple Births is required">
+          <nz-form-label nzRequired>Single / Multiple Births</nz-form-label>
+          <nz-select
+            formControlName="singleOrMultipleBirths"
+            nzPlaceHolder="Select single / multiple births"
+          >
+            <nz-option
+              *ngFor="let option of birthHivPcrOptions"
+              [nzValue]="option.value"
+              [nzLabel]="option.label"
+            ></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+      
+      <nz-form-item>
+        <nz-form-control nzErrorTip="Obstetric cause of death is required">
+          <nz-form-label nzRequired>Obstetric cause of death</nz-form-label>
+          <nz-select
+            formControlName="obstetricCauseOfDeath"
+            nzPlaceHolder="Select Obstetric cause of death"
+          >
+            <nz-option
+              *ngFor="let option of birthHivPcrOptions"
+              [nzValue]="option.value"
+              [nzLabel]="option.label"
+            ></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-control nzErrorTip="Neonatal cause of death is required">
+          <nz-form-label nzRequired>Neonatal cause of death</nz-form-label>
+          <nz-select
+            formControlName="neonatalCauseOfDeath"
+            nzPlaceHolder="Select Neonatal cause of death"
+          >
+            <nz-option
+              *ngFor="let option of birthHivPcrOptions"
+              [nzValue]="option.value"
+              [nzLabel]="option.label"
+            ></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+      
+      <nz-form-item>
+        <nz-form-control nzErrorTip="Avoidable Factors is required">
+          <nz-form-label nzRequired>Avoidable Factors</nz-form-label>
+          <nz-select
+            formControlName="avoidableFactors"
+            nzPlaceHolder="Select Avoidable Factors"
+          >
+            <nz-option
+              *ngFor="let option of birthHivPcrOptions"
+              [nzValue]="option.value"
+              [nzLabel]="option.label"
+            ></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
 
     <div style="text-align: right; margin-top: 24px">
       <div>
