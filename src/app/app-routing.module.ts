@@ -22,6 +22,7 @@ import { MaternalComponent } from './components/patients/maternal/maternal.compo
 import { CreatePatientComponent } from './components/patients/create-patient/create-patient.component';
 import { PatientFullFormComponent } from './components/patients/patient-full-form/patient-full-form.component';
 import { InternWelcomeComponent } from './components/intern-dashboard/intern-welcome/intern-welcome.component';
+import { HelpResoucesComponent } from './components/help-resouces/help-resouces.component';
 
 const patientRoutes: Routes = [
   { path: 'patients', component: PatientsComponent },
@@ -92,7 +93,12 @@ const routes: Routes = [
         data: { expectedRole: 'Admin' }
       },
       {
-        path: 'help-resource', component: HelpResourceComponent,
+        path: 'faq', component: HelpResourceComponent,
+        canActivate: [authGuard, roleGuard],
+        data: { expectedRole: 'Admin' }
+      },
+      {
+        path: 'help-resources', component: HelpResoucesComponent,
         canActivate: [authGuard, roleGuard],
         data: { expectedRole: 'Admin' }
       },
