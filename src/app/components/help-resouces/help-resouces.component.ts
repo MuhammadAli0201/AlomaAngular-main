@@ -3,6 +3,9 @@ import { HelpResource } from '../../models/help-resource';
 import { NzUploadFile, NzUploadXHRArgs } from 'ng-zorro-antd/upload';
 import { ResourceService } from '../../services/resource.service';
 import { concatMap } from 'rxjs';
+import { BACKEND_URL } from '../../constants/constants';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import { ResourceViewModalComponent } from '../resource-view-modal/resource-view-modal.component';
 
 @Component({
   selector: 'app-help-resouces',
@@ -13,16 +16,19 @@ import { concatMap } from 'rxjs';
 export class HelpResoucesComponent implements OnInit{
   loading = false;
 
+  backendUrl = BACKEND_URL
   currentType = 'image';
   accept = 'image/*';
   helpResources: HelpResource[] = []
   fileTypes = [
     { label: 'Image', value: 'image', accept: 'image/*' },
     { label: 'PDF', value: 'pdf', accept: '.pdf' },
-    // { label: 'Video', value: 'video', accept: 'video/*' }
+    { label: 'Video', value: 'video', accept: 'video/*' }
   ];
 
-  constructor(private helpResourceService: ResourceService){}
+  constructor(private helpResourceService: ResourceService,
+    private modalService: NzModalService
+  ){}
 
   ngOnInit(): void {
     this.helpResourceService.getHelpResourceByType(this.currentType).subscribe(helpResource=>{
@@ -69,4 +75,13 @@ export class HelpResoucesComponent implements OnInit{
         }
       });
     };
+
+    view(resource: HelpResource) {
+      this.modalService.create({
+        nzContent: ResourceViewModalComponent,
+        nzData:{
+          resource
+        }
+      })
+    }
 }

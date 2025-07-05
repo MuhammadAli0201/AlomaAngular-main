@@ -1,0 +1,11 @@
+<div class="resource-container">
+    @if(isImagePreviewVisible){
+    <img [src]="previewImage" alt="Profile Avatar" class="profile-avatar" style="width: 150px; height: 150px;" />
+    }
+    @else if(isVideoPreviewVisible){
+        <video controls style="width: 100%">
+        <source [src]="previewVideo" type="video/mp4" />
+        Your browser does not support the video tag.
+        </video>
+    }
+</div>

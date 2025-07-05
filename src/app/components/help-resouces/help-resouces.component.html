@@ -5,7 +5,12 @@
           Images
         </button>
       </li>
-      <!-- Future tabs -->
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="video-tab" data-bs-toggle="tab" data-bs-target="#video" type="button"
+                role="tab" aria-controls="video" aria-selected="false" (click)="handleTypeChange('video')">
+          Videos
+        </button>
+      </li>
       <li class="nav-item" role="presentation">
         <button class="nav-link" id="pdfs-tab" data-bs-toggle="tab" data-bs-target="#pdfs" type="button"
                 role="tab" aria-controls="pdfs" aria-selected="false" (click)="handleTypeChange('pdf')">
@@ -27,17 +32,16 @@
     @for (data of basicTable.data; track data; let i = $index) {
     <tr>
       <td>{{ data.resourceName | uppercase }}</td>
-      <td>{{ data.size| date }}</td>
+      <td>{{ data.size / 1000 }} KB</td>
       <td>{{ data.type }}</td>
-      <td></td>
       <td>
-        <!-- <button
-          (click)="edit(data.id!)"
+        <button
+          (click)="view(data)"
           nz-button
           nzType="primary"
         >
           View
-        </button> -->
+        </button>
       </td>
     </tr>
     }

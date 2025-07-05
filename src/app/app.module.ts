@@ -37,6 +37,7 @@ import { CreatePatientComponent } from './components/patients/create-patient/cre
 import { PatientFullFormComponent } from './components/patients/patient-full-form/patient-full-form.component';
 import { InternWelcomeComponent } from './components/intern-dashboard/intern-welcome/intern-welcome.component';
 import { HelpResoucesComponent } from './components/help-resouces/help-resouces.component';
+import { ResourceViewModalComponent } from './components/resource-view-modal/resource-view-modal.component';
 
 registerLocaleData(en);
 
@@ -63,7 +64,8 @@ registerLocaleData(en);
     CreatePatientComponent,
     PatientFullFormComponent,
     InternWelcomeComponent,
-    HelpResoucesComponent
+    HelpResoucesComponent,
+    ResourceViewModalComponent
   ],
   imports: [
     BrowserModule,
