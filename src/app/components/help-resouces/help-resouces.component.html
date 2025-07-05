@@ -48,7 +48,8 @@
   </tbody>
 </nz-table>
 
-<nz-upload
+@if(isAdmin()){
+  <nz-upload
   [nzAccept]="accept"
   nzShowUploadList="false"
   [nzCustomRequest]="handleUpload"
@@ -57,3 +58,5 @@
     <i nz-icon nzType="upload"></i> Click to Upload {{ currentType }}
   </button>
 </nz-upload>
+
+}

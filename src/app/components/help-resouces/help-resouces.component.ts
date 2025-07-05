@@ -6,6 +6,7 @@ import { concatMap } from 'rxjs';
 import { BACKEND_URL } from '../../constants/constants';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { ResourceViewModalComponent } from '../resource-view-modal/resource-view-modal.component';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-help-resouces',
@@ -27,7 +28,8 @@ export class HelpResoucesComponent implements OnInit{
   ];
 
   constructor(private helpResourceService: ResourceService,
-    private modalService: NzModalService
+    private modalService: NzModalService,
+    private authService: AuthService
   ){}
 
   ngOnInit(): void {
@@ -76,12 +78,16 @@ export class HelpResoucesComponent implements OnInit{
       });
     };
 
-    view(resource: HelpResource) {
-      this.modalService.create({
-        nzContent: ResourceViewModalComponent,
-        nzData:{
-          resource
-        }
-      })
-    }
+  view(resource: HelpResource) {
+    this.modalService.create({
+      nzContent: ResourceViewModalComponent,
+      nzData:{
+        resource
+      }
+    })
+  }
+
+  isAdmin(): boolean {
+    return this.authService.getRole()?.toLowerCase() === 'admin';
+  }
 }

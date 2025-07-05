@@ -42,6 +42,9 @@ const patientRoutes: Routes = [
       { path: 'full', component: PatientFullFormComponent },
     ]
   },
+  {
+    path: 'help-resources', component: HelpResoucesComponent,
+  }
 ];
 
 const routes: Routes = [
