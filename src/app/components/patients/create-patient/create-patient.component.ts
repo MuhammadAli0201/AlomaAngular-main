@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
@@ -8,6 +8,10 @@ import { EMPTY_GUID } from '../../../constants/constants';
 import { AuthService } from '../../../services/auth.service';
 import { strictDecimalValidator } from '../../../validators/strict-decimal';
 import { SharedService } from '../../../services/shared.service';
+import { Province } from '../../../models/province';
+import { City } from '../../../models/city';
+import { Suburb } from '../../../models/suburb';
+import { Hospital } from '../../../models/hospital';
 
 @Component({
   selector: 'app-create-patient',
@@ -87,6 +91,42 @@ export class CreatePatientComponent {
     doctor: 'doctor-dashboard'
   }
 
+  provinces: Province[] = [
+  {
+    id: 1,
+    name: 'Sindh',
+    cities: [
+      {
+        id: 1,
+        name: 'Karachi',
+        suburbs: [
+          {
+            id: 1,
+            name: 'Clifton',
+            hospitals: [
+              { id: 1, name: 'Aga Khan University Hospital' },
+              { id: 2, name: 'South City Hospital' }
+            ]
+          },
+          {
+            id: 2,
+            name: 'Gulshan-e-Iqbal',
+            hospitals: [
+              { id: 3, name: 'Liaquat National Hospital' }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+];
+
+
+  cities: City[] = [];
+  suburbs: Suburb[] = [];
+  hospitals: Hospital[] = [];
+
+
   currentRolePath: string = '';
 
   //LIFE CYCLES
@@ -107,6 +147,10 @@ export class CreatePatientComponent {
       gestationalUnit: [null],
       gestationalAge: [null, strictDecimalValidator()],
       gender: [null, Validators.required],
+      province: ['', Validators.required],
+      city: ['', Validators.required],
+      suburb: ['', Validators.required],
+      hospital: ['', Validators.required],
       placeOfBirth: [null, Validators.required],
       modeOfDelivery: [null, Validators.required],
       initialResuscitation: [[]],
@@ -198,7 +242,9 @@ export class CreatePatientComponent {
 
     if (this.patientForm.valid) {
       this.btnLoading = true;
-      this.patientService.createPatient(this.patientForm.getRawValue())
+      let formValue = this.patientForm.getRawValue();
+      // formValue = this.stripPPIPFieldsIfNotRequired(formValue);
+      this.patientService.createPatient(formValue)
         .subscribe({
           next: (res) => {
             this.patientForm.patchValue(res);
@@ -224,12 +270,95 @@ export class CreatePatientComponent {
     this.sharedService.setEditable(true)
   }
 
-  openPpipForm(): void {
-    alert('PPIP form should open here.');
+  setPPIPFormRequired(){
+    const fields = [
+      'mothersGtNumber',
+      'dateOfDeath',
+      'conditionAtBirth',
+      'syphilisSerology',
+      'singleOrMultipleBirths',
+      'obstetricCauseOfDeath',
+      'neonatalCauseOfDeath',
+      'avoidableFactors'
+    ];
+    fields.forEach(field => {
+      const control = this.patientForm.get(field);
+      if (control) {
+        control.enable();
+        control.setValidators(Validators.required);
+        control.updateValueAndValidity({ onlySelf: true });
+      }
+    });
+    this.patientForm.updateValueAndValidity();
+  }
+
+  unsetPPIPFormRequired(){
+    const fields = [
+      'mothersGtNumber',
+      'dateOfDeath',
+      'conditionAtBirth',
+      'syphilisSerology',
+      'singleOrMultipleBirths',
+      'obstetricCauseOfDeath',
+      'neonatalCauseOfDeath',
+      'avoidableFactors'
+    ];
+    fields.forEach(field => {
+      const control = this.patientForm.get(field);
+      if (control) {
+        control.disable();
+        control.clearValidators();
+        control.setErrors(null);
+        control.updateValueAndValidity({ onlySelf: true });
+      }
+    });
+    this.patientForm.updateValueAndValidity();
+  }
+
+  private stripPPIPFieldsIfNotRequired(formValue: any): any {
+    if (
+      this.outcomeStatus !== 'Died' &&
+      !this.diedInDeliveryRoom &&
+      !this.diedWithin12Hours
+    ) {
+      const fieldsToRemove = [
+        'mothersGtNumber',
+        'dateOfDeath',
+        'conditionAtBirth',
+        'syphilisSerology',
+        'singleOrMultipleBirths',
+        'obstetricCauseOfDeath',
+        'neonatalCauseOfDeath',
+        'avoidableFactors'
+      ];
+      fieldsToRemove.forEach(field => delete formValue[field]);
+    }
+    return formValue;
   }
 
   //NAVIGATIONS
   close(): void {
     this.router.navigate([this.currentRolePath, 'patients'])
+  }
+
+  onProvinceChange(provinceName: string): void {
+    const province = this.provinces.find(p => p.name === provinceName);
+    this.cities = province?.cities || [];
+    this.suburbs = [];
+    this.hospitals = [];
+    this.patientForm.patchValue({ city: null, suburb: null, hospital: null });
+  }
+
+  onCityChange(cityName: string): void {
+    const city = this.cities.find(c => c.name === cityName);
+    this.suburbs = city?.suburbs || [];
+    this.hospitals = [];
+    this.patientForm.patchValue({ suburb: null, hospital: null });
+  }
+
+  onSuburbChange(suburbName: string): void {
+    const suburb = this.suburbs.find(s => s.name === suburbName);
+    this.hospitals = suburb?.hospitals || [];
+    this.patientForm.patchValue({ hospital: null });
   }
 }
