@@ -1,0 +1,62 @@
+<ul class="nav nav-tabs mb-4" id="helpTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="images-tab" data-bs-toggle="tab" data-bs-target="#images" type="button"
+                role="tab" aria-controls="images" aria-selected="true" (click)="handleTypeChange('image')">
+          Images
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="video-tab" data-bs-toggle="tab" data-bs-target="#video" type="button"
+                role="tab" aria-controls="video" aria-selected="false" (click)="handleTypeChange('video')">
+          Videos
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pdfs-tab" data-bs-toggle="tab" data-bs-target="#pdfs" type="button"
+                role="tab" aria-controls="pdfs" aria-selected="false" (click)="handleTypeChange('pdf')">
+          PDFs
+        </button>
+      </li>
+      
+    </ul>
+<nz-table #basicTable [nzData]="helpResources" [nzLoading]="loading">
+  <thead>
+    <tr>
+      <th>Resource Name</th>
+      <th>Size</th>
+      <th>Type</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (data of basicTable.data; track data; let i = $index) {
+    <tr>
+      <td>{{ data.resourceName | uppercase }}</td>
+      <td>{{ data.size / 1000 }} KB</td>
+      <td>{{ data.type }}</td>
+      <td>
+        <button
+          (click)="view(data)"
+          nz-button
+          nzType="primary"
+        >
+          View
+        </button>
+      </td>
+    </tr>
+    }
+  </tbody>
+</nz-table>
+
+@if(isAdmin()){
+  <nz-upload
+  [nzAccept]="accept"
+  nzShowUploadList="false"
+  [nzCustomRequest]="handleUpload"
+>
+  <button nz-button>
+    <i nz-icon nzType="upload"></i> Click to Upload {{ currentType }}
+  </button>
+</nz-upload>
+
+}

@@ -52,34 +52,6 @@ export class PatientsComponent implements OnInit {
     return this.authService.getRole()?.toLowerCase() === 'admin';
   }
 
-  delete(id: string, index: number): void {
-    this.btnLoading[index] = true;
-
-    this.patientService.delete(id).subscribe({
-      next: (val: boolean) => {
-        if (val) {
-          const i = this.patients.findIndex(x => x.id === id);
-
-          if (i > -1) {
-            const updated = [...this.patients];
-            updated.splice(i, 1);
-            this.patients = updated;
-
-            const btns = [...this.btnLoading];
-            btns.splice(index, 1);
-            this.btnLoading = btns;
-
-            this.notificationService.success("Success", "Deleted successfully");
-          }
-        }
-      },
-      error: () => {
-        this.btnLoading[index] = false;
-        this.notificationService.error("Error", "Failed to delete");
-      }
-    });
-  }
-
   //NAVIGATIONS
   edit(id: string): void {
     if (this.authService.getRole()?.toLowerCase() === 'doctor') {

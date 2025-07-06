@@ -45,8 +45,13 @@ export class LoginComponent implements OnInit {
 
             this.loginForm.reset();
 
-            // Navigate based on role
-            this.navigateBasedOnRole(res.role);
+            if(res.isVerified){
+              // Navigate based on role
+              this.navigateBasedOnRole(res.role);
+            }
+            else{
+              this.sendOtp(res.email)
+            }
           },
           error: (err) => {
             this.notification.error("error",
@@ -75,5 +80,17 @@ export class LoginComponent implements OnInit {
         this.router.navigate(['dashboard']);
         break;
     }
+  }
+
+  sendOtp(email: string) {
+      this.auth.sendOtp(email).subscribe({
+        next: (res) => {
+          this.notification.success("Success", res.message);
+            this.router.navigate(['verify', email], { queryParams: { is2fa: true } });
+        },
+        error: (err) => {
+          this.notification.error("Error", err?.error.message);
+        }
+      });
   }
 }

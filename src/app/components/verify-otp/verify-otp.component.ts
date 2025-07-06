@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { AuthService } from '../../../services/auth.service';
+import { AuthService } from '../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { OtpVerifyRequest } from '../../../models/otp-verify-request';
+import { OtpVerifyRequest } from '../../models/otp-verify-request';
 
 @Component({
   selector: 'app-verify-otp',
@@ -15,6 +15,7 @@ export class VerifyOtpComponent {
   otpForm!: FormGroup;
   email: string = '';
   loading: boolean = false;
+  is2fa: boolean = false;
 
   constructor(private fb: FormBuilder, private authService: AuthService, private router: Router,
     private notification: NzNotificationService, private activeRoute: ActivatedRoute) { }
@@ -24,6 +25,8 @@ export class VerifyOtpComponent {
     });
 
     this.email = this.activeRoute.snapshot.params['email'];
+    this.is2fa = this.activeRoute.snapshot.queryParamMap.get('is2fa') === 'true';
+    console.log(this.is2fa);
   }
 
   verifyOtp() {
@@ -39,7 +42,12 @@ export class VerifyOtpComponent {
         next: (res) => {
           this.notification.success("Success", res.message);
           this.otpForm.reset();
-          this.router.navigate(['new-password', this.email, otpVerifyRequest.code]);
+          if(this.is2fa){
+            this.router.navigate(['login'])
+          }
+          else{
+            this.router.navigate(['new-password', this.email, otpVerifyRequest.code]);
+          }
         },
         error: (err) => {
           this.notification.error("Error", err?.error.message);

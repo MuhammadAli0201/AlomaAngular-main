@@ -11,6 +11,7 @@ import { EMPTY_GUID } from '../../../constants/constants';
 import { AuthService } from '../../../services/auth.service';
 import { Location } from '@angular/common';
 import { strictDecimalValidator } from '../../../validators/strict-decimal';
+import { SharedService } from '../../../services/shared.service';
 
 @Component({
   selector: 'app-maternal',
@@ -62,7 +63,7 @@ export class MaternalComponent implements OnInit {
   //LIFE CYCLES
   constructor(private activatedRoute: ActivatedRoute, private notificationService: NzNotificationService, private location: Location,
     private fb: FormBuilder, private patientService: PatientService, private maternalService: MaternalService,
-    private router: Router, private authService: AuthService) { }
+    private router: Router, private authService: AuthService, private sharedService: SharedService) { }
 
   ngOnInit(): void {
     this.motherForm = this.fb.group({
@@ -110,6 +111,9 @@ export class MaternalComponent implements OnInit {
         tap((maternal: Maternal) => {
           this.motherForm.patchValue(maternal);
           this.maternal = maternal;
+          if(!maternal){
+            this.sharedService.setEditable(true);
+          }
         }),
         finalize(() => this.loading = false)
       ).subscribe({
@@ -120,6 +124,13 @@ export class MaternalComponent implements OnInit {
     }
 
     this.setCurrentRole();
+    this.sharedService.editable$.subscribe(editable => {
+      if (editable && !this.isAdmin()) {
+        this.motherForm.enable();
+      } else {
+        this.motherForm.disable();
+      }
+    })
   }
 
   //UI LOGIC
@@ -136,19 +147,14 @@ export class MaternalComponent implements OnInit {
   }
   isAdmin = (): boolean => this.currentRolePath === this.rolesPath.admin;
 
-  onSubmit(): void {
-    if (this.isAdmin()) {
-      this.router.navigate([this.currentRolePath, "patient", this.patient.id, "full"]);
-      return;
-    }
-
+  markAsComplete(): void {
     if (this.motherForm.valid) {
       this.btnLoading = true;
       this.maternalService.createOrUpdateMaternal(this.motherForm.getRawValue()).subscribe({
         next: res => {
-          this.motherForm.patchValue(res),
-            this.btnLoading = false;
-          this.router.navigate([this.currentRolePath, "patient", this.patient.id, "full"]);
+          this.motherForm.patchValue(res)
+          this.sharedService.setEditable(false);
+          this.btnLoading = false;
         },
         error: err => {
           this.notificationService.error('Error', err.message),
@@ -159,6 +165,14 @@ export class MaternalComponent implements OnInit {
       this.motherForm.markAllAsTouched();
       this.btnLoading = false;
     }
+  }
+
+  setEditable(){
+    this.sharedService.setEditable(true);
+  }
+
+  navToNext(){
+    this.router.navigate([this.currentRolePath, "patient", this.patient.id, "full"]);
   }
 
   //NAVIGATION

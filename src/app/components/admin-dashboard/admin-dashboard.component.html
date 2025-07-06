@@ -35,13 +35,15 @@
         <nz-icon nzType="bar-chart" nzTheme="outline" />
         <span>Report</span>
       </li>
-      <li
-        nz-menu-item
-        routerLink="/admin-dashboard/help-resource"
-        nzMatchRouter
-      >
-        <nz-icon nzType="question-circle" nzTheme="outline" />
-        <span>Help Resources</span>
+      <li nz-submenu nzOpen nzTitle="Help Resources" nzIcon="question-circle">
+        <ul>
+          <li nz-menu-item routerLink="/admin-dashboard/faq" nzMatchRouter>
+            Faq
+          </li>
+          <li nz-menu-item routerLink="/admin-dashboard/help-resources" nzMatchRouter>
+            Manage Help Resources
+          </li>
+        </ul>
       </li>
       <li
         nz-menu-item

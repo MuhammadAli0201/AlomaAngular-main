@@ -39,19 +39,7 @@
           nzType="primary"
           [nzLoading]="btnLoading[i]"
         >
-          {{ isAdmin() ? "View" : "Update" }}
-        </button>
-        <button
-          class="ms-2"
-          nz-button
-          [nzLoading]="btnLoading[i]"
-          nzDanger
-          nz-popconfirm
-          nzPopconfirmTitle="Are you sure delete this task?"
-          nzPopconfirmPlacement="topRight"
-          (nzOnConfirm)="delete(data.id!, i)"
-        >
-          Delete
+          View
         </button>
       </td>
     </tr>

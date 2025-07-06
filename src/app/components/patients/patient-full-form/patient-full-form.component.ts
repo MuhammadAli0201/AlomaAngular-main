@@ -15,6 +15,7 @@ import { Organism, OrganismService } from '../../../services/organism.service';
 import { FungalOrganism, FungalOrganismService } from '../../../services/fungalorganism.service';
 import { SonarFinding, SonarFindingService } from '../../../services/sonarfinding.service';
 import { Location } from '@angular/common';
+import { SharedService } from '../../../services/shared.service';
 
 @Component({
   selector: 'app-patient-full-form',
@@ -194,7 +195,8 @@ export class PatientFullFormComponent implements OnInit {
   constructor(private fb: FormBuilder, private patientCompleteInfoService: PatientCompleteInfoService, private authService: AuthService, private location: Location,
     private nzNotificationService: NzNotificationService, private activatedRoute: ActivatedRoute, private patientService: PatientService, private router: Router,
     private congenitalInfectionOrganismService: CongenitalInfectionOrganismService, private antiMicrobialService: AntimicrobialService,
-    private oragnismService: OrganismService, private fungalOragnismService: FungalOrganismService, private sonarFindingService: SonarFindingService
+    private oragnismService: OrganismService, private fungalOragnismService: FungalOrganismService, private sonarFindingService: SonarFindingService,
+    private sharedService: SharedService
   ) { }
 
   ngOnInit(): void {
@@ -345,10 +347,17 @@ export class PatientFullFormComponent implements OnInit {
           tap((res: PatientCompleteInfo) => {
             this.patientCompleteInfo = res;
             this.diagnosisForm.patchValue(res)
+            if(!res){
+              this.sharedService.setEditable(true);
+            }
           }),
           finalize(() => this.loading = false)
         )
-        .subscribe({});
+        .subscribe({
+          error: (err: Error) => {
+          this.nzNotificationService.error("Error", err.message);
+        }
+        });
     }
 
     const dropdownCalls = forkJoin({
@@ -374,6 +383,13 @@ export class PatientFullFormComponent implements OnInit {
     });
 
     this.setCurrentRole();
+    this.sharedService.editable$.subscribe(editable => {
+      if (editable && !this.isAdmin()) {
+        this.diagnosisForm.enable();
+      } else {
+        this.diagnosisForm.disable();
+      }
+    })
   }
 
   //UI LOGIC
@@ -390,15 +406,15 @@ export class PatientFullFormComponent implements OnInit {
   }
   isAdmin = (): boolean => this.currentRolePath === this.rolesPath.admin;
 
-  onSubmit(): void {
+  markAsComplete(): void {
     if (this.diagnosisForm.valid) {
       this.btnLoading = true;
       this.patientCompleteInfoService.createOrUpdate(this.diagnosisForm.getRawValue()).subscribe({
         next: (res: PatientCompleteInfo) => {
           this.patientCompleteInfo = res;
           this.diagnosisForm.patchValue(res);
+          this.sharedService.setEditable(false);
           this.nzNotificationService.success("Success", "Patient Form has been saved successfully");
-          this.close();
           this.btnLoading = false;
         },
         error: (err: Error) => {
@@ -409,6 +425,10 @@ export class PatientFullFormComponent implements OnInit {
     } else {
       this.diagnosisForm.markAllAsTouched();
     }
+  }
+
+  setEditable(){
+    this.sharedService.setEditable(true);
   }
 
   //NAVIGATIONS

@@ -13,7 +13,7 @@ import { HelpResourceComponent } from './components/help-resource/help-resource.
 import { AdminWelcomeComponent } from './components/admin-dashboard/admin-welcome/admin-welcome.component';
 import { ManageUsersComponent } from './components/manage-users/manage-users.component';
 import { ForgetPasswordComponent } from './components/forget-password/forget-password.component';
-import { VerifyOtpComponent } from './components/forget-password/verify-otp/verify-otp.component';
+import { VerifyOtpComponent } from './components/verify-otp/verify-otp.component';
 import { NewPasswordComponent } from './components/forget-password/new-password/new-password.component';
 import { DoctorWelcomeComponent } from './components/doctor-dashboard/doctor-welcome/doctor-welcome.component';
 import { PatientsComponent } from './components/patients/patients.component';
@@ -22,6 +22,7 @@ import { MaternalComponent } from './components/patients/maternal/maternal.compo
 import { CreatePatientComponent } from './components/patients/create-patient/create-patient.component';
 import { PatientFullFormComponent } from './components/patients/patient-full-form/patient-full-form.component';
 import { InternWelcomeComponent } from './components/intern-dashboard/intern-welcome/intern-welcome.component';
+import { HelpResoucesComponent } from './components/help-resouces/help-resouces.component';
 
 const patientRoutes: Routes = [
   { path: 'patients', component: PatientsComponent },
@@ -41,6 +42,9 @@ const patientRoutes: Routes = [
       { path: 'full', component: PatientFullFormComponent },
     ]
   },
+  {
+    path: 'help-resources', component: HelpResoucesComponent,
+  }
 ];
 
 const routes: Routes = [
@@ -92,7 +96,12 @@ const routes: Routes = [
         data: { expectedRole: 'Admin' }
       },
       {
-        path: 'help-resource', component: HelpResourceComponent,
+        path: 'faq', component: HelpResourceComponent,
+        canActivate: [authGuard, roleGuard],
+        data: { expectedRole: 'Admin' }
+      },
+      {
+        path: 'help-resources', component: HelpResoucesComponent,
         canActivate: [authGuard, roleGuard],
         data: { expectedRole: 'Admin' }
       },

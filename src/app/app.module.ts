@@ -28,7 +28,7 @@ import { antdIcons, AntdModule } from './antd.module';
 import { NZ_ICONS } from 'ng-zorro-antd/icon';
 import { ManageUsersComponent } from './components/manage-users/manage-users.component';
 import { ForgetPasswordComponent } from './components/forget-password/forget-password.component';
-import { VerifyOtpComponent } from './components/forget-password/verify-otp/verify-otp.component';
+import { VerifyOtpComponent } from './components/verify-otp/verify-otp.component';
 import { NewPasswordComponent } from './components/forget-password/new-password/new-password.component';
 import { PatientsComponent } from './components/patients/patients.component';
 import { PatientComponent } from './components/patients/patient/patient.component'; 
@@ -36,6 +36,8 @@ import { MaternalComponent } from './components/patients/maternal/maternal.compo
 import { CreatePatientComponent } from './components/patients/create-patient/create-patient.component';
 import { PatientFullFormComponent } from './components/patients/patient-full-form/patient-full-form.component';
 import { InternWelcomeComponent } from './components/intern-dashboard/intern-welcome/intern-welcome.component';
+import { HelpResoucesComponent } from './components/help-resouces/help-resouces.component';
+import { ResourceViewModalComponent } from './components/resource-view-modal/resource-view-modal.component';
 
 registerLocaleData(en);
 
@@ -61,7 +63,9 @@ registerLocaleData(en);
     MaternalComponent,
     CreatePatientComponent,
     PatientFullFormComponent,
-    InternWelcomeComponent
+    InternWelcomeComponent,
+    HelpResoucesComponent,
+    ResourceViewModalComponent
   ],
   imports: [
     BrowserModule,
