@@ -18,6 +18,10 @@ export class SuburbService {
   getById(id: number): Observable<Suburb> {
     return this.http.get<Suburb>(`${this.baseUrl}/${id}`);
   }
+
+  getByCityId(cityId: number): Observable<Suburb[]> {
+    return this.http.get<Suburb[]>(`${this.baseUrl}/city/${cityId}`);
+  }
   
   create(suburb: Suburb): Observable<Suburb> {
     return this.http.post<Suburb>(this.baseUrl, suburb);

@@ -10,6 +10,11 @@ import { CityService } from '../../services/city.service';
 import { SuburbService } from '../../services/suburb.service';
 import { HospitalService } from '../../services/hospital.service';
 import { Province } from '../../models/province';
+import { City } from '../../models/city';
+import { Suburb } from '../../models/suburb';
+import { Hospital } from '../../models/hospital';
+import { Unit } from '../../models/unit';
+import { UnitService } from '../../services/unit.service';
 
 
 
@@ -20,7 +25,7 @@ import { Province } from '../../models/province';
   standalone: false
 })
 export class ManageFormTemplateComponent implements OnInit {
-
+  
   // Organism properties
   organisms: Organism[] = [];
   organismForm: Organism = { organismID: 0, organismName: '' };
@@ -56,9 +61,32 @@ export class ManageFormTemplateComponent implements OnInit {
   provniceForm: Province = { provinceId: 0, name: '', cities: [] };
   editingProvince = false;
   provinceSearchTerm: string = '';
+
+  // City properties
+  cities: City[] = [];
+  cityForm: City = { cityId: 0, name: '', provinceId: 0, suburbs: [] };
+  editingCity = false;
+  citySearchTerm: string = '';
+
+  // Suburb properties
+  suburbs: Suburb[] = [];
+  suburbForm: Suburb = { suburbId: 0, name: '', cityId: 0, provinceId: 0, hospitals: [] };
+  editingSuburb = false;
+  suburbSearchTerm: string = '';
+
+  hospitals: Hospital[] = [];
+  hospitalForm: Hospital = { hospitalId: 0, name: '', address: '', provinceId: 0, cityId: 0, suburbId: 0 };
+  editingHospital = false;
+  hospitalSearchTerm: string = '';
+
+  // Unit properties
+  units: Unit[] = [];
+  unitForm: Unit = { unitId: 0, name: '', reason: '' };
+  editingUnit = false;
+  unitSearchTerm: string = '';
   
   // Tab control with proper typing
-  activeTab: 'organism' | 'fungalOrganism' | 'antimicrobial' | 'congenitalInfectionOrganism' | 'sonarFinding' | 'province' = 'organism';
+  activeTab: 'organism' | 'fungalOrganism' | 'antimicrobial' | 'congenitalInfectionOrganism' | 'sonarFinding' | 'province' | 'city' | 'suburb' | 'hospital' | 'unit' = 'organism';
 
   // Validation and UI state properties
   successMessage: string = '';
@@ -75,6 +103,7 @@ export class ManageFormTemplateComponent implements OnInit {
     private cityService: CityService,
     private suburbService: SuburbService,
     private hospitalService: HospitalService,
+    private unitService: UnitService,
     private location: Location
   ) {}
 
@@ -85,6 +114,10 @@ export class ManageFormTemplateComponent implements OnInit {
     this.loadCongenitalInfectionOrganisms();
     this.loadSonarFindings();
     this.loadProvinces();
+    this.loadCities();
+    this.loadSuburbs();
+    this.loadHospitals();
+    this.loadUnits();
   }
 
   // Message handling methods
@@ -107,7 +140,7 @@ export class ManageFormTemplateComponent implements OnInit {
     setTimeout(() => this.clearMessages(), 8000);
   }
 
-  setActiveTab(tab: 'organism' | 'fungalOrganism' | 'antimicrobial' | 'congenitalInfectionOrganism' | 'sonarFinding' | 'province') {
+  setActiveTab(tab: 'organism' | 'fungalOrganism' | 'antimicrobial' | 'congenitalInfectionOrganism' | 'sonarFinding' | 'province' | 'city' | 'suburb' | 'hospital' | 'unit') {
     this.activeTab = tab;
     this.clearMessages(); // Clear messages when switching tabs
   }
@@ -649,6 +682,425 @@ export class ManageFormTemplateComponent implements OnInit {
   resetProvinceForm() {
     this.provniceForm = { provinceId: 0, name: '', cities: [] };
     this.editingProvince = false;
+  }
+
+  // City methods
+  loadCities() {
+    this.cityService.getAll().subscribe({
+      next: (data) => {
+        this.cities = data;
+      },
+      error: (error) => {
+        console.error('Error loading cities:', error);
+        this.showErrorMessage('Failed to load cities. Please refresh the page.');
+      }
+    });
+  }
+
+  filteredCities(): City[] {
+    return this.cities.filter(c =>
+      c.name.toLowerCase().includes(this.citySearchTerm.toLowerCase())
+    );
+  }
+
+  async saveCity(): Promise<void> {
+    if (!this.cityForm.name?.trim()) {
+      this.showErrorMessage('City name is required.');
+      return;
+    }
+
+    if (this.cityForm.name.trim().length < 2) {
+      this.showErrorMessage('City name must be at least 2 characters long.');
+      return;
+    }
+
+    if (this.cityForm.name.trim().length > 100) {
+      this.showErrorMessage('City name cannot exceed 100 characters.');
+      return;
+    }
+    
+    if (!this.cityForm.provinceId || this.cityForm.provinceId <= 0) {
+      this.showErrorMessage('Province is required for the city.');
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.clearMessages();
+
+    const trimmedForm = { ...this.cityForm, name: this.cityForm.name.trim(), suburbs: [] };
+
+    try {
+      if (this.editingCity) {
+        await this.cityService.update(trimmedForm.cityId, trimmedForm).toPromise();
+        this.showSuccessMessage('City updated successfully!');
+      } else {
+        await this.cityService.create(trimmedForm).toPromise();
+        this.showSuccessMessage('City created successfully!');
+      }
+      this.resetCityForm();
+      this.loadCities();
+    } catch (error) {
+      console.error('Error saving city:', error);
+      const action = this.editingCity ? 'update' : 'create';
+      this.showErrorMessage(`Failed to ${action} city. Please try again.`);
+    } finally {
+      this.isSubmitting = false;
+    }
+  }
+
+  editCity(city: City) {
+    this.cityForm = { ...city, suburbs: [] };
+    this.editingCity = true;
+    this.clearMessages();
+  }
+
+  async deleteCity(id: number): Promise<void> {
+    if (!confirm('Are you sure you want to delete this city?')) {
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.clearMessages();
+
+    try {
+      await this.cityService.delete(id).toPromise();
+      this.showSuccessMessage('City deleted successfully!');
+      this.loadCities();
+    } catch (error) {
+      console.error('Error deleting city:', error);
+      this.showErrorMessage('Failed to delete city. Please try again.');
+    } finally {
+      this.isSubmitting = false;
+    }
+  }
+
+  resetCityForm() {
+    this.cityForm = { cityId: 0, name: '', provinceId: 0, suburbs: [] };
+    this.editingCity = false;
+  }
+
+  // Suburb methods
+  loadSuburbs() {
+    this.suburbService.getAll().subscribe({
+      next: (data) => {
+        this.suburbs = data;
+      },
+      error: (error) => {
+        console.error('Error loading suburbs:', error);
+        this.showErrorMessage('Failed to load suburbs. Please refresh the page.');
+      }
+    });
+  }
+
+  filteredSuburbs(): Suburb[] {
+    return this.suburbs.filter(s =>
+      s.name.toLowerCase().includes(this.suburbSearchTerm.toLowerCase())
+    );
+  }
+
+  async saveSuburb(): Promise<void> {
+    if (!this.suburbForm.name?.trim()) {
+      this.showErrorMessage('Suburb name is required.');
+      return;
+    }
+
+    if (this.suburbForm.name.trim().length < 2) {
+      this.showErrorMessage('Suburb name must be at least 2 characters long.');
+      return;
+    }
+
+    if (this.suburbForm.name.trim().length > 100) {
+      this.showErrorMessage('Suburb name cannot exceed 100 characters.');
+      return;
+    }
+
+    if (!this.suburbForm.cityId || this.suburbForm.cityId <= 0) {
+      this.showErrorMessage('City is required for the suburb.');
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.clearMessages();
+
+    const trimmedForm = { ...this.suburbForm, name: this.suburbForm.name.trim(), hospitals: [] };
+
+    try {
+      if (this.editingSuburb) {
+        await this.suburbService.update(trimmedForm.suburbId, trimmedForm).toPromise();
+        this.showSuccessMessage('Suburb updated successfully!');
+      } else {
+        await this.suburbService.create(trimmedForm).toPromise();
+        this.showSuccessMessage('Suburb created successfully!');
+      }
+      this.resetSuburbForm();
+      this.loadSuburbs();
+    } catch (error) {
+      console.error('Error saving suburb:', error);
+      const action = this.editingSuburb ? 'update' : 'create';
+      this.showErrorMessage(`Failed to ${action} suburb. Please try again.`);
+    } finally {
+      this.isSubmitting = false;
+    }
+  }
+
+  editSuburb(suburb: Suburb) {
+    this.suburbForm = { ...suburb, hospitals: [] };
+    this.editingSuburb = true;
+    this.clearMessages();
+  }
+
+  async deleteSuburb(id: number): Promise<void> {
+    if (!confirm('Are you sure you want to delete this suburb?')) {
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.clearMessages();
+
+    try {
+      await this.suburbService.delete(id).toPromise();
+      this.showSuccessMessage('Suburb deleted successfully!');
+      this.loadSuburbs();
+    } catch (error) {
+      console.error('Error deleting suburb:', error);
+      this.showErrorMessage('Failed to delete suburb. Please try again.');
+    } finally {
+      this.isSubmitting = false;
+    }
+  }
+
+  resetSuburbForm() {
+    this.suburbForm = { suburbId: 0, name: '', cityId: 0, provinceId: 0, hospitals: [] };
+    this.editingSuburb = false;
+  }
+
+  loadHospitals() {
+    this.hospitalService.getAll().subscribe({
+      next: (data) => {
+        this.hospitals = data;
+      },
+      error: (error) => {
+        console.error('Error loading hospitals:', error);
+        this.showErrorMessage('Failed to load hospitals. Please refresh the page.');
+      }
+    });
+  }
+
+  filteredHospitals(): Hospital[] {
+    return this.hospitals.filter(h =>
+      h.name.toLowerCase().includes(this.hospitalSearchTerm.toLowerCase())
+    );
+  }
+
+  async saveHospital(): Promise<void> {
+    if (!this.hospitalForm.name?.trim()) {
+      this.showErrorMessage('Hospital name is required.');
+      return;
+    }
+    if (this.hospitalForm.name.trim().length < 2) {
+      this.showErrorMessage('Hospital name must be at least 2 characters long.');
+      return;
+    }
+    if (this.hospitalForm.name.trim().length > 100) {
+      this.showErrorMessage('Hospital name cannot exceed 100 characters.');
+      return;
+    }
+    if (!this.hospitalForm.address?.trim()) {
+      this.showErrorMessage('Hospital address is required.');
+      return;
+    }
+    if (!this.hospitalForm.provinceId || this.hospitalForm.provinceId <= 0) {
+      this.showErrorMessage('Province is required for the hospital.');
+      return;
+    }
+    if (!this.hospitalForm.cityId || this.hospitalForm.cityId <= 0) {
+      this.showErrorMessage('City is required for the hospital.');
+      return;
+    }
+    if (!this.hospitalForm.suburbId || this.hospitalForm.suburbId <= 0) {
+      this.showErrorMessage('Suburb is required for the hospital.');
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.clearMessages();
+
+    const trimmedForm = {
+      name: this.hospitalForm.name.trim(),
+      address: this.hospitalForm.address.trim(),
+      provinceId: this.hospitalForm.provinceId,
+      cityId: this.hospitalForm.cityId,
+      suburbId: this.hospitalForm.suburbId,
+      hospitalId: this.hospitalForm.hospitalId || 0
+    };
+
+    try {
+      if (this.editingHospital) {
+        await this.hospitalService.update(trimmedForm.hospitalId, trimmedForm).toPromise();
+        this.showSuccessMessage('Hospital updated successfully!');
+      } else {
+        await this.hospitalService.create(trimmedForm).toPromise();
+        this.showSuccessMessage('Hospital created successfully!');
+      }
+      this.resetHospitalForm();
+      this.loadHospitals();
+    } catch (error) {
+      console.error('Error saving hospital:', error);
+      const action = this.editingHospital ? 'update' : 'create';
+      this.showErrorMessage(`Failed to ${action} hospital. Please try again.`);
+    } finally {
+      this.isSubmitting = false;
+    }
+  }
+
+  editHospital(hospital: Hospital) {
+    this.hospitalForm = { ...hospital };
+    this.editingHospital = true;
+    this.clearMessages();
+  }
+
+  async deleteHospital(id: number): Promise<void> {
+    if (!confirm('Are you sure you want to delete this hospital?')) {
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.clearMessages();
+
+    try {
+      await this.hospitalService.delete(id).toPromise();
+      this.showSuccessMessage('Hospital deleted successfully!');
+      this.loadHospitals();
+    } catch (error) {
+      console.error('Error deleting hospital:', error);
+      this.showErrorMessage('Failed to delete hospital. Please try again.');
+    } finally {
+      this.isSubmitting = false;
+    }
+  }
+
+  resetHospitalForm() {
+    this.hospitalForm = { hospitalId: 0, name: '', address: '', provinceId: 0, cityId: 0, suburbId: 0 };
+    this.editingHospital = false;
+  }
+
+  // Unit methods
+  loadUnits() {
+    this.unitService.getAll().subscribe({
+      next: (data) => {
+        this.units = data;
+      },
+      error: (error) => {
+        console.error('Error loading units:', error);
+        this.showErrorMessage('Failed to load units. Please refresh the page.');
+      }
+    });
+  }
+
+  filteredUnits(): Unit[] {
+    return this.units.filter(u =>
+      u.name.toLowerCase().includes(this.unitSearchTerm.toLowerCase())
+    );
+  }
+
+  async saveUnit(): Promise<void> {
+    if (!this.unitForm.name?.trim()) {
+      this.showErrorMessage('Unit name is required.');
+      return;
+    }
+    if (this.unitForm.name.trim().length < 2) {
+      this.showErrorMessage('Unit name must be at least 2 characters long.');
+      return;
+    }
+    if (this.unitForm.name.trim().length > 100) {
+      this.showErrorMessage('Unit name cannot exceed 100 characters.');
+      return;
+    }
+    if (!this.unitForm.reason?.trim()) {
+      this.showErrorMessage('Unit reason is required.');
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.clearMessages();
+
+    const trimmedForm = {
+      ...this.unitForm,
+      name: this.unitForm.name.trim(),
+      reason: this.unitForm.reason.trim()
+    };
+
+    try {
+      if (this.editingUnit) {
+        await this.unitService.update(trimmedForm.unitId, trimmedForm).toPromise();
+        this.showSuccessMessage('Unit updated successfully!');
+      } else {
+        await this.unitService.create(trimmedForm).toPromise();
+        this.showSuccessMessage('Unit created successfully!');
+      }
+      this.resetUnitForm();
+      this.loadUnits();
+    } catch (error) {
+      console.error('Error saving unit:', error);
+      const action = this.editingUnit ? 'update' : 'create';
+      this.showErrorMessage(`Failed to ${action} unit. Please try again.`);
+    } finally {
+      this.isSubmitting = false;
+    }
+  }
+
+  editUnit(unit: Unit) {
+    this.unitForm = { ...unit };
+    this.editingUnit = true;
+    this.clearMessages();
+  }
+
+  async deleteUnit(id: number): Promise<void> {
+    if (!confirm('Are you sure you want to delete this unit?')) {
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.clearMessages();
+
+    try {
+      await this.unitService.delete(id).toPromise();
+      this.showSuccessMessage('Unit deleted successfully!');
+      this.loadUnits();
+    } catch (error) {
+      console.error('Error deleting unit:', error);
+      this.showErrorMessage('Failed to delete unit. Please try again.');
+    } finally {
+      this.isSubmitting = false;
+    }
+  }
+
+  resetUnitForm() {
+    this.unitForm = { unitId: 0, name: '', reason: '' };
+    this.editingUnit = false;
+  }
+
+  // Helper methods
+  filterCities(provinceId: number, cities: City[]): City[] {
+    if(!provinceId) return cities
+    return this.cities.filter(c => c.provinceId === provinceId);
+  }
+
+  filterSuburbs(cityId: number, suburbs: Suburb[]): Suburb[] {
+    if(!cityId) return suburbs
+    return this.suburbs.filter(s => s.cityId === cityId);
+  }
+  
+  getProvinceName(provinceId: number){
+    return this.provnices.find(p => p.provinceId === provinceId)?.name || '-'
+  }
+
+  getCityName(cityId: number){
+    return this.provnices.find(p => p.provinceId === cityId)?.name || '-'
+  }
+
+  getSuburbName(suburbId: number){
+    return this.provnices.find(p => p.provinceId === suburbId)?.name || '-'
   }
 
   goBack() {

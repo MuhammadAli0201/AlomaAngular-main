@@ -18,6 +18,10 @@ export class CityService {
   getById(id: number): Observable<City> {
     return this.http.get<City>(`${this.baseUrl}/${id}`);
   }
+
+  getByProvinceId(provinceId: number): Observable<City[]> {
+    return this.http.get<City[]>(`${this.baseUrl}/province/${provinceId}`);
+  }
   
   create(city: City): Observable<City> {
     return this.http.post<City>(this.baseUrl, city);

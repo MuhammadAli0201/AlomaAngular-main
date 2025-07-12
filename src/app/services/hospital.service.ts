@@ -7,7 +7,7 @@ import { Hospital } from '../models/hospital';
   providedIn: 'root'
 })
 export class HospitalService {
-  private baseUrl = 'https://localhost:7008/api/City';
+  private baseUrl = 'https://localhost:7008/api/Hospital';
   
   constructor(private http: HttpClient) {}
   
@@ -17,6 +17,10 @@ export class HospitalService {
   
   getById(id: number): Observable<Hospital> {
     return this.http.get<Hospital>(`${this.baseUrl}/${id}`);
+  }
+
+  getBySuburbId(suburbId: number): Observable<Hospital[]> {
+    return this.http.get<Hospital[]>(`${this.baseUrl}/suburb/${suburbId}`);
   }
   
   create(hospital: Hospital): Observable<Hospital> {
