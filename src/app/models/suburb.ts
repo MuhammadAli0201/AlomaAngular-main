@@ -1,7 +1,8 @@
 import { Hospital } from "./hospital";
 
 export interface Suburb {
-    id: number;
+    suburbId: number;
     name: string;
+    cityId: number;
     hospitals: Hospital[];
 }

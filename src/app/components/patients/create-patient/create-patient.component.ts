@@ -92,34 +92,58 @@ export class CreatePatientComponent {
   }
 
   provinces: Province[] = [
-  {
-    id: 1,
-    name: 'Sindh',
-    cities: [
-      {
-        id: 1,
-        name: 'Karachi',
-        suburbs: [
-          {
-            id: 1,
-            name: 'Clifton',
-            hospitals: [
-              { id: 1, name: 'Aga Khan University Hospital' },
-              { id: 2, name: 'South City Hospital' }
-            ]
-          },
-          {
-            id: 2,
-            name: 'Gulshan-e-Iqbal',
-            hospitals: [
-              { id: 3, name: 'Liaquat National Hospital' }
-            ]
-          }
-        ]
-      }
-    ]
-  }
-];
+    {
+      provinceId: 1,
+      name: 'Sindh',
+      cities: [
+        {
+          cityId: 1,
+          name: 'Karachi',
+          provinceId: 1,
+          suburbs: [
+            {
+              suburbId: 1,
+              name: 'Clifton',
+              cityId: 1,
+              hospitals: [
+                {
+                  hospitalId: 1,
+                  name: 'Aga Khan University Hospital',
+                  address: '',
+                  provinceId: 1,
+                  cityId: 1,
+                  suburbId: 1
+                },
+                {
+                  hospitalId: 2,
+                  name: 'South City Hospital',
+                  address: '',
+                  provinceId: 1,
+                  cityId: 1,
+                  suburbId: 1
+                }
+              ]
+            },
+            {
+              suburbId: 2,
+              name: 'Gulshan-e-Iqbal',
+              cityId: 1,
+              hospitals: [
+                {
+                  hospitalId: 3,
+                  name: 'Liaquat National Hospital',
+                  address: '',
+                  provinceId: 1,
+                  cityId: 1,
+                  suburbId: 2
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ];
 
 
   cities: City[] = [];

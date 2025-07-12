@@ -1,4 +1,8 @@
 export interface Hospital {
-    id: number;
+    hospitalId: number;
     name: string;
+    address: string;
+    provinceId: number;
+    cityId: number;
+    suburbId: number;
 }

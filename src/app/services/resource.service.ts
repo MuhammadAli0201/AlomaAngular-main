@@ -8,7 +8,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class ResourceService {
 
-  private apiUrl = 'https://localhost:7008/api/Resource';
+  private apiUrl = 'https://localhost:7008/api/HelpResource';
 
   constructor(private http: HttpClient) {}
 

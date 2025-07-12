@@ -46,6 +46,11 @@
         Sonar Findings
       </a>
     </li>
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'province'" (click)="setActiveTab('province')" href="javascript:void(0)">
+        Provinces
+      </a>
+    </li>
   </ul>
 
   <!-- Organism Tab Content -->
@@ -585,6 +590,115 @@
             <tr *ngIf="filteredSonarFindings().length === 0">
               <td colspan="2" class="text-center text-muted py-3">
                 No sonar findings found.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Province Tab Content -->
+  <div *ngIf="activeTab === 'province'"> 
+    <!-- Province Form -->
+    <form (ngSubmit)="saveProvince()" #provinceFormRef="ngForm" class="mb-4" novalidate>
+      <div class="mb-3">
+        <div class="input-group">
+          <input
+            type="text"
+            name="province"
+            #provinceName="ngModel"
+            [(ngModel)]="provniceForm.name"
+            class="form-control"
+            [class.is-invalid]="provinceName.invalid && (provinceName.dirty || provinceName.touched)"
+            [class.is-valid]="provinceName.valid && (provinceName.dirty || provinceName.touched)"
+            placeholder="Enter province name"
+            required
+            maxlength="100"
+            minlength="2"
+          />
+          <button class="btn btn-primary" type="submit" [disabled]="provinceFormRef.invalid || isSubmitting">
+            <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+            {{ editingProvince ? 'Update' : 'Create' }}
+          </button>
+          <button
+            *ngIf="editingAntimicrobial"
+            class="btn btn-secondary"
+            type="button"
+            (click)="resetAntimicrobialForm()"
+          >
+            Cancel
+          </button>
+        </div>
+        
+        <!-- Field-specific validation messages -->
+        <div *ngIf="provinceName.invalid && (provinceName.dirty || provinceName.touched)" class="invalid-feedback d-block">
+          <div *ngIf="provinceName.errors?.['required']">
+            <i class="bi bi-exclamation-circle me-1"></i>Province name is required.
+          </div>
+          <div *ngIf="provinceName.errors?.['minlength']">
+            <i class="bi bi-exclamation-circle me-1"></i>Province name must be at least 2 characters long.
+          </div>
+          <div *ngIf="provinceName.errors?.['maxlength']">
+            <i class="bi bi-exclamation-circle me-1"></i>Province name cannot exceed 100 characters.
+          </div>
+        </div>
+        
+        <!-- Character counter -->
+        <small class="form-text text-muted">
+          {{ provniceForm.name.length || 0 }}/100 characters
+        </small>
+      </div>
+    </form>
+
+    <!-- Search Input -->
+    <input type="text" [(ngModel)]="provinceSearchTerm" placeholder="Search Provinces..." class="form-control mb-2">
+    
+    <!-- Search Results List -->
+    <ul *ngIf="provinceSearchTerm" class="list-unstyled mb-3">
+      <li *ngFor="let province of filteredProvinces()" class="p-2 border-bottom">
+        <span [innerHTML]="province.name | highlight:provinceSearchTerm"></span>
+      </li>
+    </ul>
+
+    <!-- Provinces List -->
+    <div class="card">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">Provinces</h5>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Province Name</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let province of filteredProvinces()">
+              <td>{{ province.name }}</td>
+              <td>
+                <button
+                  class="btn btn-sm btn-outline-warning me-2"
+                  (click)="editProvince(province)"
+                  title="Edit"
+                  [disabled]="isSubmitting"
+                >
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="deleteProvince(province.provinceId!)"
+                  title="Delete"
+                  [disabled]="isSubmitting"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="filteredProvinces().length === 0">
+              <td colspan="2" class="text-center text-muted py-3">
+                No provinces found.
               </td>
             </tr>
           </tbody>

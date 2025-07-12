@@ -5,6 +5,11 @@ import { Antimicrobial, AntimicrobialService } from '../../services/antimicrobia
 import { CongenitalInfectionOrganism, CongenitalInfectionOrganismService} from '../../services/congenitalinfectionorganism.service';
 import { SonarFinding, SonarFindingService } from '../../services/sonarfinding.service';
 import { Location } from '@angular/common';
+import { ProvinceService } from '../../services/province.service';
+import { CityService } from '../../services/city.service';
+import { SuburbService } from '../../services/suburb.service';
+import { HospitalService } from '../../services/hospital.service';
+import { Province } from '../../models/province';
 
 
 
@@ -45,9 +50,15 @@ export class ManageFormTemplateComponent implements OnInit {
   sonarFindingForm: SonarFinding = { sonarFindingID: 0, sonarFindingName: '' };
   editingSonarFinding = false;
   sonarFindingSearchTerm: string = '';
+
+  // Province properties
+  provnices: Province[] = [];
+  provniceForm: Province = { provinceId: 0, name: '', cities: [] };
+  editingProvince = false;
+  provinceSearchTerm: string = '';
   
   // Tab control with proper typing
-  activeTab: 'organism' | 'fungalOrganism' | 'antimicrobial' | 'congenitalInfectionOrganism' | 'sonarFinding' = 'organism';
+  activeTab: 'organism' | 'fungalOrganism' | 'antimicrobial' | 'congenitalInfectionOrganism' | 'sonarFinding' | 'province' = 'organism';
 
   // Validation and UI state properties
   successMessage: string = '';
@@ -60,6 +71,10 @@ export class ManageFormTemplateComponent implements OnInit {
     private antimicrobialService: AntimicrobialService,
     private congenitalInfectionOrganismService: CongenitalInfectionOrganismService,
     private sonarFindingService: SonarFindingService,
+    private provinceService: ProvinceService,
+    private cityService: CityService,
+    private suburbService: SuburbService,
+    private hospitalService: HospitalService,
     private location: Location
   ) {}
 
@@ -69,6 +84,7 @@ export class ManageFormTemplateComponent implements OnInit {
     this.loadAntimicrobials();
     this.loadCongenitalInfectionOrganisms();
     this.loadSonarFindings();
+    this.loadProvinces();
   }
 
   // Message handling methods
@@ -91,7 +107,7 @@ export class ManageFormTemplateComponent implements OnInit {
     setTimeout(() => this.clearMessages(), 8000);
   }
 
-  setActiveTab(tab: 'organism' | 'fungalOrganism' | 'antimicrobial' | 'congenitalInfectionOrganism' | 'sonarFinding') {
+  setActiveTab(tab: 'organism' | 'fungalOrganism' | 'antimicrobial' | 'congenitalInfectionOrganism' | 'sonarFinding' | 'province') {
     this.activeTab = tab;
     this.clearMessages(); // Clear messages when switching tabs
   }
@@ -544,6 +560,95 @@ export class ManageFormTemplateComponent implements OnInit {
   resetSonarFindingForm() {
     this.sonarFindingForm = { sonarFindingID: 0, sonarFindingName: '' };
     this.editingSonarFinding = false;
+  }
+
+  loadProvinces() {
+    this.provinceService.getAll().subscribe({
+      next: (data) => {
+        this.provnices = data;
+      },
+      error: (error) => {
+        console.error('Error loading provinces:', error);
+        this.showErrorMessage('Failed to load provinces. Please refresh the page.');
+      }
+    });
+  }
+
+  filteredProvinces(): Province[] {
+    return this.provnices.filter(p =>
+      p.name.toLowerCase().includes(this.sonarFindingSearchTerm.toLowerCase())
+    );
+  }
+
+  async saveProvince(): Promise<void> {
+    if (!this.provniceForm.name?.trim()) {
+      this.showErrorMessage('Povince name is required.');
+      return;
+    }
+
+    if (this.provniceForm.name.trim().length < 2) {
+      this.showErrorMessage('Province name must be at least 2 characters long.');
+      return;
+    }
+
+    if (this.provniceForm.name.trim().length > 100) {
+      this.showErrorMessage('Province name cannot exceed 100 characters.');
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.clearMessages();
+
+    const trimmedForm = { ...this.provniceForm, name: this.provniceForm.name.trim() };
+
+    try {
+      if (this.editingProvince) {
+        await this.provinceService.update(trimmedForm.provinceId, trimmedForm).toPromise();
+        this.showSuccessMessage('Province updated successfully!');
+      } else {
+        await this.provinceService.create(trimmedForm).toPromise();
+        this.showSuccessMessage('Province created successfully!');
+      }
+      this.resetProvinceForm();
+      this.loadProvinces();
+    } catch (error) {
+      console.error('Error saving provinces:', error);
+      const action = this.editingProvince ? 'update' : 'create';
+      this.showErrorMessage(`Failed to ${action} province. Please try again.`);
+    } finally {
+      this.isSubmitting = false;
+    }
+  }
+
+  editProvince(province: Province) {
+    this.provniceForm = { ...province };
+    this.editingProvince = true;
+    this.clearMessages();
+  }
+
+  async deleteProvince(id: number): Promise<void> {
+    if (!confirm('Are you sure you want to delete this province?')) {
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.clearMessages();
+
+    try {
+      await this.provinceService.delete(id).toPromise();
+      this.showSuccessMessage('Province deleted successfully!');
+      this.loadProvinces();
+    } catch (error) {
+      console.error('Error deleting province:', error);
+      this.showErrorMessage('Failed to delete province. Please try again.');
+    } finally {
+      this.isSubmitting = false;
+    }
+  }
+
+  resetProvinceForm() {
+    this.provniceForm = { provinceId: 0, name: '', cities: [] };
+    this.editingProvince = false;
   }
 
   goBack() {

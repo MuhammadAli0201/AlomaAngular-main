@@ -13,7 +13,7 @@ export interface Faq {
   providedIn: 'root'
 })
 export class HelpResourceService {
-  private apiUrl = 'https://localhost:7008/api/HelpResources/faqs';
+  private apiUrl = 'https://localhost:7008/api/faq';
 
   constructor(private http: HttpClient) {}
 
