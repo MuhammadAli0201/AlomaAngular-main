@@ -46,6 +46,31 @@
         Sonar Findings
       </a>
     </li>
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'province'" (click)="setActiveTab('province')" href="javascript:void(0)">
+        Provinces
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'city'" (click)="setActiveTab('city')" href="javascript:void(0)">
+        Cities
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'suburb'" (click)="setActiveTab('suburb')" href="javascript:void(0)">
+        Suburbs
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'hospital'" (click)="setActiveTab('hospital')" href="javascript:void(0)">
+        Hospitals
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'unit'" (click)="setActiveTab('unit')" href="javascript:void(0)">
+        Units
+      </a>
+    </li>
   </ul>
 
   <!-- Organism Tab Content -->
@@ -585,6 +610,695 @@
             <tr *ngIf="filteredSonarFindings().length === 0">
               <td colspan="2" class="text-center text-muted py-3">
                 No sonar findings found.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Province Tab Content -->
+  <div *ngIf="activeTab === 'province'"> 
+    <!-- Province Form -->
+    <form (ngSubmit)="saveProvince()" #provinceFormRef="ngForm" class="mb-4" novalidate>
+      <div class="mb-3">
+        <div class="input-group">
+          <input
+            type="text"
+            name="province"
+            #provinceName="ngModel"
+            [(ngModel)]="provniceForm.name"
+            class="form-control"
+            [class.is-invalid]="provinceName.invalid && (provinceName.dirty || provinceName.touched)"
+            [class.is-valid]="provinceName.valid && (provinceName.dirty || provinceName.touched)"
+            placeholder="Enter province name"
+            required
+            maxlength="100"
+            minlength="2"
+          />
+          <button class="btn btn-primary" type="submit" [disabled]="provinceFormRef.invalid || isSubmitting">
+            <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+            {{ editingProvince ? 'Update' : 'Create' }}
+          </button>
+          <button
+            *ngIf="editingAntimicrobial"
+            class="btn btn-secondary"
+            type="button"
+            (click)="resetAntimicrobialForm()"
+          >
+            Cancel
+          </button>
+        </div>
+        
+        <!-- Field-specific validation messages -->
+        <div *ngIf="provinceName.invalid && (provinceName.dirty || provinceName.touched)" class="invalid-feedback d-block">
+          <div *ngIf="provinceName.errors?.['required']">
+            <i class="bi bi-exclamation-circle me-1"></i>Province name is required.
+          </div>
+          <div *ngIf="provinceName.errors?.['minlength']">
+            <i class="bi bi-exclamation-circle me-1"></i>Province name must be at least 2 characters long.
+          </div>
+          <div *ngIf="provinceName.errors?.['maxlength']">
+            <i class="bi bi-exclamation-circle me-1"></i>Province name cannot exceed 100 characters.
+          </div>
+        </div>
+        
+        <!-- Character counter -->
+        <small class="form-text text-muted">
+          {{ provniceForm.name.length || 0 }}/100 characters
+        </small>
+      </div>
+    </form>
+
+    <!-- Search Input -->
+    <input type="text" [(ngModel)]="provinceSearchTerm" placeholder="Search Provinces..." class="form-control mb-2">
+    
+    <!-- Search Results List -->
+    <ul *ngIf="provinceSearchTerm" class="list-unstyled mb-3">
+      <li *ngFor="let province of filteredProvinces()" class="p-2 border-bottom">
+        <span [innerHTML]="province.name | highlight:provinceSearchTerm"></span>
+      </li>
+    </ul>
+
+    <!-- Provinces List -->
+    <div class="card">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">Provinces</h5>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Province Name</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let province of filteredProvinces()">
+              <td>{{ province.name }}</td>
+              <td>
+                <button
+                  class="btn btn-sm btn-outline-warning me-2"
+                  (click)="editProvince(province)"
+                  title="Edit"
+                  [disabled]="isSubmitting"
+                >
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="deleteProvince(province.provinceId!)"
+                  title="Delete"
+                  [disabled]="isSubmitting"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="filteredProvinces().length === 0">
+              <td colspan="2" class="text-center text-muted py-3">
+                No provinces found.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- City Tab Content -->
+  <div *ngIf="activeTab === 'city'"> 
+    <!-- City Form -->
+    <form (ngSubmit)="saveCity()" #cityFormRef="ngForm" class="mb-4" novalidate>
+      <div class="mb-3">
+        <div nz-row [nzGutter]="12">
+          <div nz-col [nzSpan]="24">
+            <nz-form-item>
+              <nz-form-control nzErrorTip="Province is required">
+                <nz-form-label nzRequired>Province</nz-form-label>
+                <nz-select [(ngModel)]="cityForm.provinceId" name="province" nzPlaceHolder="Select Province">
+                  <nz-option
+                    *ngFor="let province of provnices"
+                    [nzValue]="province.provinceId"
+                    [nzLabel]="province.name"
+                  ></nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+        </div>
+        <div class="input-group">
+          <input
+            type="text"
+            name="city"
+            #cityName="ngModel"
+            [(ngModel)]="cityForm.name"
+            class="form-control"
+            [class.is-invalid]="cityName.invalid && (cityName.dirty || cityName.touched)"
+            [class.is-valid]="cityName.valid && (cityName.dirty || cityName.touched)"
+            placeholder="Enter city name"
+            required
+            maxlength="100"
+            minlength="2"
+          />
+          <button class="btn btn-primary" type="submit" [disabled]="cityFormRef.invalid || isSubmitting">
+            <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+            {{ editingCity ? 'Update' : 'Create' }}
+          </button>
+          <button
+            *ngIf="editingCity"
+            class="btn btn-secondary"
+            type="button"
+            (click)="resetCityForm()"
+          >
+            Cancel
+          </button>
+        </div>
+        
+        <!-- Field-specific validation messages -->
+        <div *ngIf="cityName.invalid && (cityName.dirty || cityName.touched)" class="invalid-feedback d-block">
+          <div *ngIf="cityName.errors?.['required']">
+            <i class="bi bi-exclamation-circle me-1"></i>City name is required.
+          </div>
+          <div *ngIf="cityName.errors?.['minlength']">
+            <i class="bi bi-exclamation-circle me-1"></i>City name must be at least 2 characters long.
+          </div>
+          <div *ngIf="cityName.errors?.['maxlength']">
+            <i class="bi bi-exclamation-circle me-1"></i>City name cannot exceed 100 characters.
+          </div>
+        </div>
+        
+        <!-- Character counter -->
+        <small class="form-text text-muted">
+          {{ cityForm.name.length || 0 }}/100 characters
+        </small>
+      </div>
+    </form>
+
+    <!-- Search Input -->
+    <input type="text" [(ngModel)]="citySearchTerm" placeholder="Search Cities..." class="form-control mb-2">
+
+    <!-- Search Results List -->
+    <ul *ngIf="citySearchTerm" class="list-unstyled mb-3">
+      <li *ngFor="let city of filteredCities()" class="p-2 border-bottom">
+        <span [innerHTML]="city.name | highlight:citySearchTerm"></span>
+      </li>
+    </ul>
+
+    <!-- Cities List -->
+    <div class="card">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">Cities</h5>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>City Name</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let city of filteredCities()">
+              <td>{{ city.name }}</td>
+              <td>
+                <button
+                  class="btn btn-sm btn-outline-warning me-2"
+                  (click)="editCity(city)"
+                  title="Edit"
+                  [disabled]="isSubmitting"
+                >
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="deleteCity(city.cityId!)"
+                  title="Delete"
+                  [disabled]="isSubmitting"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="filteredCities().length === 0">
+              <td colspan="2" class="text-center text-muted py-3">
+                No cities found.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Suburb Tab Content -->
+  <div *ngIf="activeTab === 'suburb'"> 
+    <!-- Suburb Form -->
+    <form (ngSubmit)="saveSuburb()" #suburbFormRef="ngForm" class="mb-4" novalidate>
+      <div class="mb-3">
+        <div nz-row [nzGutter]="12">
+          <div nz-col [nzSpan]="24">
+            <nz-form-item>
+              <nz-form-control nzErrorTip="Province is required">
+                <nz-form-label nzRequired>Province</nz-form-label>
+                <nz-select [(ngModel)]="suburbForm.provinceId" name="province" nzPlaceHolder="Select Province">
+                  <nz-option
+                    *ngFor="let province of provnices"
+                    [nzValue]="province.provinceId"
+                    [nzLabel]="province.name"
+                  ></nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+        </div>
+        <div nz-row [nzGutter]="12">
+          <div nz-col [nzSpan]="24">
+            <nz-form-item>
+              <nz-form-control nzErrorTip="City is required">
+                <nz-form-label nzRequired>City</nz-form-label>
+                <nz-select [(ngModel)]="suburbForm.cityId" name="city" nzPlaceHolder="Select City">
+                  <nz-option
+                    *ngFor="let city of filterCities(suburbForm.provinceId, cities)"
+                    [nzValue]="city.cityId"
+                    [nzLabel]="city.name"
+                  ></nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+        </div>
+        <div class="input-group">
+          <input
+            type="text"
+            name="suburb"
+            #suburbName="ngModel"
+            [(ngModel)]="suburbForm.name"
+            class="form-control"
+            [class.is-invalid]="suburbName.invalid && (suburbName.dirty || suburbName.touched)"
+            [class.is-valid]="suburbName.valid && (suburbName.dirty || suburbName.touched)"
+            placeholder="Enter suburb name"
+            required
+            maxlength="100"
+            minlength="2"
+          />
+          <button class="btn btn-primary" type="submit" [disabled]="suburbFormRef.invalid || isSubmitting">
+            <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+            {{ editingSuburb ? 'Update' : 'Create' }}
+          </button>
+          <button
+            *ngIf="editingSuburb"
+            class="btn btn-secondary"
+            type="button"
+            (click)="resetSuburbForm()"
+          >
+            Cancel
+          </button>
+        </div>
+        
+        <!-- Field-specific validation messages -->
+        <div *ngIf="suburbName.invalid && (suburbName.dirty || suburbName.touched)" class="invalid-feedback d-block">
+          <div *ngIf="suburbName.errors?.['required']">
+            <i class="bi bi-exclamation-circle me-1"></i>Suburb name is required.
+          </div>
+          <div *ngIf="suburbName.errors?.['minlength']">
+            <i class="bi bi-exclamation-circle me-1"></i>Suburb name must be at least 2 characters long.
+          </div>
+          <div *ngIf="suburbName.errors?.['maxlength']">
+            <i class="bi bi-exclamation-circle me-1"></i>Suburb name cannot exceed 100 characters.
+          </div>
+        </div>
+        
+        <!-- Character counter -->
+        <small class="form-text text-muted">
+          {{ suburbForm.name.length || 0 }}/100 characters
+        </small>
+      </div>
+    </form>
+
+    <!-- Search Input -->
+    <input type="text" [(ngModel)]="suburbSearchTerm" placeholder="Search Suburbs..." class="form-control mb-2">
+
+    <!-- Search Results List -->
+    <ul *ngIf="suburbSearchTerm" class="list-unstyled mb-3">
+      <li *ngFor="let suburb of filteredSuburbs()" class="p-2 border-bottom">
+        <span [innerHTML]="suburb.name | highlight:suburbSearchTerm"></span>
+      </li>
+    </ul>
+
+    <!-- Suburbs List -->
+    <div class="card">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">Suburbs</h5>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Suburb Name</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let suburb of filteredSuburbs()">
+              <td>{{ suburb.name }}</td>
+              <td>
+                <button
+                  class="btn btn-sm btn-outline-warning me-2"
+                  (click)="editSuburb(suburb)"
+                  title="Edit"
+                  [disabled]="isSubmitting"
+                >
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="deleteSuburb(suburb.suburbId!)"
+                  title="Delete"
+                  [disabled]="isSubmitting"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="filteredSuburbs().length === 0">
+              <td colspan="2" class="text-center text-muted py-3">
+                No suburbs found.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hospital Tab Content -->
+  <div *ngIf="activeTab === 'hospital'">
+    <!-- Hospital Form -->
+    <form (ngSubmit)="saveHospital()" #hospitalFormRef="ngForm" class="mb-4" novalidate>
+      <div class="mb-3">
+        <div nz-row [nzGutter]="12">
+          <div nz-col [nzSpan]="24">
+            <nz-form-item>
+              <nz-form-control nzErrorTip="Province is required">
+                <nz-form-label nzRequired>Province</nz-form-label>
+                <nz-select [(ngModel)]="hospitalForm.provinceId" name="province" nzPlaceHolder="Select Province" required>
+                  <nz-option
+                    *ngFor="let province of provnices"
+                    [nzValue]="province.provinceId"
+                    [nzLabel]="province.name"
+                  ></nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+        </div>
+        <div nz-row [nzGutter]="12">
+          <div nz-col [nzSpan]="24">
+            <nz-form-item>
+              <nz-form-control nzErrorTip="City is required">
+                <nz-form-label nzRequired>City</nz-form-label>
+                <nz-select [(ngModel)]="hospitalForm.cityId" name="city" nzPlaceHolder="Select City" required>
+                  <nz-option
+                    *ngFor="let city of filterCities(hospitalForm.provinceId, cities)"
+                    [nzValue]="city.cityId"
+                    [nzLabel]="city.name"
+                  ></nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+        </div>
+        <div nz-row [nzGutter]="12">
+          <div nz-col [nzSpan]="24">
+            <nz-form-item>
+              <nz-form-control nzErrorTip="Suburb is required">
+                <nz-form-label nzRequired>Suburb</nz-form-label>
+                <nz-select [(ngModel)]="hospitalForm.suburbId" name="suburb" nzPlaceHolder="Select Suburb" required>
+                  <nz-option
+                    *ngFor="let suburb of filterSuburbs(hospitalForm.cityId, suburbs)"
+                    [nzValue]="suburb.suburbId"
+                    [nzLabel]="suburb.name"
+                  ></nz-option>
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+        </div>
+        <div class="input-group mb-2">
+          <input
+            type="text"
+            name="hospitalName"
+            #hospitalName="ngModel"
+            [(ngModel)]="hospitalForm.name"
+            class="form-control"
+            [class.is-invalid]="hospitalName.invalid && (hospitalName.dirty || hospitalName.touched)"
+            [class.is-valid]="hospitalName.valid && (hospitalName.dirty || hospitalName.touched)"
+            placeholder="Enter hospital name"
+            required
+            maxlength="100"
+            minlength="2"
+          />
+        </div>
+        <div *ngIf="hospitalName.invalid && (hospitalName.dirty || hospitalName.touched)" class="invalid-feedback d-block">
+          <div *ngIf="hospitalName.errors?.['required']">
+            <i class="bi bi-exclamation-circle me-1"></i>Hospital name is required.
+          </div>
+          <div *ngIf="hospitalName.errors?.['minlength']">
+            <i class="bi bi-exclamation-circle me-1"></i>Hospital name must be at least 2 characters long.
+          </div>
+          <div *ngIf="hospitalName.errors?.['maxlength']">
+            <i class="bi bi-exclamation-circle me-1"></i>Hospital name cannot exceed 100 characters.
+          </div>
+        </div>
+        <small class="form-text text-muted">
+          {{ hospitalForm.name.length || 0 }}/100 characters
+        </small>
+        <div class="input-group mt-2">
+          <input
+            type="text"
+            name="hospitalAddress"
+            #hospitalAddress="ngModel"
+            [(ngModel)]="hospitalForm.address"
+            class="form-control"
+            [class.is-invalid]="hospitalAddress.invalid && (hospitalAddress.dirty || hospitalAddress.touched)"
+            [class.is-valid]="hospitalAddress.valid && (hospitalAddress.dirty || hospitalAddress.touched)"
+            placeholder="Enter hospital address"
+            required
+          />
+        </div>
+        <div *ngIf="hospitalAddress.invalid && (hospitalAddress.dirty || hospitalAddress.touched)" class="invalid-feedback d-block">
+          <div *ngIf="hospitalAddress.errors?.['required']">
+            <i class="bi bi-exclamation-circle me-1"></i>Hospital address is required.
+          </div>
+        </div>
+        <div class="mt-3">
+          <button class="btn btn-primary" type="submit" [disabled]="hospitalFormRef.invalid || isSubmitting">
+            <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+            {{ editingHospital ? 'Update' : 'Create' }}
+          </button>
+          <button
+            *ngIf="editingHospital"
+            class="btn btn-secondary"
+            type="button"
+            (click)="resetHospitalForm()"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Search Input -->
+    <input type="text" [(ngModel)]="hospitalSearchTerm" placeholder="Search Hospitals..." class="form-control mb-2" name="hospitalSearch">
+
+    <!-- Search Results List -->
+    <ul *ngIf="hospitalSearchTerm" class="list-unstyled mb-3">
+      <li *ngFor="let hospital of filteredHospitals()" class="p-2 border-bottom">
+        <span [innerHTML]="hospital.name | highlight:hospitalSearchTerm"></span>
+      </li>
+    </ul>
+
+    <!-- Hospitals List -->
+    <div class="card">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">Hospitals</h5>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Hospital Name</th>
+              <th>Address</th>
+              <th>Province</th>
+              <th>City</th>
+              <th>Suburb</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let hospital of filteredHospitals()">
+              <td>{{ hospital.name }}</td>
+              <td>{{ hospital.address }}</td>
+              <td>
+                {{ getProvinceName(hospital.provinceId) }}
+              </td>
+              <td>
+                {{ getCityName(hospital.cityId) }}
+              </td>
+              <td>
+                {{ getSuburbName(hospital.suburbId) }}
+              </td>
+              <td>
+                <button
+                  class="btn btn-sm btn-outline-warning me-2"
+                  (click)="editHospital(hospital)"
+                  title="Edit"
+                  [disabled]="isSubmitting"
+                >
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="deleteHospital(hospital.hospitalId!)"
+                  title="Delete"
+                  [disabled]="isSubmitting"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="filteredHospitals().length === 0">
+              <td colspan="6" class="text-center text-muted py-3">
+                No hospitals found.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Unit Tab Content -->
+  <div *ngIf="activeTab === 'unit'">
+    <!-- Unit Form -->
+    <form (ngSubmit)="saveUnit()" #unitFormRef="ngForm" class="mb-4" novalidate>
+      <div class="mb-3">
+        <div class="input-group mb-2">
+          <input
+            type="text"
+            name="unitName"
+            #unitName="ngModel"
+            [(ngModel)]="unitForm.name"
+            class="form-control"
+            [class.is-invalid]="unitName.invalid && (unitName.dirty || unitName.touched)"
+            [class.is-valid]="unitName.valid && (unitName.dirty || unitName.touched)"
+            placeholder="Enter unit name"
+            required
+            maxlength="100"
+            minlength="2"
+          />
+        </div>
+        <div *ngIf="unitName.invalid && (unitName.dirty || unitName.touched)" class="invalid-feedback d-block">
+          <div *ngIf="unitName.errors?.['required']">
+            <i class="bi bi-exclamation-circle me-1"></i>Unit name is required.
+          </div>
+          <div *ngIf="unitName.errors?.['minlength']">
+            <i class="bi bi-exclamation-circle me-1"></i>Unit name must be at least 2 characters long.
+          </div>
+          <div *ngIf="unitName.errors?.['maxlength']">
+            <i class="bi bi-exclamation-circle me-1"></i>Unit name cannot exceed 100 characters.
+          </div>
+        </div>
+        <small class="form-text text-muted">
+          {{ unitForm.name.length || 0 }}/100 characters
+        </small>
+        <div class="input-group mt-2">
+          <input
+            type="text"
+            name="unitReason"
+            #unitReason="ngModel"
+            [(ngModel)]="unitForm.reason"
+            class="form-control"
+            [class.is-invalid]="unitReason.invalid && (unitReason.dirty || unitReason.touched)"
+            [class.is-valid]="unitReason.valid && (unitReason.dirty || unitReason.touched)"
+            placeholder="Enter unit reason"
+            required
+          />
+        </div>
+        <div *ngIf="unitReason.invalid && (unitReason.dirty || unitReason.touched)" class="invalid-feedback d-block">
+          <div *ngIf="unitReason.errors?.['required']">
+            <i class="bi bi-exclamation-circle me-1"></i>Unit reason is required.
+          </div>
+        </div>
+        <div class="mt-3">
+          <button class="btn btn-primary" type="submit" [disabled]="unitFormRef.invalid || isSubmitting">
+            <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+            {{ editingUnit ? 'Update' : 'Create' }}
+          </button>
+          <button
+            *ngIf="editingUnit"
+            class="btn btn-secondary"
+            type="button"
+            (click)="resetUnitForm()"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Search Input -->
+    <input type="text" [(ngModel)]="unitSearchTerm" placeholder="Search Units..." class="form-control mb-2" name="unitSearch">
+
+    <!-- Search Results List -->
+    <ul *ngIf="unitSearchTerm" class="list-unstyled mb-3">
+      <li *ngFor="let unit of filteredUnits()" class="p-2 border-bottom">
+        <span [innerHTML]="unit.name | highlight:unitSearchTerm"></span>
+      </li>
+    </ul>
+
+    <!-- Units List -->
+    <div class="card">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">Units</h5>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Unit Name</th>
+              <th>Reason</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let unit of filteredUnits()">
+              <td>{{ unit.name }}</td>
+              <td>{{ unit.reason }}</td>
+              <td>
+                <button
+                  class="btn btn-sm btn-outline-warning me-2"
+                  (click)="editUnit(unit)"
+                  title="Edit"
+                  [disabled]="isSubmitting"
+                >
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="deleteUnit(unit.unitId!)"
+                  title="Delete"
+                  [disabled]="isSubmitting"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="filteredUnits().length === 0">
+              <td colspan="3" class="text-center text-muted py-3">
+                No units found.
               </td>
             </tr>
           </tbody>

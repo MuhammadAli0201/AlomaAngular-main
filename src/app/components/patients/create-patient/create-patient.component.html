@@ -166,13 +166,12 @@
         <nz-form-control nzErrorTip="Province is required">
           <nz-form-label nzRequired>Province</nz-form-label>
           <nz-select
-            formControlName="province"
+            formControlName="provinceId"
             nzPlaceHolder="Select province"
-            (ngModelChange)="onProvinceChange($event)"
           >
             <nz-option
               *ngFor="let option of provinces"
-              [nzValue]="option.name"
+              [nzValue]="option.provinceId"
               [nzLabel]="option.name"
             ></nz-option>
           </nz-select>
@@ -184,13 +183,12 @@
         <nz-form-control nzErrorTip="City is required">
           <nz-form-label nzRequired>City</nz-form-label>
           <nz-select
-            formControlName="city"
+            formControlName="cityId"
             nzPlaceHolder="Select city"
-            (ngModelChange)="onCityChange($event)"
           >
             <nz-option
               *ngFor="let option of cities"
-              [nzValue]="option.name"
+              [nzValue]="option.cityId"
               [nzLabel]="option.name"
             ></nz-option>
           </nz-select>
@@ -202,13 +200,12 @@
         <nz-form-control nzErrorTip="Suburb is required">
           <nz-form-label nzRequired>Suburb</nz-form-label>
           <nz-select
-            formControlName="suburb"
+            formControlName="suburbId"
             nzPlaceHolder="Select suburb"
-            (ngModelChange)="onSuburbChange($event)"
           >
             <nz-option
               *ngFor="let option of suburbs"
-              [nzValue]="option.name"
+              [nzValue]="option.suburbId"
               [nzLabel]="option.name"
             ></nz-option>
           </nz-select>
@@ -220,12 +217,12 @@
         <nz-form-control nzErrorTip="Hospital is required">
           <nz-form-label nzRequired>Hospital</nz-form-label>
           <nz-select
-            formControlName="hospital"
+            formControlName="hospitalId"
             nzPlaceHolder="Select hospital"
           >
             <nz-option
               *ngFor="let option of hospitals"
-              [nzValue]="option.name"
+              [nzValue]="option.hospitalId"
               [nzLabel]="option.name"
             ></nz-option>
           </nz-select>

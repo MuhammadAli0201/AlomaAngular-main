@@ -12,6 +12,10 @@ import { Province } from '../../../models/province';
 import { City } from '../../../models/city';
 import { Suburb } from '../../../models/suburb';
 import { Hospital } from '../../../models/hospital';
+import { ProvinceService } from '../../../services/province.service';
+import { CityService } from '../../../services/city.service';
+import { SuburbService } from '../../../services/suburb.service';
+import { HospitalService } from '../../../services/hospital.service';
 
 @Component({
   selector: 'app-create-patient',
@@ -91,37 +95,7 @@ export class CreatePatientComponent {
     doctor: 'doctor-dashboard'
   }
 
-  provinces: Province[] = [
-  {
-    id: 1,
-    name: 'Sindh',
-    cities: [
-      {
-        id: 1,
-        name: 'Karachi',
-        suburbs: [
-          {
-            id: 1,
-            name: 'Clifton',
-            hospitals: [
-              { id: 1, name: 'Aga Khan University Hospital' },
-              { id: 2, name: 'South City Hospital' }
-            ]
-          },
-          {
-            id: 2,
-            name: 'Gulshan-e-Iqbal',
-            hospitals: [
-              { id: 3, name: 'Liaquat National Hospital' }
-            ]
-          }
-        ]
-      }
-    ]
-  }
-];
-
-
+  provinces: Province[] = []
   cities: City[] = [];
   suburbs: Suburb[] = [];
   hospitals: Hospital[] = [];
@@ -132,9 +106,15 @@ export class CreatePatientComponent {
   //LIFE CYCLES
   constructor(private fb: FormBuilder, private patientService: PatientService, private router: Router,
     private activeRoute: ActivatedRoute, private notificationService: NzNotificationService, private authService: AuthService,
-    private sharedService: SharedService) { }
+    private sharedService: SharedService, private provinceService: ProvinceService,
+    private cityService: CityService, private suburbService: SuburbService,
+    private hospitalService: HospitalService
+  ) { }
 
   ngOnInit(): void {
+    this.provinceService.getAll().subscribe(provinces=>{
+      this.provinces = provinces;
+    })
     this.patientForm = this.fb.group({
       id: [EMPTY_GUID],
       hospitalNumber: [''],
@@ -147,19 +127,19 @@ export class CreatePatientComponent {
       gestationalUnit: [null],
       gestationalAge: [null, strictDecimalValidator()],
       gender: [null, Validators.required],
-      province: ['', Validators.required],
-      city: ['', Validators.required],
-      suburb: ['', Validators.required],
-      hospital: ['', Validators.required],
+      provinceId: [0, Validators.required],
+      cityId: [0, Validators.required],
+      suburbId: [0, Validators.required],
+      hospitalId: [0, Validators.required],
       placeOfBirth: [null, Validators.required],
       modeOfDelivery: [null, Validators.required],
       initialResuscitation: [[]],
-      oneMinuteApgar: [null],
-      fiveMinuteApgar: [null],
-      tenMinuteApgar: [null],
-      outcomeStatus: [null, Validators.required],
+      oneMinuteApgar: [''],
+      fiveMinuteApgar: [''],
+      tenMinuteApgar: [''],
+      outcomeStatus: ['', Validators.required],
       transferHospital: [''],
-      birthHivPcr: [null, Validators.required],
+      birthHivPcr: ['', Validators.required],
       headCircumference: [null, [strictDecimalValidator()]],
       footLength: [null, [strictDecimalValidator()]],
       lengthAtBirth: [null, [strictDecimalValidator()]],
@@ -202,6 +182,33 @@ export class CreatePatientComponent {
       } else {
         this.patientForm.disable();
       }
+    })
+    this.changes();
+  }
+
+  changes(){
+    this.patientForm.get('provinceId')?.valueChanges.subscribe(val =>{
+      this.cityService.getByProvinceId(val).subscribe(cities =>{
+          this.cities = cities;
+        })
+        this.suburbs = [];
+        this.hospitals = [];
+        this.patientForm.patchValue({ city: null, suburb: null, hospital: null });
+    })
+
+    this.patientForm.get('cityId')?.valueChanges.subscribe(val =>{
+      this.suburbService.getByCityId(val).subscribe(suburbs =>{
+        this.suburbs = suburbs;
+      })
+      this.hospitals = [];
+      this.patientForm.patchValue({ suburb: null, hospital: null });
+    })
+
+    this.patientForm.get('suburbId')?.valueChanges.subscribe(val =>{
+      this.hospitalService.getBySuburbId(val).subscribe(hospitals =>{
+        this.hospitals = hospitals;
+      })
+      this.patientForm.patchValue({ hospital: null });
     })
   }
 
@@ -339,26 +346,5 @@ export class CreatePatientComponent {
   //NAVIGATIONS
   close(): void {
     this.router.navigate([this.currentRolePath, 'patients'])
-  }
-
-  onProvinceChange(provinceName: string): void {
-    const province = this.provinces.find(p => p.name === provinceName);
-    this.cities = province?.cities || [];
-    this.suburbs = [];
-    this.hospitals = [];
-    this.patientForm.patchValue({ city: null, suburb: null, hospital: null });
-  }
-
-  onCityChange(cityName: string): void {
-    const city = this.cities.find(c => c.name === cityName);
-    this.suburbs = city?.suburbs || [];
-    this.hospitals = [];
-    this.patientForm.patchValue({ suburb: null, hospital: null });
-  }
-
-  onSuburbChange(suburbName: string): void {
-    const suburb = this.suburbs.find(s => s.name === suburbName);
-    this.hospitals = suburb?.hospitals || [];
-    this.patientForm.patchValue({ hospital: null });
   }
 }
