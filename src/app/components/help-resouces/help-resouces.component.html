@@ -17,6 +17,13 @@
           PDFs
         </button>
       </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="xml-tab" data-bs-toggle="tab" data-bs-target="#xml" type="button"
+                role="tab" aria-controls="xml" aria-selected="false" (click)="handleTypeChange('xml')">
+          XML
+        </button>
+      </li>
+
       
     </ul>
 <nz-table #basicTable [nzData]="helpResources" [nzLoading]="loading">

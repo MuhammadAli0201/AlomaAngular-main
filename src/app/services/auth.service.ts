@@ -103,4 +103,14 @@ export class AuthService {
   updatePassword(model: PasswordUpdateRequest) {
     return this.http.post<any>(`${this.baseUrl}update-password`, model);
   }
+
+  getOtpTimer() {
+    return this.http.get<{ Timer: string }>(`${this.baseUrl}system/otp-timer`);
+  }
+
+  updateOtpTimer(minutes: number) {
+    return this.http.post(`${this.baseUrl}system/otp-timer`, minutes);
+  }
+
+
 }

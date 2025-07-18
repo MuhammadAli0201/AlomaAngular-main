@@ -23,6 +23,8 @@ import { CreatePatientComponent } from './components/patients/create-patient/cre
 import { PatientFullFormComponent } from './components/patients/patient-full-form/patient-full-form.component';
 import { InternWelcomeComponent } from './components/intern-dashboard/intern-welcome/intern-welcome.component';
 import { HelpResoucesComponent } from './components/help-resouces/help-resouces.component';
+import { ManageSystemComponent } from './components/manage-system/manage-system.component';
+
 
 const patientRoutes: Routes = [
   { path: 'patients', component: PatientsComponent },
@@ -107,6 +109,12 @@ const routes: Routes = [
       },
       {
         path: 'users', component: ManageUsersComponent,
+        canActivate: [authGuard, roleGuard],
+        data: { expectedRole: 'Admin' }
+      },
+      {
+        path: 'manage-system',
+        component: ManageSystemComponent,
         canActivate: [authGuard, roleGuard],
         data: { expectedRole: 'Admin' }
       },

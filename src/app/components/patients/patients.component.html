@@ -6,7 +6,7 @@
       nz-input
       [disabled]="loading"
       [placeholder]="
-        'search ' + (loading ? '' : (patients.length | number) + ' record(s)')
+        'Search ' + (loading ? '' : (patients.length | number) + ' record(s)')
       "
       autocomplete="off"
       [(ngModel)]="filter"
@@ -18,20 +18,22 @@
 <nz-table #basicTable [nzData]="patients" [nzLoading]="loading">
   <thead>
     <tr>
-      <th>Name</th>
-      <th>Date Of Birth</th>
       <th>Hospital Number</th>
-      <th>Gender</th>
+      <th>Patient Name</th>
+      <th>Admission Date</th>
+      <!--<th>Diagnosis</th>-->
+      <th>Outcome</th>
       <th>Action</th>
     </tr>
   </thead>
   <tbody>
     @for (data of basicTable.data; track data; let i = $index) {
     <tr>
-      <td>{{ data.name + " " + data.surname | uppercase }}</td>
-      <td>{{ data.dateOfBirth | date }}</td>
       <td>{{ data.hospitalNumber }}</td>
-      <td>{{ data.gender }}</td>
+      <td>{{ data.name + " " + data.surname | uppercase }}</td>
+      <td>{{ data.dateOfAdmission| date }}</td>
+      <!--<td>{{ data. }}</td>-->
+      <td>{{ data.outcomeStatus }}</td>
       <td>
         <button
           (click)="edit(data.id!)"
