@@ -3,3 +3,64 @@
     display: flex;
     justify-content: center;
 }
+
+.upload-method-selector {
+  .ant-radio-group {
+    display: flex;
+    gap: 16px;
+  }
+  
+  .ant-radio-wrapper {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    transition: all 0.3s;
+    
+    &:hover {
+      border-color: #40a9ff;
+    }
+    
+    &.ant-radio-wrapper-checked {
+      border-color: #1890ff;
+      background-color: #f6ffed;
+    }
+  }
+}
+
+.webcam-container {
+  .video-container {
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  
+  .webcam-controls {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+  }
+}
+
+.profile-avatar {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #d9d9d9;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .upload-method-selector {
+    .ant-radio-group {
+      flex-direction: column;
+    }
+  }
+  
+  .webcam-container {
+    video {
+      width: 100% !important;
+      max-width: 320px;
+      height: auto !important;
+    }
+  }
+}

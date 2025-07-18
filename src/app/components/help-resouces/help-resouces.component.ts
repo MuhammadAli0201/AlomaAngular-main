@@ -24,7 +24,9 @@ export class HelpResoucesComponent implements OnInit{
   fileTypes = [
     { label: 'Image', value: 'image', accept: 'image/*' },
     { label: 'PDF', value: 'pdf', accept: '.pdf' },
-    { label: 'Video', value: 'video', accept: 'video/*' }
+    { label: 'Video', value: 'video', accept: 'video/*' },
+    { label: 'XML', value: 'xml', accept: '.xml' }
+    
   ];
 
   constructor(private helpResourceService: ResourceService,

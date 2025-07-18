@@ -1,6 +1,7 @@
 <div *nzModalTitle>
   <h5 class="modal-title">My Profile</h5>
 </div>
+
 <div>
   <div class="modal-body">
     <p>
@@ -28,6 +29,7 @@
       <span *ngIf="!editMode">{{ user?.role }}</span>
       <input *ngIf="editMode" [(ngModel)]="user.role" class="form-control" />
     </p>
+    
     <div class="container">
       <div>
         <ng-container *ngIf="!editMode">
@@ -38,19 +40,94 @@
             <img src="images/avatar-placeholder.png" alt="No Profile Avatar" class="profile-avatar" style="width: 100px; height: 100px; opacity: 0.5;" />
           }
         </ng-container>
+        
         <ng-container *ngIf="editMode">
-          <nz-upload
-            nzListType="picture-card"
-            [(nzFileList)]="fileList"
-            [nzShowButton]="fileList.length < 1"
-            [nzPreview]="handlePreview"
-            [nzCustomRequest]="handleUpload"
-          >
-            <div>
-              <nz-icon nzType="plus" />
-              <div style="margin-top: 8px">Upload pic</div>
+          <!-- Upload Method Selection -->
+          <div class="upload-method-selector" style="margin-bottom: 16px;">
+            <nz-radio-group [(ngModel)]="uploadMethod" (ngModelChange)="setUploadMethod($event)">
+              <label nz-radio nzValue="file">
+                <nz-icon nzType="upload" style="margin-right: 8px;"></nz-icon>
+                Upload File
+              </label>
+              <label nz-radio nzValue="webcam">
+                <nz-icon nzType="camera" style="margin-right: 8px;"></nz-icon>
+                Take Photo
+              </label>
+            </nz-radio-group>
+          </div>
+
+          <!-- File Upload -->
+          <div *ngIf="uploadMethod === 'file'">
+            <nz-upload
+              nzListType="picture-card"
+              [(nzFileList)]="fileList"
+              [nzShowButton]="fileList.length < 1"
+              [nzPreview]="handlePreview"
+              [nzCustomRequest]="handleUpload"
+            >
+              <div>
+                <nz-icon nzType="plus" />
+                <div style="margin-top: 8px">Upload pic</div>
+              </div>
+            </nz-upload>
+          </div>
+
+          <!-- Webcam Capture -->
+          <div *ngIf="uploadMethod === 'webcam'" class="webcam-container">
+            <div *ngIf="showWebcam" class="webcam-section">
+              <div class="video-container" style="position: relative; display: inline-block;">
+                <video 
+                  #videoElement 
+                  autoplay 
+                  playsinline 
+                  style="width: 320px; height: 240px; border: 2px solid #d9d9d9; border-radius: 6px;"
+                ></video>
+                <canvas 
+                  #canvasElement 
+                  style="display: none;"
+                ></canvas>
+              </div>
+              
+              <div class="webcam-controls" style="margin-top: 12px; text-align: center;">
+                <button 
+                  nz-button 
+                  nzType="primary" 
+                  (click)="capturePhoto()"
+                  style="margin-right: 8px;"
+                >
+                  <nz-icon nzType="camera"></nz-icon>
+                  Capture Photo
+                </button>
+                <button 
+                  nz-button 
+                  (click)="setUploadMethod('file')"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
-          </nz-upload>
+
+            <!-- Show captured photo in file list if available -->
+            <div *ngIf="fileList.length > 0" style="margin-top: 16px;">
+              <nz-upload
+                nzListType="picture-card"
+                [(nzFileList)]="fileList"
+                [nzShowButton]="false"
+                [nzPreview]="handlePreview"
+              >
+              </nz-upload>
+              <div style="text-align: center; margin-top: 8px;">
+                <button 
+                  nz-button 
+                  nzType="dashed" 
+                  (click)="retakePhoto()"
+                >
+                  <nz-icon nzType="camera"></nz-icon>
+                  Retake Photo
+                </button>
+              </div>
+            </div>
+          </div>
         </ng-container>
       </div>
     </div>
