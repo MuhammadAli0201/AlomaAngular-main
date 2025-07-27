@@ -43,12 +43,12 @@ import { LookupCategoryIds } from '../../../constants/lookup-categories';
 import { LookupItemIds } from '../../../constants/lookup-items';
 
 @Component({
-  selector: 'app-patient-full-form',
+  selector: 'app-diagnosis-treatment-form',
   standalone: false,
-  templateUrl: './patient-full-form.component.html',
-  styleUrl: './patient-full-form.component.scss',
+  templateUrl: './diagnosis-treatment-form.component.html',
+  styleUrl: './diagnosis-treatment-form.component.scss',
 })
-export class PatientFullFormComponent implements OnInit {
+export class DiagnosisTreatmentFormComponent implements OnInit {
   diagnosisForm!: FormGroup;
   btnLoading: boolean = false;
   loading: boolean = false;

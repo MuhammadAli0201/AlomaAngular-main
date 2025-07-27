@@ -20,7 +20,7 @@ import { PatientsComponent } from './components/patients/patients.component';
 import { PatientComponent } from './components/patients/patient/patient.component';
 import { MaternalComponent } from './components/patients/maternal/maternal.component';
 import { CreatePatientComponent } from './components/patients/create-patient/create-patient.component';
-import { PatientFullFormComponent } from './components/patients/patient-full-form/patient-full-form.component';
+import { DiagnosisTreatmentFormComponent } from './components/patients/diagnosis-treatment-form/diagnosis-treatment-form.component';
 import { InternWelcomeComponent } from './components/intern-dashboard/intern-welcome/intern-welcome.component';
 import { HelpResoucesComponent } from './components/help-resouces/help-resouces.component';
 import { ManageSystemComponent } from './components/manage-system/manage-system.component';
@@ -41,7 +41,7 @@ const patientRoutes: Routes = [
       { path: '', redirectTo: 'create', pathMatch: 'full' },
       { path: 'create', component: CreatePatientComponent },
       { path: 'maternal', component: MaternalComponent },
-      { path: 'full', component: PatientFullFormComponent },
+      { path: 'full', component: DiagnosisTreatmentFormComponent },
     ]
   },
   {
