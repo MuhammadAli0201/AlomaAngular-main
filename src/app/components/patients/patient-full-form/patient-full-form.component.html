@@ -47,8 +47,8 @@
           >
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -56,7 +56,7 @@
 
       <!-- Congenital Infection Organism -->
       <nz-form-item
-        *ngIf="diagnosisForm.get('congenitalInfection')?.value === 'Yes'"
+        *ngIf="isCongentialInfection()"
       >
         <nz-form-control>
           <nz-form-label>Congenital Infection Organism</nz-form-label>
@@ -76,7 +76,7 @@
 
       <!-- Specify Other -->
       <nz-form-item
-        *ngIf="diagnosisForm.get('congenitalInfection')?.value === 'Yes'"
+        *ngIf="isCongentialInfection()"
       >
         <nz-form-control>
           <nz-form-label>Specify Other</nz-form-label>
@@ -98,8 +98,8 @@
           >
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -107,7 +107,7 @@
 
       <!-- Organism (if early sepsis Yes) -->
       <nz-form-item
-        *ngIf="diagnosisForm.get('bacterialSepsisBeforeDay3')?.value === 'Yes'"
+        *ngIf="isBacterialSepsisBeforeDay3()"
       >
         <nz-form-control>
           <nz-form-label>Organism</nz-form-label>
@@ -127,7 +127,7 @@
 
       <!-- Antibiotics for early sepsis -->
       <nz-form-item
-        *ngIf="diagnosisForm.get('bacterialSepsisBeforeDay3')?.value === 'Yes'"
+        *ngIf="isBacterialSepsisBeforeDay3()"
       >
         <nz-form-control>
           <nz-form-label>Were Antibiotics given for early sepsis</nz-form-label>
@@ -148,8 +148,8 @@
           <nz-select nzPlaceHolder="Select" formControlName="sepsisAfterDay3">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -157,7 +157,7 @@
 
       <!-- Sepsis site -->
       <nz-form-item
-        *ngIf="diagnosisForm.get('sepsisAfterDay3')?.value === 'Yes'"
+        *ngIf="isSepsisAfterDay3()"
       >
         <nz-form-control>
           <nz-form-label>Sepsis site</nz-form-label>
@@ -168,8 +168,8 @@
           >
             <nz-option
               *ngFor="let o of sepsisSites"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -177,15 +177,15 @@
 
       <!-- Bacterial pathogen -->
       <nz-form-item
-        *ngIf="diagnosisForm.get('sepsisAfterDay3')?.value === 'Yes'"
+        *ngIf="isSepsisAfterDay3()"
       >
         <nz-form-control>
           <nz-form-label>Bacterial pathogen</nz-form-label>
           <nz-select formControlName="bacterialPathogen" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -193,7 +193,7 @@
 
       <!-- Bacterial infection location -->
       <nz-form-item
-        *ngIf="diagnosisForm.get('bacterialPathogen')?.value === 'Yes'"
+        *ngIf="isBacterialPathogen()"
       >
         <nz-form-control>
           <nz-form-label>Where did bacterial infection occur?</nz-form-label>
@@ -203,8 +203,8 @@
           >
             <nz-option
               *ngFor="let o of locationOptions"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -217,29 +217,29 @@
           <nz-select formControlName="cons" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
 
       <!-- CONS location -->
-      <nz-form-item *ngIf="diagnosisForm.get('cons')?.value === 'Yes'">
+      <nz-form-item *ngIf="isCons()">
         <nz-form-control>
           <nz-form-label>Where did CONS occur?</nz-form-label>
           <nz-select formControlName="consLocation" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of locationOptions"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
 
       <!-- Other bacteria -->
-      <nz-form-item *ngIf="diagnosisForm.get('cons')?.value === 'Yes'">
+      <nz-form-item *ngIf="isCons()">
         <nz-form-control>
           <nz-form-label>Other bacteria</nz-form-label>
           <input
@@ -257,8 +257,8 @@
           <nz-select formControlName="fungalSepsis" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -271,15 +271,15 @@
           <nz-select formControlName="betaDGlucan" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
 
       <!-- Fungal sepsis location -->
-      <nz-form-item *ngIf="diagnosisForm.get('fungalSepsis')?.value === 'Yes'">
+      <nz-form-item *ngIf="isFungalSepsis()">
         <nz-form-control>
           <nz-form-label>Where did fungal sepsis occur?</nz-form-label>
           <nz-select
@@ -288,15 +288,15 @@
           >
             <nz-option
               *ngFor="let o of fungalLocationOptions"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
 
       <!-- Fungal organism -->
-      <nz-form-item *ngIf="diagnosisForm.get('fungalSepsis')?.value === 'Yes'">
+      <nz-form-item *ngIf="isFungalSepsis()">
         <nz-form-control>
           <nz-form-label>Fungal organism</nz-form-label>
           <nz-select
@@ -369,15 +369,15 @@
           <nz-select formControlName="abgAvailable" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
 
       <!-- Base Excess -->
-      <nz-form-item *ngIf="diagnosisForm.get('abgAvailable')?.value === 'Yes'">
+      <nz-form-item *ngIf="isAbgAvailable()">
         <nz-form-control>
           <nz-form-label>Base Excess on admission</nz-form-label>
           <input
@@ -443,15 +443,15 @@
           <nz-select formControlName="eosCalcDone" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
 
       <!-- EOS risk -->
-      <nz-form-item *ngIf="diagnosisForm.get('eosCalcDone')?.value === 'Yes'">
+      <nz-form-item *ngIf="isEosCalcDone()">
         <nz-form-control>
           <nz-form-label>What was the EOS risk?</nz-form-label>
           <input nz-input formControlName="eosRisk" placeholder="Enter risk" />
@@ -459,28 +459,28 @@
       </nz-form-item>
 
       <!-- EOS recommendation -->
-      <nz-form-item *ngIf="diagnosisForm.get('eosCalcDone')?.value === 'Yes'">
+      <nz-form-item *ngIf="isEosCalcDone()">
         <nz-form-control>
           <nz-form-label>Recommendation from EOS calc</nz-form-label>
           <nz-select formControlName="eosRecommendation" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of eosRecOptions"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
 
       <!-- Recommendation followed -->
-      <nz-form-item *ngIf="diagnosisForm.get('eosCalcDone')?.value === 'Yes'">
+      <nz-form-item *ngIf="isEosCalcDone()">
         <nz-form-control>
           <nz-form-label>Was it followed?</nz-form-label>
           <nz-select formControlName="eosFollowed" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -498,8 +498,8 @@
           <nz-select formControlName="cranialBefore28" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -507,29 +507,29 @@
 
       <!-- IVH -->
       <nz-form-item
-        *ngIf="diagnosisForm.get('cranialBefore28')?.value === 'Yes'"
+        *ngIf="isCranialBefore28()"
       >
         <nz-form-control>
           <nz-form-label>Intraventricular Haemorrhage</nz-form-label>
           <nz-select formControlName="ivh" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
 
       <!-- Worst IVH -->
-      <nz-form-item *ngIf="diagnosisForm.get('ivh')?.value === 'Yes'">
+      <nz-form-item *ngIf="isIvh()">
         <nz-form-control>
           <nz-form-label>Worst IVH on sonar</nz-form-label>
           <nz-select formControlName="worstIvh" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of ivhGrades"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -560,8 +560,8 @@
           <nz-select formControlName="cysticPvl" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoNaUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -595,8 +595,8 @@
           >
             <nz-option
               *ngFor="let o of respDiagnosisOptions"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -609,8 +609,8 @@
           <nz-select formControlName="pneumoLocation" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of locationOptions"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -627,8 +627,8 @@
           >
             <nz-option
               *ngFor="let o of respSupportOptions"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -643,8 +643,8 @@
           <nz-select formControlName="hfncHighRate" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -782,8 +782,8 @@
           <nz-select formControlName="ncpapNoEtt" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -794,8 +794,8 @@
           <nz-select formControlName="septalNecrosis" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -806,8 +806,8 @@
           <nz-select formControlName="ino" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -818,8 +818,8 @@
           <nz-select formControlName="oxygen28" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -830,8 +830,8 @@
           <nz-select formControlName="resp28" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -842,8 +842,8 @@
           <nz-select formControlName="steroidsCld" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoNaUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -854,8 +854,8 @@
           <nz-select formControlName="caffeine" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -866,8 +866,8 @@
           <nz-select formControlName="surfactantInit" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoNaUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -878,8 +878,8 @@
           <nz-select formControlName="surfactantAny" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoNaUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -934,45 +934,45 @@
           <nz-select formControlName="pdaLiti" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
 
-      <nz-form-item *ngIf="diagnosisForm.get('pdaLiti')?.value === 'Yes'">
+      <nz-form-item *ngIf="isPdaLiti()">
         <nz-form-control>
           <nz-form-label>Ibuprofen for PDA</nz-form-label>
           <nz-select formControlName="pdaIbuprofen" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
-      <nz-form-item *ngIf="diagnosisForm.get('pdaLiti')?.value === 'Yes'">
+      <nz-form-item *ngIf="isPdaLiti()">
         <nz-form-control>
           <nz-form-label>Paracetamol for PDA</nz-form-label>
           <nz-select formControlName="pdaParacetamol" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
-      <nz-form-item *ngIf="diagnosisForm.get('pdaLiti')?.value === 'Yes'">
+      <nz-form-item *ngIf="isPdaLiti()">
         <nz-form-control>
           <nz-form-label>Inotropic support</nz-form-label>
           <nz-select formControlName="inotropicSupport" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -985,13 +985,13 @@
           <nz-select formControlName="hieSection" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
-      <div *ngIf="diagnosisForm.get('hieSection')?.value === 'Yes'">
+      <div *ngIf="isHieSection()">
         <nz-form-item>
           <nz-form-control>
             <nz-form-label>Thomson score</nz-form-label>
@@ -1018,8 +1018,8 @@
             <nz-select formControlName="hieGradeSection" nzPlaceHolder="Select">
               <nz-option
                 *ngFor="let o of hieGradeOptions"
-                [nzValue]="o.value"
-                [nzLabel]="o.label"
+                [nzValue]="o.id"
+                [nzLabel]="o.name"
               ></nz-option>
             </nz-select>
           </nz-form-control>
@@ -1030,13 +1030,13 @@
             <nz-select formControlName="aeeG" nzPlaceHolder="Select">
               <nz-option
                 *ngFor="let o of yesNoUnknown"
-                [nzValue]="o.value"
-                [nzLabel]="o.label"
+                [nzValue]="o.id"
+                [nzLabel]="o.name"
               ></nz-option>
             </nz-select>
           </nz-form-control>
         </nz-form-item>
-        <nz-form-item *ngIf="diagnosisForm.get('aeeG')?.value === 'No'">
+        <nz-form-item *ngIf="isAeeG()">
           <nz-form-control>
             <nz-form-label>Why aEEG not done</nz-form-label>
             <nz-select
@@ -1046,8 +1046,8 @@
             >
               <nz-option
                 *ngFor="let o of aeeGReasonOptions"
-                [nzValue]="o.value"
-                [nzLabel]="o.label"
+                [nzValue]="o.id"
+                [nzLabel]="o.name"
               ></nz-option>
             </nz-select>
           </nz-form-control>
@@ -1068,14 +1068,14 @@
             <nz-select formControlName="cerebralCooling" nzPlaceHolder="Select">
               <nz-option
                 *ngFor="let o of yesNoUnknown"
-                [nzValue]="o.value"
-                [nzLabel]="o.label"
+                [nzValue]="o.id"
+                [nzLabel]="o.name"
               ></nz-option>
             </nz-select>
           </nz-form-control>
         </nz-form-item>
         <nz-form-item
-          *ngIf="diagnosisForm.get('cerebralCooling')?.value === 'No'"
+          *ngIf="isCerebralCoolingNo()"
         >
           <nz-form-control>
             <nz-form-label>Reason for not cooling</nz-form-label>
@@ -1086,14 +1086,14 @@
             >
               <nz-option
                 *ngFor="let o of coolingReasonOptions"
-                [nzValue]="o.value"
-                [nzLabel]="o.label"
+                [nzValue]="o.id"
+                [nzLabel]="o.name"
               ></nz-option>
             </nz-select>
           </nz-form-control>
         </nz-form-item>
         <nz-form-item
-          *ngIf="diagnosisForm.get('cerebralCooling')?.value === 'Yes'"
+          *ngIf="isCerebralCoolingYes()"
         >
           <nz-form-control>
             <nz-form-label>Cooling type</nz-form-label>
@@ -1104,8 +1104,8 @@
             >
               <nz-option
                 *ngFor="let o of coolingTypeOptions"
-                [nzValue]="o.value"
-                [nzLabel]="o.label"
+                [nzValue]="o.id"
+                [nzLabel]="o.name"
               ></nz-option>
             </nz-select>
           </nz-form-control>
@@ -1119,8 +1119,8 @@
           <nz-select formControlName="necEnterocolitis" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -1134,8 +1134,8 @@
           >
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -1146,8 +1146,8 @@
           <nz-select formControlName="necSurgery" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -1159,13 +1159,13 @@
           <nz-select formControlName="otherSurgery" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
-      <nz-form-item *ngIf="diagnosisForm.get('necSurgery')?.value === 'Yes'">
+      <nz-form-item *ngIf="isNecSurgery()">
         <nz-form-control>
           <nz-form-label>Type of NEC surgery</nz-form-label>
           <nz-select
@@ -1175,8 +1175,8 @@
           >
             <nz-option
               *ngFor="let o of necSurgeryTypeOptions"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -1229,14 +1229,14 @@
           <nz-select formControlName="retinopathyPre" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
       <nz-form-item
-        *ngIf="diagnosisForm.get('retinopathyPre')?.value === 'Yes'"
+        *ngIf="isRetinopathyPre()"
       >
         <nz-form-control>
           <nz-form-label>ROP findings</nz-form-label>
@@ -1247,14 +1247,14 @@
           >
             <nz-option
               *ngFor="let o of ropFindingsOptions"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
       <nz-form-item
-        *ngIf="diagnosisForm.get('retinopathyPre')?.value === 'Yes'"
+        *ngIf="isRetinopathyPre()"
       >
         <nz-form-control>
           <nz-form-label>ROP surgery</nz-form-label>
@@ -1265,8 +1265,8 @@
           >
             <nz-option
               *ngFor="let o of ropSurgeryOptions"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -1282,8 +1282,8 @@
           >
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -1297,8 +1297,8 @@
           >
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -1321,8 +1321,8 @@
           <nz-select formControlName="bloodTransfusion" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -1336,8 +1336,8 @@
           >
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -1348,8 +1348,8 @@
           <nz-select formControlName="plasmaTransfusion" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -1366,8 +1366,8 @@
           >
             <nz-option
               *ngFor="let o of metabolicOptions"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -1382,8 +1382,8 @@
           >
             <nz-option
               *ngFor="let o of glucoseAbnOptions"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -1396,8 +1396,8 @@
           <nz-select formControlName="majorBirthDefect" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -1430,13 +1430,13 @@
           <nz-select formControlName="kangarooCare" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
-      <nz-form-item *ngIf="diagnosisForm.get('kangarooCare')?.value === 'Yes'">
+      <nz-form-item *ngIf="isKangarooCare()">
         <nz-form-control>
           <nz-form-label>Type of KMC</nz-form-label>
           <nz-select
@@ -1446,8 +1446,8 @@
           >
             <nz-option
               *ngFor="let o of kmcTypeOptions"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -1468,14 +1468,14 @@
           >
             <nz-option
               *ngFor="let o of outcomeOptions"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
       <nz-form-item
-        *ngIf="diagnosisForm.get('outcomeSection')?.value.includes('Hospital')"
+        *ngIf="isOutcomeHospital()"
       >
         <nz-form-control>
           <nz-form-label>Hospital name</nz-form-label>
@@ -1497,8 +1497,8 @@
           >
             <nz-option
               *ngFor="let o of feedOptions"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>
@@ -1510,8 +1510,8 @@
           <nz-select formControlName="homeOxygen" nzPlaceHolder="Select">
             <nz-option
               *ngFor="let o of yesNoUnknown"
-              [nzValue]="o.value"
-              [nzLabel]="o.label"
+              [nzValue]="o.id"
+              [nzLabel]="o.name"
             ></nz-option>
           </nz-select>
         </nz-form-control>

@@ -1,27 +1,52 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { PatientCompleteInfoService } from '../../../services/patient-complete-info.service';
+import { DiagnosisTreatmentFormService } from '../../../services/diagnosis-treatment-form.service';
 import { PatientCompleteInfo } from '../../../models/patient-complete-info';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { EMPTY_GUID } from '../../../constants/constants';
 import { ActivatedRoute, Router, TitleStrategy } from '@angular/router';
 import { Patient } from '../../../models/patient';
 import { PatientService } from '../../../services/patient.service';
-import { catchError, finalize, forkJoin, mergeMap, of, subscribeOn, switchMap, tap } from 'rxjs';
+import {
+  catchError,
+  finalize,
+  forkJoin,
+  mergeMap,
+  of,
+  subscribeOn,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
-import { CongenitalInfectionOrganism, CongenitalInfectionOrganismService } from '../../../services/congenitalinfectionorganism.service';
-import { Antimicrobial, AntimicrobialService } from '../../../services/antimicrobial.service';
+import {
+  CongenitalInfectionOrganism,
+  CongenitalInfectionOrganismService,
+} from '../../../services/congenitalinfectionorganism.service';
+import {
+  Antimicrobial,
+  AntimicrobialService,
+} from '../../../services/antimicrobial.service';
 import { Organism, OrganismService } from '../../../services/organism.service';
-import { FungalOrganism, FungalOrganismService } from '../../../services/fungalorganism.service';
-import { SonarFinding, SonarFindingService } from '../../../services/sonarfinding.service';
+import {
+  FungalOrganism,
+  FungalOrganismService,
+} from '../../../services/fungalorganism.service';
+import {
+  SonarFinding,
+  SonarFindingService,
+} from '../../../services/sonarfinding.service';
 import { Location } from '@angular/common';
 import { SharedService } from '../../../services/shared.service';
+import { LookupService } from '../../../services/lookup.service';
+import { LookupItems } from '../../../models/lookup-items';
+import { LookupCategoryIds } from '../../../constants/lookup-categories';
+import { LookupItemIds } from '../../../constants/lookup-items';
 
 @Component({
   selector: 'app-patient-full-form',
   standalone: false,
   templateUrl: './patient-full-form.component.html',
-  styleUrl: './patient-full-form.component.scss'
+  styleUrl: './patient-full-form.component.scss',
 })
 export class PatientFullFormComponent implements OnInit {
   diagnosisForm!: FormGroup;
@@ -29,239 +54,125 @@ export class PatientFullFormComponent implements OnInit {
   loading: boolean = false;
   patient!: Patient;
   patientCompleteInfo!: PatientCompleteInfo;
-  congenitalOrganisms: CongenitalInfectionOrganism[] = [];
-  bacterialOrganisms: Organism[] = [];
-  sonarFindingsOptions: SonarFinding[] = [];
-  earlyAbxOptions: Antimicrobial[] = [];
+  congenitalOrganisms: CongenitalInfectionOrganism[] = []; //
+  bacterialOrganisms: Organism[] = []; //
+  sonarFindingsOptions: SonarFinding[] = []; //
+  earlyAbxOptions: Antimicrobial[] = []; //
   lateAbxOptions: Antimicrobial[] = [];
-  fungalOrganisms: FungalOrganism[] = [];
+  fungalOrganisms: FungalOrganism[] = []; //
 
-  yesNoUnknown = [
-    { label: 'Yes', value: 'Yes' },
-    { label: 'No', value: 'No' },
-    { label: 'Unknown', value: 'Unknown' }
-  ];
-  yesNoNaUnknown = [
-    { label: 'Yes', value: 'Yes' },
-    { label: 'No', value: 'No' },
-    { label: 'N/A', value: 'N/A' },
-    { label: 'Unknown', value: 'Unknown' }
-  ];
-
-  locationOptions = [
-    { label: 'CMJAH', value: 'CMJAH' },
-    { label: 'Other Hospital', value: 'OtherHospital' },
-    { label: 'Both', value: 'Both' }
-  ];
-  sepsisSites = [
-    { label: 'Blood', value: 'Blood' },
-    { label: 'Urine', value: 'Urine' },
-    { label: 'Skin', value: 'Skin' },
-    { label: 'Wound', value: 'Wound' },
-    { label: 'Eye', value: 'Eye' },
-    { label: 'Meningitis', value: 'Meningitis' },
-    { label: 'Arthritis', value: 'Arthritis' },
-    { label: 'Pneumonia', value: 'Pneumonia' },
-    { label: 'Endocarditis', value: 'Endocarditis' }
-  ];
-  fungalLocationOptions = [
-    { label: 'Base hospital', value: 'Base' },
-    { label: 'Other hospital', value: 'OtherHospital' },
-    { label: 'Both', value: 'Both' }
-  ];
-  respDiagnosisOptions = [
-    { label: 'Transient tachypnoea of the newborn', value: 'TTN' },
-    { label: 'Congenital pneumonia', value: 'CongPneum' },
-    { label: 'Meconium aspiration syndrome', value: 'MAS' },
-    { label: 'Birth asphyxia', value: 'Asphyxia' },
-    { label: 'Pneumothorax', value: 'Pneumothorax' },
-    { label: 'Acquired pneumonia', value: 'AcqPneum' },
-    { label: 'Pulmonary haemorrhage', value: 'Hemorrhage' },
-    { label: 'PPHN', value: 'PPHN' },
-    { label: 'Atelectasis', value: 'Atelectasis' },
-    { label: 'HMD/RDS', value: 'RDS' },
-    { label: 'BPD/CLD', value: 'BPD' }
-  ];
-  respSupportOptions = [
-    { label: 'Oxygen', value: 'Oxygen' },
-    { label: 'NCPAP', value: 'NCPAP' },
-    { label: 'Conventional ventilation', value: 'Conventional' },
-    { label: 'High frequency ventilation', value: 'HFV' },
-    { label: 'Nasal IMV/SIMV', value: 'IMV' },
-    { label: 'High flow cannula', value: 'HFNC' },
-    { label: 'Unknown', value: 'Unknown' }
-  ];
-  ivhGrades = [
-    { label: 'None', value: 'None' },
-    { label: '1', value: '1' },
-    { label: '2', value: '2' },
-    { label: '3', value: '3' },
-    { label: '4', value: '4' }
-  ];
-  eosRecOptions = [
-    { label: 'No culture, No Antibiotics', value: 'NoCulture' },
-    { label: 'Strong Consider Empiric Antibiotics', value: 'StrongEmpiric' },
-    { label: 'Blood Culture', value: 'BloodCulture' },
-    { label: 'Empiric Antibiotics', value: 'Empiric' }
-  ];
-  hieGradeOptions = [
-    { label: '1', value: '1' },
-    { label: '2', value: '2' },
-    { label: '3', value: '3' }
-  ];
-
-  aeeGReasonOptions = [
-    { label: 'Machine unavailable', value: 'MachineUnavailable' },
-    { label: 'Patient unstable', value: 'PatientUnstable' },
-    { label: 'Parental refusal', value: 'ParentalRefusal' },
-    { label: 'Other', value: 'Other' }
-  ];
-
-  coolingReasonOptions = [
-    { label: 'Not indicated', value: 'NotIndicated' },
-    { label: 'Medical contraindication', value: 'Contraindication' },
-    { label: 'Equipment failure', value: 'EquipmentFailure' },
-    { label: 'Parental refusal', value: 'ParentalRefusal' },
-    { label: 'Other', value: 'Other' }
-  ];
-
-  coolingTypeOptions = [
-    { label: 'Whole‑body cooling', value: 'WholeBody' },
-    { label: 'Selective head cooling', value: 'HeadCooling' },
-    { label: 'Other', value: 'Other' }
-  ];
-
-  necSurgeryTypeOptions = [
-    { label: 'Resection', value: 'Resection' },
-    { label: 'Stoma formation', value: 'Stoma' },
-    { label: 'Peritoneal drainage', value: 'Drainage' },
-    { label: 'Other', value: 'Other' }
-  ];
-
-  ropFindingsOptions = [
-    { label: 'Stage 1', value: 'Stage1' },
-    { label: 'Stage 2', value: 'Stage2' },
-    { label: 'Stage 3', value: 'Stage3' },
-    { label: 'Plus disease', value: 'PlusDisease' },
-    { label: 'Other', value: 'Other' }
-  ];
-
-  kmcTypeOptions = [
-    { label: 'Skin‑to‑skin contact', value: 'SkinToSkin' },
-    { label: 'Breastfeeding support', value: 'Breastfeeding' },
-    { label: 'Thermal regulation', value: 'ThermalRegulation' },
-    { label: 'Parent education', value: 'ParentEducation' },
-    { label: 'Other', value: 'Other' }
-  ];
-
-  ropSurgeryOptions = [
-    { label: 'Laser therapy', value: 'Laser' },
-    { label: 'Anti‑VEGF injection', value: 'AntiVEGF' },
-    { label: 'Vitrectomy', value: 'Vitrectomy' },
-    { label: 'Other', value: 'Other' }
-  ];
-
-  metabolicOptions = [
-    { label: 'Hypoglycemia', value: 'Hypoglycemia' },
-    { label: 'Hyperglycemia', value: 'Hyperglycemia' },
-    { label: 'Electrolyte imbalance', value: 'Electrolyte' }
-  ];
-
-  glucoseAbnOptions = [
-    { label: 'Hypoglycemia', value: 'Hypoglycemia' },
-    { label: 'Hyperglycemia', value: 'Hyperglycemia' }
-  ];
-
-  outcomeOptions = [
-    { label: 'Home', value: 'Home' },
-    { label: 'Transfer to hospital', value: 'Transfer' },
-    { label: 'Death', value: 'Death' }
-  ];
-
-  feedOptions = [
-    { label: 'Breast milk', value: 'Breast' },
-    { label: 'Formula', value: 'Formula' },
-    { label: 'Breastmilk and formula', value: 'Mixed' }
-  ];
+  yesNoUnknown: LookupItems[] = [];
+  yesNoNaUnknown: LookupItems[] = [];
+  locationOptions: LookupItems[] = [];
+  sepsisSites: LookupItems[] = [];
+  fungalLocationOptions: LookupItems[] = [];
+  respDiagnosisOptions: LookupItems[] = [];
+  respSupportOptions: LookupItems[] = [];
+  ivhGrades: LookupItems[] = [];
+  eosRecOptions: LookupItems[] = [];
+  hieGradeOptions: LookupItems[] = [];
+  aeeGReasonOptions: LookupItems[] = [];
+  coolingReasonOptions: LookupItems[] = [];
+  coolingTypeOptions: LookupItems[] = [];
+  necSurgeryTypeOptions: LookupItems[] = [];
+  ropFindingsOptions: LookupItems[] = [];
+  kmcTypeOptions: LookupItems[] = [];
+  ropSurgeryOptions: LookupItems[] = [];
+  metabolicOptions: LookupItems[] = [];
+  glucoseAbnOptions: LookupItems[] = [];
+  outcomeOptions: LookupItems[] = [];
+  feedOptions: LookupItems[] = [];
 
   rolesPath = {
     admin: 'admin-dashboard',
     intern: 'intern-dashboard',
-    doctor: 'doctor-dashboard'
-  }
+    doctor: 'doctor-dashboard',
+  };
 
   currentRolePath: string = '';
 
-  constructor(private fb: FormBuilder, private patientCompleteInfoService: PatientCompleteInfoService, private authService: AuthService, private location: Location,
-    private nzNotificationService: NzNotificationService, private activatedRoute: ActivatedRoute, private patientService: PatientService, private router: Router,
-    private congenitalInfectionOrganismService: CongenitalInfectionOrganismService, private antiMicrobialService: AntimicrobialService,
-    private oragnismService: OrganismService, private fungalOragnismService: FungalOrganismService, private sonarFindingService: SonarFindingService,
-    private sharedService: SharedService
-  ) { }
+  constructor(
+    private fb: FormBuilder,
+    private patientCompleteInfoService: DiagnosisTreatmentFormService,
+    private authService: AuthService,
+    private location: Location,
+    private nzNotificationService: NzNotificationService,
+    private activatedRoute: ActivatedRoute,
+    private patientService: PatientService,
+    private router: Router,
+    private congenitalInfectionOrganismService: CongenitalInfectionOrganismService,
+    private antiMicrobialService: AntimicrobialService,
+    private oragnismService: OrganismService,
+    private fungalOragnismService: FungalOrganismService,
+    private sonarFindingService: SonarFindingService,
+    private sharedService: SharedService,
+    private lookupService: LookupService
+  ) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.loading = true;
     this.diagnosisForm = this.fb.group({
-      id: [EMPTY_GUID],
+       id: [EMPTY_GUID],
       patientId: [EMPTY_GUID],
-      neonatalSepsis: [''],
+
+      neonatalSepsis: [null],
       congenitalInfection: [null],
-      congenitalInfectionOrganism: [[]],
-      specifyOther: [''],
+      congenitalInfectionOrganism: [null],
+      specifyOther: [null],
       bacterialSepsisBeforeDay3: [null],
-      bsOrganism: [[]],
+      bsOrganism: [null],
       earlyAntibiotics: [null],
       sepsisAfterDay3: [null],
-      sepsisSite: [[]],
+      sepsisSite: [null],
       bacterialPathogen: [null],
       bacterialInfectionLocation: [null],
       cons: [null],
       consLocation: [null],
-      otherBacteria: [''],
+      otherBacteria: [null],
       fungalSepsis: [null],
       betaDGlucan: [null],
       fungalSepsisLocation: [null],
-      fungalOrganism: [[]],
-      lateSepsisAbx: [[]],
-      specifyOtherAbx: [''],
-      abxDuration: [''],
+      fungalOrganism: [null],
+      lateSepsisAbx: [null],
+      specifyOtherAbx: [null],
+      abxDuration: [null],
 
       abgAvailable: [null],
-      baseExcess: [''],
-      cribWeightGa: [''],
-      cribTemp: [''],
-      cribBaseExcess: [''],
-      cribTotal: [''],
+      baseExcess: [null],
+      cribWeightGa: [null],
+      cribTemp: [null],
+      cribBaseExcess: [null],
+      cribTotal: [null],
       eosCalcDone: [null],
-      eosRisk: [''],
+      eosRisk: [null],
       eosRecommendation: [null],
       eosFollowed: [null],
 
       cranialBefore28: [null],
       ivh: [null],
       worstIvh: [null],
-      sonarFindings: [[]],
+      sonarFindings: [null],
       cysticPvl: [null],
-      otherSonarFindings: [''],
+      otherSonarFindings: [null],
 
-      respiratoryDiagnosis: [[]],
+      respiratoryDiagnosis: [null],
       pneumoLocation: [null],
-      respSupportAfter: [[]],
+      respSupportAfter: [null],
       hfncHighRate: [null],
-      hfStart: [''],
-      hfEnd: [''],
-      ncpapStart: [''],
-      ncpapEnd: [''],
-      ncpapDuration: [''],
-      ncpap2Start: [''],
-      ncpap2End: [''],
-      ncpap2Duration: [''],
-      vent1Start: [''],
-      vent1End: [''],
-      vent1Duration: [''],
-      vent2Start: [''],
-      vent2End: [''],
-      vent2Duration: [''],
+      hfStart: [null],
+      hfEnd: [null],
+      ncpapStart: [null],
+      ncpapEnd: [null],
+      ncpapDuration: [null],
+      ncpap2Start: [null],
+      ncpap2End: [null],
+      ncpap2Duration: [null],
+      vent1Start: [null],
+      vent1End: [null],
+      vent1Duration: [null],
+      vent2Start: [null],
+      vent2End: [null],
+      vent2Duration: [null],
       ncpapNoEtt: [null],
       septalNecrosis: [null],
       ino: [null],
@@ -271,92 +182,149 @@ export class PatientFullFormComponent implements OnInit {
       caffeine: [null],
       surfactantInit: [null],
       surfactantAny: [null],
-      svtDoses: [''],
-      svtFirstHours: [''],
-      svtFirstMinutes: [''],
+      svtDoses: [null],
+      svtFirstHours: [null],
+      svtFirstMinutes: [null],
 
-      chd: [''],
+      chd: [null],
       pdaLiti: [null],
       pdaIbuprofen: [null],
       pdaParacetamol: [null],
       inotropicSupport: [null],
 
       hieSection: [null],
-      thomsonScore: [''],
-      bloodGasResult: [''],
+      thomsonScore: [null],
+      bloodGasResult: [null],
       hieGradeSection: [null],
       aeeG: [null],
-      aeeGNotDoneReason: [[]],
-      aeeGFindings: [''],
+      aeeGNotDoneReason: [null],
+      aeeGFindings: [null],
       cerebralCooling: [null],
-      coolingNotDoneReason: [[]],
-      coolingType: [[]],
+      coolingNotDoneReason: [null],
+      coolingType: [null],
 
       necEnterocolitis: [null],
       parenteralNutrition: [null],
       necSurgery: [null],
       otherSurgery: [null],
-      typeNecSurgery: [[]],
-      surgeryCode1: [''],
-      surgeryCode2: [''],
-      surgeryCode3: [''],
-      surgeryCode4: [''],
+      typeNecSurgery: [null],
+      surgeryCode1: [null],
+      surgeryCode2: [null],
+      surgeryCode3: [null],
+      surgeryCode4: [null],
 
       retinopathyPre: [null],
-      ropFindings: [[]],
-      ropSurgery: [[]],
+      ropFindings: [null],
+      ropSurgery: [null],
 
       jaundiceRequirement: [null],
       exchangeTransfusion: [null],
-      maxBilirubin: [''],
+      maxBilirubin: [null],
 
       bloodTransfusion: [null],
       plateletTransfusion: [null],
       plasmaTransfusion: [null],
 
-      metabolicComplications: [[]],
-      glucoseAbnormalities: [[]],
+      metabolicComplications: [null],
+      glucoseAbnormalities: [null],
 
       majorBirthDefect: [null],
-      defectCodes: [''],
-      congenitalAnomaly: [''],
+      defectCodes: [null],
+      congenitalAnomaly: [null],
 
       kangarooCare: [null],
-      kmcType: [[]],
-
-      outcomeSection: [[]],
-      hospitalName: [''],
-      feedsOnDischarge: [[]],
-      homeOxygen: [''],
-      dischargeWeight: [''],
-      durationOfStay: ['']
+      kmcType: [null],
+      outcomeSection: [null],
+      hospitalName: [null],
+      feedsOnDischarge: [null],
+      homeOxygen: [null],
+      dischargeWeight: [null],
+      durationOfStay: [null],
     });
+    
+    this.loading = true;
+    [
+      this.yesNoUnknown,
+      this.yesNoNaUnknown,
+      this.locationOptions,
+      this.sepsisSites,
+      this.fungalLocationOptions,
+      this.respDiagnosisOptions,
+      this.respSupportOptions,
+      this.ivhGrades,
+      this.eosRecOptions,
+      this.hieGradeOptions,
+      this.aeeGReasonOptions,
+      this.coolingReasonOptions,
+      this.coolingTypeOptions,
+      this.necSurgeryTypeOptions,
+      this.ropFindingsOptions,
+      this.kmcTypeOptions,
+      this.ropSurgeryOptions,
+      this.metabolicOptions,
+      this.glucoseAbnOptions,
+      this.outcomeOptions,
+      this.feedOptions,
+    ] = await Promise.all([
+      this.lookupService.getByCategoryId(LookupCategoryIds.yesNoUnknown),
+      this.lookupService.getByCategoryId(LookupCategoryIds.yesNoNaUnknown),
+      this.lookupService.getByCategoryId(LookupCategoryIds.locationOptions),
+      this.lookupService.getByCategoryId(LookupCategoryIds.sepsisSites),
+      this.lookupService.getByCategoryId(
+        LookupCategoryIds.fungalLocationOptions
+      ),
+      this.lookupService.getByCategoryId(
+        LookupCategoryIds.respDiagnosisOptions
+      ),
+      this.lookupService.getByCategoryId(LookupCategoryIds.respSupportOptions),
+      this.lookupService.getByCategoryId(LookupCategoryIds.ivhGrades),
+      this.lookupService.getByCategoryId(LookupCategoryIds.eosRecOptions),
+      this.lookupService.getByCategoryId(LookupCategoryIds.hieGradeOptions),
+      this.lookupService.getByCategoryId(LookupCategoryIds.aeeGReasonOptions),
+      this.lookupService.getByCategoryId(
+        LookupCategoryIds.coolingReasonOptions
+      ),
+      this.lookupService.getByCategoryId(LookupCategoryIds.coolingTypeOptions),
+      this.lookupService.getByCategoryId(
+        LookupCategoryIds.necSurgeryTypeOptions
+      ),
+      this.lookupService.getByCategoryId(LookupCategoryIds.ropFindingsOptions),
+      this.lookupService.getByCategoryId(LookupCategoryIds.kmcTypeOptions),
+      this.lookupService.getByCategoryId(LookupCategoryIds.ropSurgeryOptions),
+      this.lookupService.getByCategoryId(LookupCategoryIds.metabolicOptions),
+      this.lookupService.getByCategoryId(LookupCategoryIds.glucoseAbnOptions),
+      this.lookupService.getByCategoryId(LookupCategoryIds.outcomeOptions),
+      this.lookupService.getByCategoryId(LookupCategoryIds.feedOptions),
+    ]);
 
     const patientId = this.activatedRoute.parent?.snapshot.params['id'];
 
     if (patientId) {
-      this.patientService.getPatientById(patientId)
+      this.patientService
+        .getPatientById(patientId)
         .pipe(
           tap((res: Patient) => {
             this.patient = res;
             this.diagnosisForm.patchValue({
-              patientId: res.id
+              patientId: res.id,
             });
           }),
-          switchMap((patient: Patient) => this.patientCompleteInfoService.getByPatientId(patient.id!)),
+          switchMap((patient: Patient) =>
+            this.patientCompleteInfoService.getByPatientId(patient.id!)
+          ),
           tap((res: PatientCompleteInfo) => {
             this.patientCompleteInfo = res;
-            this.diagnosisForm.patchValue(res)
-            if(!res){
+            this.diagnosisForm.patchValue(res);
+            if (!res) {
               this.sharedService.setEditable(true);
             }
           }),
-          finalize(() => this.loading = false)
+          finalize(() => (this.loading = false))
         )
         .subscribe({
           error: (err: Error) => {
-          this.nzNotificationService.error("Error", err.message);
-        }
+            this.nzNotificationService.error('Error', err.message);
+          },
         });
     }
 
@@ -368,9 +336,7 @@ export class PatientFullFormComponent implements OnInit {
       sonarFindingsOptions: this.sonarFindingService.getAll(),
     });
 
-    dropdownCalls.pipe(
-      tap((res: any) => this.loading = true)
-    ).subscribe({
+    dropdownCalls.pipe(tap((res: any) => (this.loading = true))).subscribe({
       next: (res: any) => {
         this.congenitalOrganisms = res.congenitalOrganisms;
         this.earlyAbxOptions = res.earlyAndLateAbx;
@@ -379,55 +345,140 @@ export class PatientFullFormComponent implements OnInit {
         this.fungalOrganisms = res.fungalOrganisms;
         this.sonarFindingsOptions = res.sonarFindingsOptions;
         this.loading = false;
-      }
+      },
     });
 
     this.setCurrentRole();
-    this.sharedService.editable$.subscribe(editable => {
+    this.sharedService.editable$.subscribe((editable) => {
       if (editable && !this.isAdmin()) {
         this.diagnosisForm.enable();
       } else {
         this.diagnosisForm.disable();
       }
-    })
+    });
   }
 
   //UI LOGIC
+  isCongentialInfection(): boolean{
+    return this.diagnosisForm.get('congenitalInfection')?.value === LookupItemIds.yesNoUnknown.Yes;
+  }
+
+  isBacterialSepsisBeforeDay3(): boolean {
+    return this.diagnosisForm.get('bacterialSepsisBeforeDay3')?.value === LookupItemIds.yesNoUnknown.Yes;
+  }
+
+  isSepsisAfterDay3(): boolean {
+    return this.diagnosisForm.get('sepsisAfterDay3')?.value === LookupItemIds.yesNoUnknown.Yes;
+  }
+
+  isBacterialPathogen(): boolean {
+    return this.diagnosisForm.get('bacterialPathogen')?.value === LookupItemIds.yesNoUnknown.Yes;
+  }
+
+  isCons(): boolean {
+    return this.diagnosisForm.get('cons')?.value === LookupItemIds.yesNoUnknown.Yes;
+  }
+
+  isFungalSepsis(): boolean {
+    return this.diagnosisForm.get('fungalSepsis')?.value === LookupItemIds.yesNoUnknown.Yes;
+  }
+
+  isAbgAvailable(): boolean {
+    return this.diagnosisForm.get('abgAvailable')?.value === LookupItemIds.yesNoUnknown.Yes;
+  }
+
+  isEosCalcDone(): boolean {
+    return this.diagnosisForm.get('eosCalcDone')?.value === LookupItemIds.yesNoUnknown.Yes;
+  }
+
+  isIvh(): boolean {
+    return this.diagnosisForm.get('ivh')?.value === LookupItemIds.yesNoUnknown.Yes;
+  }
+
+  isWorstIvh(): boolean {
+    return this.diagnosisForm.get('ivh')?.value === LookupItemIds.yesNoUnknown.Yes;
+  }
+
+  isPdaLiti(): boolean {
+    return this.diagnosisForm.get('pdaLiti')?.value === LookupItemIds.yesNoUnknown.Yes;
+  }
+
+  isAeeG(): boolean {
+    return this.diagnosisForm.get('aeeG')?.value === LookupItemIds.yesNoUnknown.No;
+  }
+
+  isCerebralCoolingNo(): boolean {
+    return this.diagnosisForm.get('cerebralCooling')?.value === LookupItemIds.yesNoUnknown.No;
+  }
+
+  isCerebralCoolingYes(): boolean {
+    return this.diagnosisForm.get('cerebralCooling')?.value === LookupItemIds.yesNoUnknown.Yes;
+  }
+  
+  isCranialBefore28() : boolean {
+    return this.diagnosisForm.get('cranialBefore28')?.value === LookupItemIds.yesNoUnknown.Yes;
+  }
+
+  isHieSection():boolean{
+   return this.diagnosisForm.get('hieSection')?.value === LookupItemIds.yesNoUnknown.Yes;
+  }
+
+  isNecSurgery(): boolean {
+    return this.diagnosisForm.get('necSurgery')?.value === LookupItemIds.yesNoUnknown.Yes;
+  }
+
+  isRetinopathyPre(): boolean {
+    return this.diagnosisForm.get('retinopathyPre')?.value === LookupItemIds.yesNoUnknown.Yes;
+  }
+
+  isKangarooCare(): boolean {
+    return this.diagnosisForm.get('kangarooCare')?.value === LookupItemIds.yesNoUnknown.Yes;
+  }
+
+  isOutcomeHospital(): boolean {
+    const val = this.diagnosisForm.get('outcomeSection')?.value;
+    return Array.isArray(val) && val.includes('Hospital');
+  }
+
   setCurrentRole(): void {
-    if (this.authService.getRole()?.toLowerCase() === "doctor") {
+    if (this.authService.getRole()?.toLowerCase() === 'doctor') {
       this.currentRolePath = this.rolesPath.doctor;
-    }
-    else if (this.authService.getRole()?.toLowerCase() === "intern") {
+    } else if (this.authService.getRole()?.toLowerCase() === 'intern') {
       this.currentRolePath = this.rolesPath.intern;
-    }
-    else if (this.authService.getRole()?.toLowerCase() === 'admin') {
+    } else if (this.authService.getRole()?.toLowerCase() === 'admin') {
       this.currentRolePath = this.rolesPath.admin;
     }
   }
   isAdmin = (): boolean => this.currentRolePath === this.rolesPath.admin;
 
   markAsComplete(): void {
+    debugger;
     if (this.diagnosisForm.valid) {
       this.btnLoading = true;
-      this.patientCompleteInfoService.createOrUpdate(this.diagnosisForm.getRawValue()).subscribe({
-        next: (res: PatientCompleteInfo) => {
-          this.patientCompleteInfo = res;
-          this.diagnosisForm.patchValue(res);
-          this.sharedService.setEditable(false);
-          this.nzNotificationService.success("Success", "Patient Form has been saved successfully");
-          this.btnLoading = false;
-        },
-        error: (err: Error) => {
-          this.nzNotificationService.error("Error", err.message)
-          this.btnLoading = false;
-        }
-      });
+      this.patientCompleteInfoService
+        .createOrUpdate(this.diagnosisForm.getRawValue())
+        .subscribe({
+          next: (res: PatientCompleteInfo) => {
+            this.patientCompleteInfo = res;
+            this.diagnosisForm.patchValue(res);
+            this.sharedService.setEditable(false);
+            this.nzNotificationService.success(
+              'Success',
+              'Patient Form has been saved successfully'
+            );
+            this.btnLoading = false;
+          },
+          error: (err: Error) => {
+            this.nzNotificationService.error('Error', err.message);
+            this.btnLoading = false;
+          },
+        });
     } else {
       this.diagnosisForm.markAllAsTouched();
     }
   }
 
-  setEditable(){
+  setEditable() {
     this.sharedService.setEditable(true);
   }
 
@@ -437,6 +488,6 @@ export class PatientFullFormComponent implements OnInit {
   }
 
   close(): void {
-    this.router.navigate([this.currentRolePath, 'patients'])
+    this.router.navigate([this.currentRolePath, 'patients']);
   }
 }

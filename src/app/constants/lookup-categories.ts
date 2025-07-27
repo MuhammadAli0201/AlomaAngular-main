@@ -1,0 +1,23 @@
+export const LookupCategoryIds = {
+  yesNoUnknown: 'f19e2830-b2b5-4fba-8ce2-84aba4bc931b',
+  yesNoNaUnknown: 'ab149262-20a6-44f2-9017-c171c930cb42',
+  locationOptions: 'b765fa18-ceec-4cfc-a927-91fb886c004e',
+  sepsisSites: '8ba19a0c-270b-4c0a-add2-003507965164',
+  fungalLocationOptions: '6a857e17-800b-4861-85b1-fb52b856b57f',
+  respDiagnosisOptions: 'b578f275-5aa0-4526-87dd-273f34276340',
+  respSupportOptions: 'cc65c352-bd6a-4c56-8267-ed28483ea2af',
+  ivhGrades: 'cbcfaf60-f19e-43c6-8ba4-c997046e1e8f',
+  eosRecOptions: '2e353620-eec4-4642-86f3-696b74de0f6f',
+  hieGradeOptions: 'e2fd4415-7a70-4de2-9f9a-c66d980d36b3',
+  aeeGReasonOptions: '49ae6a35-8ccb-43a2-990f-d4189b033728',
+  coolingReasonOptions: '5abe4055-fe8b-40fc-be50-06a866cf818d',
+  coolingTypeOptions: 'd3b98292-a3cc-4205-bda1-34b38be670da',
+  necSurgeryTypeOptions: 'b037c865-ae2c-4898-b941-1c543426a789',
+  ropFindingsOptions: 'c0322c49-c606-4e23-b3e5-ad858ea6efd1',
+  kmcTypeOptions: 'b049a713-5556-4bfa-86f5-d66dadf6ec98',
+  ropSurgeryOptions: 'b9117427-e94c-4e72-994b-47ed4d035332',
+  metabolicOptions: '7a6de903-2377-4c8b-9072-a6036e027b74',
+  glucoseAbnOptions: '85f2c828-0bab-4777-8bbb-f1431770fd7c',
+  outcomeOptions: '0e50994e-5eee-42fd-9798-c8fa9b313225',
+  feedOptions: '113a235a-c203-46f7-b93a-f75f1c2f8a66'
+};

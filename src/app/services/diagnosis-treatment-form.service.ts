@@ -6,8 +6,8 @@ import { PatientCompleteInfo } from '../models/patient-complete-info';
 @Injectable({
   providedIn: 'root'
 })
-export class PatientCompleteInfoService {
-  private apiUrl = 'https://localhost:7008/api/PatientCompleteInfo';
+export class DiagnosisTreatmentFormService {
+  private apiUrl = 'https://localhost:7008/api/DiagnosisTreatmentForm';
 
   constructor(private http: HttpClient) { }
 
@@ -25,7 +25,7 @@ export class PatientCompleteInfoService {
     });
   }
 
-  createOrUpdate(info: PatientCompleteInfo): Observable<PatientCompleteInfo> {
+  createOrUpdate(info: any): Observable<PatientCompleteInfo> {
     return this.http.post<PatientCompleteInfo>(`${this.apiUrl}`, info, {
       headers: this.getAuthHeaders()
     });
