@@ -1,3 +1,8 @@
+import { City } from "./city";
+import { Hospital } from "./hospital";
+import { Province } from "./province";
+import { Suburb } from "./suburb";
+
 export interface Patient {
   id?: string;
   hospitalNumber?: string;
@@ -11,6 +16,14 @@ export interface Patient {
   gestationalAge?: number;
   gender?: string;
   placeOfBirth?: string;
+  provinceId: number;
+  province: Province;
+  cityId: number;
+  city: City;
+  suburbId: number;
+  suburb: Suburb;
+  hospitalId: number;
+  hospital: Hospital;
   modeOfDelivery?: string;
   initialResuscitation?: string[];
   oneMinuteApgar:string,

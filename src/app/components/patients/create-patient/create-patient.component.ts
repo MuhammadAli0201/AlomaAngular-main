@@ -161,6 +161,7 @@ export class CreatePatientComponent {
       this.loading = true;
       this.patientService.getPatientById(id).subscribe({
         next: (val: Patient) => {
+          this.setLocation(val);
           this.patientForm.patchValue(val);
           this.patient = val;
           if(val){
@@ -210,6 +211,13 @@ export class CreatePatientComponent {
       })
       this.patientForm.patchValue({ hospital: null });
     })
+  }
+
+  setLocation(patient: Patient){
+    this.provinces.push(patient.province)
+    this.cities.push(patient.city);
+    this.suburbs.push(patient.suburb);
+    this.hospitals.push(patient.hospital);
   }
 
   //GETTERS

@@ -10,6 +10,7 @@ import { PatientService } from '../../../services/patient.service';
 import {
   catchError,
   finalize,
+  firstValueFrom,
   forkJoin,
   mergeMap,
   of,
@@ -313,6 +314,7 @@ export class DiagnosisTreatmentFormComponent implements OnInit {
             this.patientCompleteInfoService.getByPatientId(patient.id!)
           ),
           tap((res: PatientCompleteInfo) => {
+            this.setManagedItems(res)
             this.patientCompleteInfo = res;
             this.diagnosisForm.patchValue(res);
             if (!res) {
@@ -356,6 +358,33 @@ export class DiagnosisTreatmentFormComponent implements OnInit {
         this.diagnosisForm.disable();
       }
     });
+  }
+
+  async setManagedItems(patientCompleteInfo: PatientCompleteInfo){
+    if(patientCompleteInfo.bsOrganism)
+    for(let b of patientCompleteInfo.bsOrganism){
+      let response = await firstValueFrom(this.oragnismService.getById(parseInt(b)))
+      this.bacterialOrganisms.push(response);
+    }
+    if(patientCompleteInfo.fungalOrganism)
+    for(let f of patientCompleteInfo.fungalOrganism){
+      let response = await firstValueFrom(this.fungalOragnismService.getById(parseInt(f)))
+      this.fungalOrganisms.push(response);
+    }
+    if(patientCompleteInfo.earlyAntibiotics){
+      let response = await firstValueFrom(this.antiMicrobialService.getById(parseInt(patientCompleteInfo.earlyAntibiotics)))
+      this.earlyAbxOptions.push(response);
+    }
+    if(patientCompleteInfo.congenitalInfectionOrganism)
+    for(let c of patientCompleteInfo.congenitalInfectionOrganism){
+      let response = await firstValueFrom(this.congenitalInfectionOrganismService.getById(parseInt(c)))
+      this.congenitalOrganisms.push(response);
+    }
+    if(patientCompleteInfo.sonarFindings)
+    for(let s of patientCompleteInfo.sonarFindings){
+      let response = await firstValueFrom(this.sonarFindingService.getById(parseInt(s)))
+      this.sonarFindingsOptions.push(response);
+    }
   }
 
   //UI LOGIC
