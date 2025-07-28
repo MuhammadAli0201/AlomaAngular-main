@@ -1541,6 +1541,29 @@
           />
         </nz-form-control>
       </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-control>
+          <nz-form-label>Upload Supporting file</nz-form-label>
+          <nz-upload
+            [nzBeforeUpload]="beforeUpload"
+            [nzShowUploadList]="false"
+            [nzMultiple]="true"
+          >
+            <button nz-button>
+              <i nz-icon nzType="upload"></i>
+              Upload
+            </button>
+          </nz-upload>
+        </nz-form-control>
+      </nz-form-item>
+
+      <ul *ngIf="filesArray.controls?.length">
+        <li *ngFor="let ctrl of filesArray.controls">
+          {{ ctrl.value | slice:20:40 }}{{ ctrl.value.length > 40 ? '...' : '' }}
+        </li>
+      </ul>
+
     </div>
 
     <div nz-flex nzAlign="center" nzJustify="end">

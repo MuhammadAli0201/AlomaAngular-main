@@ -134,4 +134,5 @@ export interface PatientCompleteInfo {
     homeOxygen: string;
     dischargeWeight: string;
     durationOfStay: string;
+    fileBase64List: string[];
 }

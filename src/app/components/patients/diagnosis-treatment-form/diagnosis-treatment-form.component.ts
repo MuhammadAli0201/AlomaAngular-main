@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { DiagnosisTreatmentFormService } from '../../../services/diagnosis-treatment-form.service';
 import { PatientCompleteInfo } from '../../../models/patient-complete-info';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
@@ -42,6 +42,7 @@ import { LookupService } from '../../../services/lookup.service';
 import { LookupItems } from '../../../models/lookup-items';
 import { LookupCategoryIds } from '../../../constants/lookup-categories';
 import { LookupItemIds } from '../../../constants/lookup-items';
+import { NzUploadFile } from 'ng-zorro-antd/upload';
 
 @Component({
   selector: 'app-diagnosis-treatment-form',
@@ -241,6 +242,7 @@ export class DiagnosisTreatmentFormComponent implements OnInit {
       homeOxygen: [null],
       dischargeWeight: [null],
       durationOfStay: [null],
+      fileBase64List: this.fb.array([]),
     });
     
     this.loading = true;
@@ -317,6 +319,12 @@ export class DiagnosisTreatmentFormComponent implements OnInit {
             this.setManagedItems(res)
             this.patientCompleteInfo = res;
             this.diagnosisForm.patchValue(res);
+            console.log(res.fileBase64List);
+            if (res.fileBase64List) {
+                res.fileBase64List.forEach((file: any) => {
+                  this.filesArray.push(this.fb.control(file));
+                });
+              }
             if (!res) {
               this.sharedService.setEditable(true);
             }
@@ -359,6 +367,26 @@ export class DiagnosisTreatmentFormComponent implements OnInit {
       }
     });
   }
+
+  get filesArray(): FormArray {
+    return this.diagnosisForm.get('fileBase64List') as FormArray;
+  }
+
+  beforeUpload = (file: NzUploadFile, _fileList: NzUploadFile[]): boolean => {
+    const rawFile = file as any as File; // Cast to real File object
+
+    const reader = new FileReader();
+    reader.readAsDataURL(rawFile);
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      this.filesArray.push(this.fb.control(base64));
+      for(let c of this.filesArray.controls){
+        console.log(c.value)
+      }
+    };
+
+    return false; // Prevent automatic upload
+  };
 
   async setManagedItems(patientCompleteInfo: PatientCompleteInfo){
     if(patientCompleteInfo.bsOrganism)
@@ -520,3 +548,11 @@ export class DiagnosisTreatmentFormComponent implements OnInit {
     this.router.navigate([this.currentRolePath, 'patients']);
   }
 }
+
+const getBase64 = (file: File): Promise<string | ArrayBuffer | null> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
