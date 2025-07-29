@@ -319,8 +319,7 @@ export class DiagnosisTreatmentFormComponent implements OnInit {
             this.setManagedItems(res)
             this.patientCompleteInfo = res;
             this.diagnosisForm.patchValue(res);
-            console.log(res.fileBase64List);
-            if (res.fileBase64List) {
+            if (res?.fileBase64List) {
                 res.fileBase64List.forEach((file: any) => {
                   this.filesArray.push(this.fb.control(file));
                 });
@@ -389,26 +388,28 @@ export class DiagnosisTreatmentFormComponent implements OnInit {
   };
 
   async setManagedItems(patientCompleteInfo: PatientCompleteInfo){
-    if(patientCompleteInfo.bsOrganism)
-    for(let b of patientCompleteInfo.bsOrganism){
-      let response = await firstValueFrom(this.oragnismService.getById(parseInt(b)))
-      this.bacterialOrganisms.push(response);
+    if(patientCompleteInfo?.bsOrganism){
+      for(let b of patientCompleteInfo.bsOrganism){
+        let response = await firstValueFrom(this.oragnismService.getById(parseInt(b)))
+        this.bacterialOrganisms.push(response);
+      }
     }
-    if(patientCompleteInfo.fungalOrganism)
-    for(let f of patientCompleteInfo.fungalOrganism){
-      let response = await firstValueFrom(this.fungalOragnismService.getById(parseInt(f)))
-      this.fungalOrganisms.push(response);
+    if(patientCompleteInfo?.fungalOrganism){
+      for(let f of patientCompleteInfo.fungalOrganism){
+        let response = await firstValueFrom(this.fungalOragnismService.getById(parseInt(f)))
+        this.fungalOrganisms.push(response);
+      }
     }
-    if(patientCompleteInfo.earlyAntibiotics){
+    if(patientCompleteInfo?.earlyAntibiotics){
       let response = await firstValueFrom(this.antiMicrobialService.getById(parseInt(patientCompleteInfo.earlyAntibiotics)))
       this.earlyAbxOptions.push(response);
     }
-    if(patientCompleteInfo.congenitalInfectionOrganism)
+    if(patientCompleteInfo?.congenitalInfectionOrganism)
     for(let c of patientCompleteInfo.congenitalInfectionOrganism){
       let response = await firstValueFrom(this.congenitalInfectionOrganismService.getById(parseInt(c)))
       this.congenitalOrganisms.push(response);
     }
-    if(patientCompleteInfo.sonarFindings)
+    if(patientCompleteInfo?.sonarFindings)
     for(let s of patientCompleteInfo.sonarFindings){
       let response = await firstValueFrom(this.sonarFindingService.getById(parseInt(s)))
       this.sonarFindingsOptions.push(response);
