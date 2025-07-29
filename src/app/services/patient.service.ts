@@ -27,7 +27,13 @@ export class PatientService {
   }
 
   getAllPatients(): Observable<any[]> {
-    return this.http.get<any[]>(this.baseUrl, {
+    return this.http.get<Patient[]>(this.baseUrl, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  getPatientsByAdmissionMonth(month: number): Observable<any[]> {
+    return this.http.get<Patient[]>(`${this.baseUrl}/admission-month/${month}`, {
       headers: this.getAuthHeaders()
     });
   }

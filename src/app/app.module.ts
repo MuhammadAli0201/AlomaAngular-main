@@ -21,7 +21,7 @@ import { HighlightPipe } from './pipes/highlight.pipe';
 import { AdminWelcomeComponent } from './components/admin-dashboard/admin-welcome/admin-welcome.component';
 import { provideNzI18n } from 'ng-zorro-antd/i18n';
 import { en_US } from 'ng-zorro-antd/i18n';
-import { registerLocaleData } from '@angular/common';
+import { DatePipe, registerLocaleData } from '@angular/common';
 import en from '@angular/common/locales/en';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { antdIcons, AntdModule } from './antd.module';
@@ -39,6 +39,7 @@ import { InternWelcomeComponent } from './components/intern-dashboard/intern-wel
 import { HelpResoucesComponent } from './components/help-resouces/help-resouces.component';
 import { ResourceViewModalComponent } from './components/resource-view-modal/resource-view-modal.component';
 import { ManageSystemComponent } from './components/manage-system/manage-system.component';
+import { ListReportComponent } from './components/list-report/list-report.component';
 
 registerLocaleData(en);
 
@@ -67,7 +68,8 @@ registerLocaleData(en);
     InternWelcomeComponent,
     HelpResoucesComponent,
     ResourceViewModalComponent,
-    ManageSystemComponent
+    ManageSystemComponent,
+    ListReportComponent
   ],
   imports: [
     BrowserModule,
@@ -77,7 +79,8 @@ registerLocaleData(en);
     HttpClientModule,
     RouterModule,
     HighlightPipe,
-    AntdModule
+    AntdModule,
+    DatePipe
   ],
   providers: [ApiService, AuthService, provideNzI18n(en_US), provideAnimationsAsync(), provideHttpClient(),
     { provide: NZ_ICONS, useValue: antdIcons },
