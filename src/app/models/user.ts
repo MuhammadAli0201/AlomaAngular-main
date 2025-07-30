@@ -9,5 +9,6 @@ export interface User {
   password: string;
   role: string;
   token: string;
+  verifiedDate: Date;
   userRole?: UserRole; 
 }

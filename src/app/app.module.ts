@@ -40,6 +40,8 @@ import { HelpResoucesComponent } from './components/help-resouces/help-resouces.
 import { ResourceViewModalComponent } from './components/resource-view-modal/resource-view-modal.component';
 import { ManageSystemComponent } from './components/manage-system/manage-system.component';
 import { ListReportComponent } from './components/list-report/list-report.component';
+import { ReportHeaderComponent } from './common/report-header/report-header.component';
+import { ReportListingComponent } from './common/report-listing/report-listing.component';
 
 registerLocaleData(en);
 
@@ -69,7 +71,9 @@ registerLocaleData(en);
     HelpResoucesComponent,
     ResourceViewModalComponent,
     ManageSystemComponent,
-    ListReportComponent
+    ListReportComponent,
+    ReportHeaderComponent,
+    ReportListingComponent
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,27 @@
+header{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+}
+
+header img{
+    width: 25%;
+    height: auto;
+}
+
+header h4{
+    font-weight: normal;
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+}
+
+hr{
+    border: none;
+    border-top: 2px solid black;
+}
+
+h1{
+    text-align: center;
+}

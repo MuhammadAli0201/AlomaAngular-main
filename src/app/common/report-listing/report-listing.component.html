@@ -1,0 +1,16 @@
+<nz-table [nzData]="tableData">
+        <thead>
+            <tr>
+                @for (col of listOfColumns; track $index) {
+                    <th>{{col.name}}</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let row of tableData">
+                <td *ngFor="let col of listOfColumns">
+                    {{ row[col.key || ''] }}
+                </td>
+            </tr>
+        </tbody>
+    </nz-table>

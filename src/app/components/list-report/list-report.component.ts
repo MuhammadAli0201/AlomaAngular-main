@@ -46,10 +46,10 @@ export class ListReportComponent {
       await this.setupPatientsReport();
     }
     else if(this.reportType === 'interns'){
-      console.log('interns report')
+      await this.setupInternsReport();
     }
     else if(this.reportType === 'doctors'){
-      console.log('doctors report')
+      this.setupDoctorsReport()
     }
     else{
       console.error('Unknown report type:', this.reportType);
@@ -86,6 +86,67 @@ export class ListReportComponent {
       ? new Date(patient.dateOfAdmission).toLocaleDateString('en-GB')
       : ''
       }))
+    })
+  }
+
+  async setupInternsReport(){
+    this.listOfColumns = [
+      {
+        name: 'Hospital Number',
+        key: 'hospitalNumber'
+      },
+      {
+        name: 'Name and surname',
+        key: 'name'
+      },
+      {
+        name: 'Start Date',
+        key: 'startDate'
+      },
+      {
+        name: 'End of rotation',
+        key: 'endOfRotation'
+      }
+    ];
+
+    const interns = await this.authService.getUsersByRoleAndVerifiedMonth('Intern',this.currentMonthDate.getMonth() + 1)
+    this.tableData = interns.map(intern =>{
+      const endOfRotation = intern.verifiedDate 
+        ? new Date(intern.verifiedDate)
+        : null;
+      endOfRotation?.setMonth(endOfRotation?.getMonth() + 3);
+      return {
+        hospitalNumber: intern.usernumber,
+        name: intern.firstName + ' ' + intern.lastName,
+        startDate: intern.verifiedDate,
+        endOfRotation: endOfRotation?.toLocaleDateString('en-GB')
+      }
+    })
+  }
+
+  async setupDoctorsReport(){
+    this.listOfColumns = [
+      {
+        name: 'Hospital Number',
+        key: 'hospitalNumber'
+      },
+      {
+        name: 'Name and surname',
+        key: 'name'
+      },
+      {
+        name: 'Start Date',
+        key: 'startDate'
+      }
+    ];
+
+    const doctors = await this.authService.getUsersByRoleAndVerifiedMonth('Doctor',this.currentMonthDate.getMonth() + 1)
+    this.tableData = doctors.map(doctor =>{
+      return {
+        hospitalNumber: doctor.usernumber,
+        name: doctor.firstName + ' ' + doctor.lastName,
+        startDate: doctor.verifiedDate,
+      }
     })
   }
 }
