@@ -1,0 +1,11 @@
+<div class="container">
+    <app-report-header [reportType]="reportType"
+        [userName]="`${currentUser?.firstName} ${currentUser?.lastName}`"></app-report-header>
+    <div class="month-picker-container">
+        <label for="monthPicker" style="font-weight: bold;">Select Month:</label>
+        <nz-date-picker nzMode="month" [(ngModel)]="currentMonthDate" (ngModelChange)="onMonthChange($event)"></nz-date-picker>
+    </div>
+    <app-report-listing
+    [listOfColumns]="listOfColumns"
+    [tableData]="tableData"></app-report-listing>
+</div>

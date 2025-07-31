@@ -67,6 +67,14 @@ export class AuthService {
     return await firstValueFrom(this.http.get<UserRole[]>(`${this.baseUrl}roles`, { headers }));
   }
 
+  async getUsersByRoleAndVerifiedMonth(role: string, month: number): Promise<User[]> {
+    const token = this.getToken();
+    const headers = {
+      Authorization: `Bearer ${token}`
+    };
+    return await firstValueFrom(this.http.get<User[]>(`${this.baseUrl}role/${role}/admission-date/${month}`, { headers }));
+  }
+
   updateUserRole(role: UserRole) {
     const token = this.getToken();
     const headers = {

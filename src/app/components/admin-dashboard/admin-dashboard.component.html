@@ -31,10 +31,20 @@
         <nz-icon nzType="search" nzTheme="outline" />
         <span>Audit</span>
       </li>
-      <li nz-menu-item>
-        <nz-icon nzType="bar-chart" nzTheme="outline" />
-        <span>Report</span>
+      <li nz-submenu nzTitle="Report" nzIcon="bar-chart">
+        <ul>
+          <li nz-menu-item routerLink="list-report/patients" nzMatchRouter>
+            Patients Report
+          </li>
+          <li nz-menu-item routerLink="list-report/interns" nzMatchRouter>
+            Interns Report
+          </li>
+          <li nz-menu-item routerLink="list-report/doctors" nzMatchRouter>
+            Doctors Report
+          </li>
+        </ul>
       </li>
+
       <li nz-submenu nzOpen nzTitle="Help Resources" nzIcon="question-circle">
         <ul>
           <li nz-menu-item routerLink="/admin-dashboard/faq" nzMatchRouter>
