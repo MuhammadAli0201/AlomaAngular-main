@@ -42,7 +42,8 @@ import { ManageSystemComponent } from './components/manage-system/manage-system.
 import { ListReportComponent } from './components/list-report/list-report.component';
 import { ReportHeaderComponent } from './common/report-header/report-header.component';
 import { ReportListingComponent } from './common/report-listing/report-listing.component';
-import { OutcomeReportComponent } from './components/outcome-report/outcome-report.component';
+import { CategoryReportComponent } from './components/category-report/category-report.component';
+import { MortalityReportComponent } from './components/mortality-report/mortality-report.component';
 
 registerLocaleData(en);
 
@@ -75,7 +76,8 @@ registerLocaleData(en);
     ListReportComponent,
     ReportHeaderComponent,
     ReportListingComponent,
-    OutcomeReportComponent
+    CategoryReportComponent,
+    MortalityReportComponent
   ],
   imports: [
     BrowserModule,

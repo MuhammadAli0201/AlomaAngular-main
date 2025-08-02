@@ -9,7 +9,12 @@
         <tbody>
             <tr *ngFor="let row of tableData">
                 <td *ngFor="let col of listOfColumns">
-                    {{ row[col.key || ''] }}
+                    @if(col.formatter){
+                        {{ col.formatter(row[col.key || '']) }}
+                    }
+                    @else{
+                        {{ row[col.key || ''] }}
+                    }
                 </td>
             </tr>
         </tbody>

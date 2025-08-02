@@ -1,4 +1,5 @@
 export interface ColumnItem {
-    name: string,
+    name: string;
     key?: string;
+    formatter?: (value: any) => string;
 }

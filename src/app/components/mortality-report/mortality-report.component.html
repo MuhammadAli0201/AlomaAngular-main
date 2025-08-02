@@ -1,0 +1,21 @@
+<app-report-header [reportTitle]="`ADMISSIONS VS DECEASED REPORT`"
+        [userName]="`${currentUser?.firstName} ${currentUser?.lastName}`"></app-report-header>
+
+<div class="chart">
+  <canvas id="canvas">{{chart}}</canvas>
+</div>
+
+<app-report-listing
+        [listOfColumns]="listOfColumns"
+        [tableData]="mortalityReport?.monthlyRecords || []"></app-report-listing>
+
+<div class="yearly-totals-section">
+    <div>SUMMARY FOR PERIOD</div>
+    <div class="totals-and-range-container">
+        <div class="yearly-totals">
+            <div>OVERALL ADMISSION: {{mortalityReport?.yearlyReport?.totalAdmissions}}</div>
+            <div>OVERALL DEATH: {{mortalityReport?.yearlyReport?.totalDeaths}}</div>
+            <div>MORTALITY RATE: {{mortalityReport?.yearlyReport?.mortalityRate}}%</div>
+        </div>
+    </div>
+</div>

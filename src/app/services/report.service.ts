@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom, Observable } from 'rxjs';
 import { ReportDto } from '../models/report-dto';
+import { MortalityReportDto } from '../models/mortality-report-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +24,10 @@ export class ReportService {
       {dates: dateListDTO}, {
       headers: this.getAuthHeaders()
     }));
+  }
+
+  async getMortalityReport(year: number): Promise<MortalityReportDto> {
+    return await firstValueFrom(this.http.get<MortalityReportDto>(`${this.baseUrl}/mortality/${year}`, {headers: this.getAuthHeaders()}));
   }
 
   private getAuthHeaders(): HttpHeaders {

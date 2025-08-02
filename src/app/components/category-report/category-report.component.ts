@@ -7,12 +7,12 @@ import { ColumnItem } from '../../models/column-item';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
-  selector: 'app-outcome-report',
+  selector: 'app-category-report',
   standalone: false,
-  templateUrl: './outcome-report.component.html',
-  styleUrl: './outcome-report.component.scss'
+  templateUrl: './category-report.component.html',
+  styleUrl: './category-report.component.scss'
 })
-export class OutcomeReportComponent{
+export class CategoryReportComponent{
   reportType!: string;
   report: ReportDto | undefined;
   currentDate = new Date();
@@ -48,7 +48,8 @@ export class OutcomeReportComponent{
       },
       {
         name: 'Outcome Rate',
-        key: 'outcomeRate'
+        key: 'outcomeRate',
+        formatter: (value: any)=> value ? `${value.toFixed(2)}%` : '0%'
       }
     ];
     this.fetchReports()
