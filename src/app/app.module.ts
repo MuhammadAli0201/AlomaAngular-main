@@ -42,6 +42,7 @@ import { ManageSystemComponent } from './components/manage-system/manage-system.
 import { ListReportComponent } from './components/list-report/list-report.component';
 import { ReportHeaderComponent } from './common/report-header/report-header.component';
 import { ReportListingComponent } from './common/report-listing/report-listing.component';
+import { OutcomeReportComponent } from './components/outcome-report/outcome-report.component';
 
 registerLocaleData(en);
 
@@ -73,7 +74,8 @@ registerLocaleData(en);
     ManageSystemComponent,
     ListReportComponent,
     ReportHeaderComponent,
-    ReportListingComponent
+    ReportListingComponent,
+    OutcomeReportComponent
   ],
   imports: [
     BrowserModule,

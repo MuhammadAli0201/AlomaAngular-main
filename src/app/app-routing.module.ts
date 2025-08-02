@@ -25,6 +25,7 @@ import { InternWelcomeComponent } from './components/intern-dashboard/intern-wel
 import { HelpResoucesComponent } from './components/help-resouces/help-resouces.component';
 import { ManageSystemComponent } from './components/manage-system/manage-system.component';
 import { ListReportComponent } from './components/list-report/list-report.component';
+import { OutcomeReportComponent } from './components/outcome-report/outcome-report.component';
 
 
 const patientRoutes: Routes = [
@@ -105,6 +106,11 @@ const routes: Routes = [
       },
       {
         path: 'list-report/:type', component: ListReportComponent,
+        canActivate: [authGuard, roleGuard],
+        data: { expectedRole: 'Admin' }
+      },
+      {
+        path: 'category-report/:type', component: OutcomeReportComponent,
         canActivate: [authGuard, roleGuard],
         data: { expectedRole: 'Admin' }
       },

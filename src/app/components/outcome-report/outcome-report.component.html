@@ -1,0 +1,26 @@
+<app-report-header [reportTitle]="`PATIENT OUTCOME REPORT`"
+        [userName]="`${currentUser?.firstName} ${currentUser?.lastName}`"></app-report-header>
+<nz-range-picker nzMode="month" [(ngModel)]="dateMonthsRange" (ngModelChange)="onMonthRangeChange($event)"></nz-range-picker>
+
+@for(monthlyReport of report?.monthlyReports; track $index){
+    <div class="month-year-date">
+        {{getFormattedMonthAndYear(monthlyReport.reportMonthAndYear)}}
+    </div>
+    <app-report-listing
+        [listOfColumns]="listOfColumns"
+        [tableData]="monthlyReport.reportRecords"></app-report-listing>
+}
+
+<div class="yearly-totals-section">
+    <div>OUTCOME RATE TOTALS FOR THE YEAR</div>
+    <div class="totals-and-range-container">
+        <div class="yearly-totals">
+            @for (total of report?.yearTotals; track $index) {
+                <div>{{`${total.category} : ${total.percentage}%`}}</div>
+            }
+        </div>
+        <div class="months-range">
+            {{getMonthRange}}
+        </div>
+    </div>
+</div>

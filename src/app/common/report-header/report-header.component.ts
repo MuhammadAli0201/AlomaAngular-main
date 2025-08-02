@@ -9,5 +9,5 @@ import { Component, Input } from '@angular/core';
 export class ReportHeaderComponent {
   currentDate: Date = new Date();
   @Input() userName!: string;
-  @Input() reportType!: string;
+  @Input() reportTitle!: string;
 }
