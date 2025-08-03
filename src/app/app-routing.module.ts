@@ -25,6 +25,8 @@ import { InternWelcomeComponent } from './components/intern-dashboard/intern-wel
 import { HelpResoucesComponent } from './components/help-resouces/help-resouces.component';
 import { ManageSystemComponent } from './components/manage-system/manage-system.component';
 import { ListReportComponent } from './components/list-report/list-report.component';
+import { CategoryReportComponent } from './components/category-report/category-report.component';
+import { MortalityReportComponent } from './components/mortality-report/mortality-report.component';
 
 
 const patientRoutes: Routes = [
@@ -105,6 +107,16 @@ const routes: Routes = [
       },
       {
         path: 'list-report/:type', component: ListReportComponent,
+        canActivate: [authGuard, roleGuard],
+        data: { expectedRole: 'Admin' }
+      },
+      {
+        path: 'category-report/:type', component: CategoryReportComponent,
+        canActivate: [authGuard, roleGuard],
+        data: { expectedRole: 'Admin' }
+      },
+      {
+        path: 'mortality-report', component: MortalityReportComponent,
         canActivate: [authGuard, roleGuard],
         data: { expectedRole: 'Admin' }
       },

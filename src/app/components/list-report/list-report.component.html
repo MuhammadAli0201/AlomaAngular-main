@@ -1,5 +1,5 @@
 <div class="container">
-    <app-report-header [reportType]="reportType"
+    <app-report-header [reportTitle]="`LIST OF CURRENT ${reportType}`"
         [userName]="`${currentUser?.firstName} ${currentUser?.lastName}`"></app-report-header>
     <div class="month-picker-container">
         <label for="monthPicker" style="font-weight: bold;">Select Month:</label>
