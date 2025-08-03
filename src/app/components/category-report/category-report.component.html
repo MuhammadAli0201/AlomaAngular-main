@@ -1,6 +1,14 @@
 <app-report-header [reportTitle]="reportTitle"
         [userName]="`${currentUser?.firstName} ${currentUser?.lastName}`"></app-report-header>
 <div style="display: flex; justify-content: space-between; align-items: center;">
+    <button
+    [disabled]="!report"
+    nz-button
+    nzType="primary"
+    (click)="downloadPdf()"
+  >
+    <i nz-icon nzType="download"></i>Download PDF
+  </button>
     <nz-range-picker nzMode="month" [(ngModel)]="dateMonthsRange" (ngModelChange)="onMonthRangeChange($event)"></nz-range-picker>
     <nz-select [ngModel]="categoryFilterValue" style="min-width: 200px;"
     (ngModelChange)="onCategoryFilterChange($event)">
