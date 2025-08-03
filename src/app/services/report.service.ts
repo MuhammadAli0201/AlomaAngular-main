@@ -12,16 +12,16 @@ export class ReportService {
 
   constructor(private http: HttpClient) { }
 
-  async getOutcomeReport(dateListDTO: Date[]): Promise<ReportDto> {
+  async getOutcomeReport(dateListDTO: Date[], category: string | null = null): Promise<ReportDto> {
     return await firstValueFrom(this.http.post<ReportDto>(`${this.baseUrl}/outcome`,
-      {dates: dateListDTO}, {
+      {dates: dateListDTO, category}, {
       headers: this.getAuthHeaders()
     }));
   }
 
-  async getSepsisReport(dateListDTO: Date[]): Promise<ReportDto> {
+  async getSepsisReport(dateListDTO: Date[], category: string | null = null): Promise<ReportDto> {
     return await firstValueFrom(this.http.post<ReportDto>(`${this.baseUrl}/sepsis`,
-      {dates: dateListDTO}, {
+      {dates: dateListDTO, category}, {
       headers: this.getAuthHeaders()
     }));
   }

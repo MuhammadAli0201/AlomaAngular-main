@@ -7,6 +7,9 @@ import { ColumnItem } from '../../models/column-item';
 import { ActivatedRoute, Router } from '@angular/router';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { LookupService } from '../../services/lookup.service';
+import { OrganismService } from '../../services/organism.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-category-report',
@@ -19,15 +22,24 @@ export class CategoryReportComponent{
   report: ReportDto | undefined;
   currentDate = new Date();
   currentUser: User | undefined;
+  reportTitle: string = '';
+  totalsTitle: string = '';
   listOfColumns: ColumnItem[] = []
   dateMonthsRange: Date[] = []
+  listOfCategories: string[] = []
+  categoryFilterValue: string = ''
+  outcomeOptionsId: string = '0E50994E-5EEE-42FD-9798-C8FA9B313225';
+
 
   constructor(private route: ActivatedRoute, private router: Router,
     private reportService: ReportService,
-    private authService: AuthService
+    private authService: AuthService,
+    private lookupService: LookupService,
+    private organismService: OrganismService
   ){
     this.route.params.subscribe(params => {
       this.reportType = params['type'];
+      this.listOfCategories = [];
       this.setupReport();
     });
     this.authService.getCurrentUser().subscribe(user => {
@@ -35,38 +47,71 @@ export class CategoryReportComponent{
     })
   }
   async setupReport(){
-    this.listOfColumns = [
-      {
-        name: 'Outcome',
-        key: 'category'
-      },
-      {
-        name: 'Cases',
-        key: 'cases'
-      },
-      {
-        name: 'Admission',
-        key: 'admissions'
-      },
-      {
-        name: 'Outcome Rate',
-        key: 'outcomeRate',
-        formatter: (value: any)=> value ? `${value.toFixed(2)}%` : value !== undefined ? '0%' : ''
-      }
-    ];
     this.fetchReports()
   }
 
   async fetchReports(){
     this.dateMonthsRange = this.dateMonthsRange.sort((a, b) => a.getTime() - b.getTime());
     if(this.reportType === 'outcome'){
+      this.reportTitle = 'PATIENT OUTCOME REPORT'
+      this.totalsTitle = 'OUTCOME RATE TOTALS FOR THE YEAR'
+      this.listOfColumns = [
+        {
+          name: 'OUTCOME',
+          key: 'category'
+        },
+        {
+          name: 'CASES',
+          key: 'cases'
+        },
+        {
+          name: 'ADMISSIONS',
+          key: 'admissions'
+        },
+        {
+          name: 'OUTCOME RATE(%)',
+          key: 'outcomeRate',
+          formatter: (value: any)=> value ? `${value.toFixed(2)}%` : value !== undefined ? '0%' : ''
+        }
+      ];
+      if(this.listOfCategories.length === 0){
+        this.listOfCategories = (await this.lookupService.getByCategoryId(this.outcomeOptionsId))
+          .map(item => item.name);
+      }
       this.report = await this.reportService.getOutcomeReport(
-        this.dateMonthsRange
+        this.dateMonthsRange,
+        this.categoryFilterValue
       )
     }
     else if(this.reportType === 'sepsis'){
+      this.reportTitle = 'RATE OF SEPSIS REPORT'
+      this.totalsTitle = 'GRAND TOTAL'
+      this.listOfColumns = [
+        {
+          name: 'ORGANISM',
+          key: 'category'
+        },
+        {
+          name: 'CASES',
+          key: 'cases'
+        },
+        {
+          name: 'ADMISSIONS',
+          key: 'admissions'
+        },
+        {
+          name: 'SEPSIS RATE(%)',
+          key: 'outcomeRate',
+          formatter: (value: any)=> value ? `${value.toFixed(2)}%` : value !== undefined ? '0%' : ''
+        }
+      ];
+      if(this.listOfCategories.length === 0){
+        this.listOfCategories = (await firstValueFrom(this.organismService.getAll()))
+          .map(organism => organism.organismName);
+      }
       this.report = await this.reportService.getSepsisReport(
-        this.dateMonthsRange
+        this.dateMonthsRange,
+        this.categoryFilterValue
       )
     }
     else{
@@ -102,6 +147,10 @@ export class CategoryReportComponent{
   }
 
   onMonthRangeChange(result: Date[]){
+    this.fetchReports()
+  }
+  onCategoryFilterChange(filterValue: string){
+    this.categoryFilterValue = filterValue;
     this.fetchReports()
   }
 
