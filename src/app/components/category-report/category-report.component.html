@@ -12,12 +12,13 @@
 </div>
 
 @for(monthlyReport of report?.monthlyReports; track $index){
-    <div class="month-year-date">
-        {{getFormattedMonthAndYear(monthlyReport.reportMonthAndYear)}}
-    </div>
-    <app-report-listing
-        [listOfColumns]="listOfColumns"
-        [tableData]="monthlyReport.reportRecords"></app-report-listing>
+<div class="month-year-date">
+  {{ getFormattedMonthAndYear(monthlyReport.reportMonthAndYear) }}
+</div>
+<app-report-listing
+  [listOfColumns]="listOfColumns"
+  [tableData]="monthlyReport.reportRecords"
+></app-report-listing>
 }
 
 @if(report){

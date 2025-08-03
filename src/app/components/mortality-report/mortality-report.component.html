@@ -1,23 +1,44 @@
-<app-report-header [reportTitle]="`ADMISSIONS VS DECEASED REPORT`"
-        [userName]="`${currentUser?.firstName} ${currentUser?.lastName}`"></app-report-header>
+<app-report-header
+  [reportTitle]="`ADMISSIONS VS DECEASED REPORT`"
+  [userName]="`${currentUser?.firstName} ${currentUser?.lastName}`"
+></app-report-header>
 
-<nz-date-picker nzMode="year" [(ngModel)]="currentYearDate" (ngModelChange)="onYearChange($event)"></nz-date-picker>
+<div nz-flex nzAlign="center" nzJustify="space-between">
+  <nz-date-picker
+    nzMode="year"
+    [(ngModel)]="currentYearDate"
+    (ngModelChange)="onYearChange($event)"
+  ></nz-date-picker>
+  <button
+    [disabled]="!mortalityReport"
+    nz-button
+    nzType="primary"
+    (click)="downloadPdf()"
+  >
+    <i nz-icon nzType="download"></i>Download PDF
+  </button>
+</div>
 
 <div class="chart">
-  <canvas id="canvas">{{chart}}</canvas>
+  <canvas id="canvas">{{ chart }}</canvas>
 </div>
 
 <app-report-listing
-        [listOfColumns]="listOfColumns"
-        [tableData]="mortalityReport?.monthlyRecords || []"></app-report-listing>
+  [listOfColumns]="listOfColumns"
+  [tableData]="mortalityReport?.monthlyRecords || []"
+></app-report-listing>
 
 <div class="yearly-totals-section">
-    <div>SUMMARY FOR PERIOD</div>
-    <div class="totals-and-range-container">
-        <div class="yearly-totals">
-            <div>OVERALL ADMISSION: {{mortalityReport?.yearlyReport?.totalAdmissions}}</div>
-            <div>OVERALL DEATH: {{mortalityReport?.yearlyReport?.totalDeaths}}</div>
-            <div>MORTALITY RATE: {{mortalityReport?.yearlyReport?.mortalityRate}}%</div>
-        </div>
+  <div>SUMMARY FOR PERIOD</div>
+  <div class="totals-and-range-container">
+    <div class="yearly-totals">
+      <div>
+        OVERALL ADMISSION: {{ mortalityReport?.yearlyReport?.totalAdmissions }}
+      </div>
+      <div>OVERALL DEATH: {{ mortalityReport?.yearlyReport?.totalDeaths }}</div>
+      <div>
+        MORTALITY RATE: {{ mortalityReport?.yearlyReport?.mortalityRate }}%
+      </div>
     </div>
+  </div>
 </div>
