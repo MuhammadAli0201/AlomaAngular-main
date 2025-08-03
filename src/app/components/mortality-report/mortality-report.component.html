@@ -1,6 +1,8 @@
 <app-report-header [reportTitle]="`ADMISSIONS VS DECEASED REPORT`"
         [userName]="`${currentUser?.firstName} ${currentUser?.lastName}`"></app-report-header>
 
+<nz-date-picker nzMode="year" [(ngModel)]="currentYearDate" (ngModelChange)="onYearChange($event)"></nz-date-picker>
+
 <div class="chart">
   <canvas id="canvas">{{chart}}</canvas>
 </div>

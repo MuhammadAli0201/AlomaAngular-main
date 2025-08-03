@@ -49,7 +49,7 @@ export class CategoryReportComponent{
       {
         name: 'Outcome Rate',
         key: 'outcomeRate',
-        formatter: (value: any)=> value ? `${value.toFixed(2)}%` : '0%'
+        formatter: (value: any)=> value ? `${value.toFixed(2)}%` : value !== undefined ? '0%' : ''
       }
     ];
     this.fetchReports()
@@ -70,6 +70,12 @@ export class CategoryReportComponent{
     else{
       console.error('Unknown report type:', this.reportType);
       this.router.navigate(['/'])
+    }
+    if(this.report){
+      for(let monthlyReport of this.report.monthlyReports){
+        const records = monthlyReport.reportRecords
+        records[records.length-1].outcomeRate = undefined
+      }
     }
   }
 

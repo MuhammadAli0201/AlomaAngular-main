@@ -16,7 +16,9 @@ export class MortalityReportComponent {
   currentUser: any;
   listOfColumns: ColumnItem[] = []
   mortalityReport: MortalityReportDto | undefined;
-  chart: any = []
+  chart: any = null
+  currentYearDate: Date = new Date()
+  currentYearNumber = new Date().getFullYear()
 
   constructor(private route: ActivatedRoute, private router: Router,
     private reportService: ReportService,
@@ -46,11 +48,15 @@ export class MortalityReportComponent {
         formatter: (value: any)=> value ? `${value.toFixed(2)}%` : '0%'
       }
     ];
-    this.mortalityReport = await this.reportService.getMortalityReport(2025)
+    this.mortalityReport = await this.reportService.getMortalityReport(this.currentYearNumber)
+    console.log(this.mortalityReport)
     this.setupChart();
   }
 
   setupChart(){
+    if(this.chart){
+      this.chart.destroy();
+    }
     let labels: string[] = [];
     let admissions: number[] = [];
     let deaths: number[] = [];
@@ -113,5 +119,10 @@ export class MortalityReportComponent {
         }
       },
     });
+  }
+
+  onYearChange(yearDate: Date){
+    this.currentYearNumber = yearDate.getFullYear();
+    this.setupReport();
   }
 }
