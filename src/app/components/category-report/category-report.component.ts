@@ -74,10 +74,16 @@ export class CategoryReportComponent{
           formatter: (value: any)=> value ? `${value.toFixed(2)}%` : value !== undefined ? '0%' : ''
         }
       ];
-      if(this.listOfCategories.length === 0){
-        this.listOfCategories = (await this.lookupService.getByCategoryId(this.outcomeOptionsId))
-          .map(item => item.name);
-      }
+      this.listOfCategories = [
+        'Discharged',
+        'Discharged to surgical ward',
+        'Discharged to medical ward',
+        'Transferred to another hospital',
+        'Died',
+        'Hospitalised on first birthday',
+        'N/A',
+        'Unknown',
+      ];
       this.report = await this.reportService.getOutcomeReport(
         this.dateMonthsRange,
         this.categoryFilterValue
