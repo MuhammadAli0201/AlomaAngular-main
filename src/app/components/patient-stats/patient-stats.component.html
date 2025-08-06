@@ -1,0 +1,17 @@
+<div class="patient-count">
+  <nz-statistic 
+    [nzValue]="count" 
+    nzTitle="Total Patients"
+    [nzPrefix]="trendArrow"
+    [nzValueStyle]="{ 'color': '#1890ff', 'font-size': '24px' }">
+  </nz-statistic>
+</div>
+
+<ng-template #trendArrow>
+  <span 
+    nz-icon 
+    [nzType]="trend === 'up' ? 'arrow-up' : (trend === 'down' ? 'arrow-down' : 'minus')"
+    [style.color]="trend === 'up' ? '#52c41a' : (trend === 'down' ? '#f5222d' : '#d9d9d9')"
+    style="margin-right: 8px">
+  </span>
+</ng-template>

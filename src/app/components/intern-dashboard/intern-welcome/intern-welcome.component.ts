@@ -7,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrl: './intern-welcome.component.scss'
 })
 export class InternWelcomeComponent {
-
+currentDate: Date = new Date();
 }

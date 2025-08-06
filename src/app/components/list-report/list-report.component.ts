@@ -66,7 +66,7 @@ export class ListReportComponent {
         key: 'hospitalNumber'
       },
       {
-        name: 'Name',
+        name: 'Name and surname',
         key: 'name'
       },
       {
@@ -82,7 +82,7 @@ export class ListReportComponent {
     this.patientService.getPatientsByAdmissionMonth(this.currentMonthDate.getMonth() + 1).subscribe((allpatients: Patient[]) =>{
       this.tableData = allpatients.map(patient =>({
         hospitalNumber: patient.hospitalNumber,
-        name: patient.name,
+        name: patient.name + ' ' + patient.surname,
         gender: patient.gender,
         dateOfAdmission: patient.dateOfAdmission
       ? new Date(patient.dateOfAdmission).toLocaleDateString('en-GB')

@@ -9,6 +9,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { LookupService } from '../../services/lookup.service';
 import { OrganismService } from '../../services/organism.service';
+import { PatientService } from '../../services/patient.service'; // Add this import
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -29,13 +30,28 @@ export class CategoryReportComponent{
   listOfCategories: string[] = []
   categoryFilterValue: string = ''
   outcomeOptionsId: string = '0E50994E-5EEE-42FD-9798-C8FA9B313225';
+  sepsisOrganismTotals: { organism: string, cases: number, admissions: number }[] = [];
+  sepsisSummary: {
+    organismTotals: { [key: string]: number },
+    totalSepsis: number,
+    totalAdmissions: number,
+    overallSepsisRate: number
+  } = {
+    organismTotals: {},
+    totalSepsis: 0,
+    totalAdmissions: 0,
+    overallSepsisRate: 0
+  };
 
 
-  constructor(private route: ActivatedRoute, private router: Router,
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
     private reportService: ReportService,
     private authService: AuthService,
     private lookupService: LookupService,
-    private organismService: OrganismService
+    private organismService: OrganismService,
+    private patientService: PatientService // Add this to constructor
   ){
     this.route.params.subscribe(params => {
       this.reportType = params['type'];
@@ -87,11 +103,12 @@ export class CategoryReportComponent{
       this.report = await this.reportService.getOutcomeReport(
         this.dateMonthsRange,
         this.categoryFilterValue
-      )
+      );
     }
     else if(this.reportType === 'sepsis'){
       this.reportTitle = 'RATE OF SEPSIS REPORT'
-      this.totalsTitle = 'GRAND TOTAL'
+      this.totalsTitle = ''
+
       this.listOfColumns = [
         {
           name: 'ORGANISM',
@@ -100,15 +117,6 @@ export class CategoryReportComponent{
         {
           name: 'CASES',
           key: 'cases'
-        },
-        {
-          name: 'ADMISSIONS',
-          key: 'admissions'
-        },
-        {
-          name: 'SEPSIS RATE(%)',
-          key: 'outcomeRate',
-          formatter: (value: any)=> value ? `${value.toFixed(2)}%` : value !== undefined ? '0%' : ''
         }
       ];
       if(this.listOfCategories.length === 0){
@@ -118,7 +126,51 @@ export class CategoryReportComponent{
       this.report = await this.reportService.getSepsisReport(
         this.dateMonthsRange,
         this.categoryFilterValue
-      )
+      );
+
+      // Aggregate by organism
+      const organismTotals: { [key: string]: number } = {};
+      let totalAdmissions = 0;
+      if (this.report && this.report.monthlyReports) {
+        for (const monthlyReport of this.report.monthlyReports) {
+          for (const record of monthlyReport.reportRecords) {
+            const org = record.category;
+            organismTotals[org] = (organismTotals[org] || 0) + (record.cases || 0);
+            totalAdmissions += record.admissions || 0;
+          }
+        }
+      }
+
+      // Change null key to 'Total' for display
+      const displayOrganismTotals: { organism: string, cases: number, admissions: number }[] = [];
+      Object.entries(organismTotals).forEach(([organism, cases]) => {
+        // Find admissions for this organism across all months
+        let admissions = 0;
+        if (this.report && this.report.monthlyReports) {
+          for (const monthlyReport of this.report.monthlyReports) {
+            for (const record of monthlyReport.reportRecords) {
+              const org = record.category;
+              if ((organism === null || organism === 'null') ? (org === null || org === 'null') : org === organism) {
+                admissions += record.admissions || 0;
+              }
+            }
+          }
+        }
+        displayOrganismTotals.push({
+          organism: organism === null || organism === 'null' ? 'Total' : organism,
+          cases,
+          admissions
+        });
+      });
+      this.sepsisOrganismTotals = displayOrganismTotals;
+
+      // Prepare summary (only total admissions and overall sepsis rate)
+      this.sepsisSummary.totalAdmissions = totalAdmissions;
+      // Find the "Total" row's cases
+      const totalCases = displayOrganismTotals.find(row => row.organism === 'Total')?.cases || 0;
+      this.sepsisSummary.overallSepsisRate = totalAdmissions > 0
+        ? (totalCases / totalAdmissions) * 100
+        : 0;
     }
     else{
       console.error('Unknown report type:', this.reportType);
@@ -173,7 +225,6 @@ export class CategoryReportComponent{
     // Header Text aligned to right of logo
     const textX = pageWidth - 60;
     const textY = logoY + 6;
-
     doc.setFontSize(12);
     doc.text(this.currentDate.toLocaleDateString('en-GB'), textX, textY);
     doc.text(
@@ -182,16 +233,21 @@ export class CategoryReportComponent{
       textY + 8
     );
 
-    // Report Title (below the header block)
+    // Report Title
     doc.setFontSize(16);
-    const title = `LIST OF CURRENT ${this.reportType.toUpperCase()}`;
-    doc.text(title, pageWidth / 2, logoY + logoHeight + 10, { align: 'center' });
+    doc.text(
+      this.reportTitle,
+      pageWidth / 2,
+      logoY + logoHeight + 10,
+      { align: 'center' }
+    );
 
-    // Prepare tables for each month
-    let currentY = 45;
+    let currentY = logoY + logoHeight + 18;
+
+    // Render monthly tables for sepsis report (just like outcome)
     if (this.report && this.report.monthlyReports) {
       for (const monthlyReport of this.report.monthlyReports) {
-        // Add month name above the table
+        // Month-Year Heading
         const monthDate = monthlyReport.reportMonthAndYear ? new Date(monthlyReport.reportMonthAndYear) : undefined;
         let monthLabel = monthDate ? monthDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long' }).toUpperCase() : '';
         if (monthLabel) {
@@ -231,16 +287,68 @@ export class CategoryReportComponent{
       }
     }
 
-    // Add Footer with Page Numbers
-    const pageCount = doc.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(10);
+    // Outcome Rate Totals for the Year
+    if (this.reportType === 'outcome') {
+      doc.setFontSize(15);
+      doc.text('Outcome Rate Totals for the Year', pageWidth / 2, currentY, { align: 'center' });
+      currentY += 8;
+
+      // Table
+      if (this.report && this.report.yearTotals) {
+        const outcomeTableBody = this.report.yearTotals.map(total => [total.category, `${total.percentage.toFixed(2)}%`]);
+        autoTable(doc, {
+          head: [['Outcome', 'Percentage']],
+          body: outcomeTableBody,
+          startY: currentY,
+          styles: { fontSize: 10 },
+          headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+          theme: 'grid',
+          didDrawPage: (data) => {
+            if (data.cursor) {
+              currentY = data.cursor.y + 10;
+            } else {
+              currentY += 30;
+            }
+          }
+        });
+      }
+    }
+
+    // Sepsis Organism Summary Table and Summary
+    if (this.reportType === 'sepsis') {
+      doc.setFontSize(15);
+      doc.text('Sepsis Organism Summary', pageWidth / 2, currentY, { align: 'center' });
+      currentY += 8;
+
+      // Table
+      const sepsisTableBody = this.sepsisOrganismTotals.map(row => [row.organism, row.cases]);
+      autoTable(doc, {
+        head: [['Organism', 'Cases']],
+        body: sepsisTableBody,
+        startY: currentY,
+        styles: { fontSize: 10 },
+        headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+        theme: 'grid',
+        didDrawPage: (data) => {
+          if (data.cursor) {
+            currentY = data.cursor.y + 10;
+          } else {
+            currentY += 30;
+          }
+        }
+      });
+
+      // Summary
+      doc.setFontSize(12);
       doc.text(
-        `Page ${i} of ${pageCount}`,
-        doc.internal.pageSize.width / 2,
-        doc.internal.pageSize.height - 10,
-        { align: 'center' }
+        `Total Admissions: ${this.sepsisSummary.totalAdmissions}`,
+        20,
+        currentY
+      );
+      doc.text(
+        `Overall Sepsis Rate: ${this.sepsisSummary.overallSepsisRate.toFixed(2)}%`,
+        20,
+        currentY + 7
       );
     }
 
