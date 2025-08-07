@@ -47,6 +47,7 @@ import { MortalityReportComponent } from './components/mortality-report/mortalit
 import { GraphsComponent } from './components/graphs/graphs.component';
 import { PatientStatsComponent } from './components/patient-stats/patient-stats.component';
 import { CalendarComponent } from './components/calendar/calendar.component';
+import { AuditComponent } from './components/audit/audit.component';
 
 registerLocaleData(en);
 
@@ -83,7 +84,8 @@ registerLocaleData(en);
     MortalityReportComponent,
     GraphsComponent,
     PatientStatsComponent,
-    CalendarComponent
+    CalendarComponent,
+    AuditComponent
   ],
   imports: [
     BrowserModule,

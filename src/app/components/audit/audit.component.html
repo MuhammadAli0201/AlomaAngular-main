@@ -1,0 +1,20 @@
+<nz-table #basicTable [nzData]="audits" [nzLoading]="loading">
+  <thead>
+    <tr>
+      <th>HPSCA</th>
+      <th>Name & surname</th>
+      <th>User role</th>
+      <th>Action Performed</th>
+      <th>Timestamp</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let data of basicTable.data">
+      <td>{{ data?.user?.usernumber || '' }}</td>
+      <td>{{ `${data?.user?.firstName || ''} ${data?.user?.lastName || ''}`}}</td>
+      <td>{{ data?.user?.role || '' }}</td>
+      <td>{{ data.actionType }}</td>
+      <td>{{ data.dateTime | date}}</td>
+    </tr>
+  </tbody>
+</nz-table>
