@@ -128,22 +128,20 @@ export class MortalityReportComponent {
     this.setupReport();
   }
 
-  downloadPdf() {
+  async downloadPdf() {
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
       // Add Logo
-      // Assuming logo is 150x50 pixels
-      // Logo
       const logoX = 14;
       const logoY = 10;
       const logoWidth = 40;
       const logoHeight = 20;
       doc.addImage('images/logo.jpeg', 'JPEG', logoX, logoY, logoWidth, logoHeight);
-  
+
       // Header Text aligned to right of logo
       const textX = pageWidth - 60;
       const textY = logoY + 6;
-  
+
       doc.setFontSize(12);
       doc.text(new Date().toLocaleDateString('en-GB'), textX, textY);
       doc.text(
@@ -151,13 +149,54 @@ export class MortalityReportComponent {
         textX,
         textY + 8
       );
-  
+
       // Report Title (below the header block)
       doc.setFontSize(16);
-      const title = `LIST OF CURRENT MORTALITY`;
-      doc.setFontSize(16);
+      const title = `ADMISSIONS VS DECEASED REPORT`;
       doc.text(title, pageWidth / 2, logoY + logoHeight + 10, { align: 'center' });
-      
+
+      // --- Add Summary for the Period ---
+      doc.setFontSize(12);
+      let totalAdmissions = 0;
+      let totalDeaths = 0;
+      let avgMortalityRate = 0;
+      if (this.mortalityReport && this.mortalityReport.monthlyRecords.length > 0) {
+        totalAdmissions = this.mortalityReport.monthlyRecords.reduce((sum, r) => sum + r.admissions, 0);
+        totalDeaths = this.mortalityReport.monthlyRecords.reduce((sum, r) => sum + r.deaths, 0);
+        avgMortalityRate = this.mortalityReport.monthlyRecords.reduce((sum, r) => sum + r.mortalityRate, 0) / this.mortalityReport.monthlyRecords.length;
+      }
+      const summaryY = logoY + logoHeight + 18;
+      doc.text(
+        `Summary for ${this.currentYearNumber}:`,
+        20,
+        summaryY
+      );
+      doc.text(
+        `Total Admissions: ${totalAdmissions}`,
+        20,
+        summaryY + 7
+      );
+      doc.text(
+        `Total Deaths: ${totalDeaths}`,
+        20,
+        summaryY + 14
+      );
+      doc.text(
+        `Average Mortality Rate: ${avgMortalityRate.toFixed(2)}%`,
+        20,
+        summaryY + 21
+      );
+
+      // --- Add Chart Image ---
+      if (this.chart) {
+        const chartImage = this.chart.toBase64Image();
+        const chartX = 20;
+        const chartY = summaryY + 28; // Place chart below summary
+        const chartWidth = pageWidth - 40;
+        const chartHeight = 60;
+        doc.addImage(chartImage, 'PNG', chartX, chartY, chartWidth, chartHeight);
+      }
+
       // Prepare table data from mortalityReport
       let tableRows: any[] = [];
       if (this.mortalityReport && this.mortalityReport.monthlyRecords) {
@@ -173,15 +212,17 @@ export class MortalityReportComponent {
         }
       }
 
+      // Table below chart
+      const tableStartY = summaryY + 28 + 60 + 10; // chartY + chartHeight + margin
       autoTable(doc, {
         head: [this.listOfColumns.map(col => col.name)],
         body: tableRows,
-        startY: 45,
+        startY: tableStartY,
         styles: { fontSize: 10 },
         headStyles: { fillColor: [41, 128, 185], textColor: 255 },
         theme: 'grid'
       });
-  
+
       // Add Footer with Page Numbers
       const pageCount = doc.getNumberOfPages();
       for (let i = 1; i <= pageCount; i++) {
@@ -194,7 +235,7 @@ export class MortalityReportComponent {
           { align: 'center' }
         );
       }
-  
+
       // Save the PDF
       const today = new Date();
       doc.save(`mortality-report-${this.currentYearNumber}-${today.toISOString().split('T')[0]}.pdf`);

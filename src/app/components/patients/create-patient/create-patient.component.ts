@@ -122,7 +122,7 @@ export class CreatePatientComponent {
       surname: ['', Validators.required],
       dateOfBirth: [null, Validators.required],
       dateOfAdmission: [null, Validators.required],
-      ageOnAdmission: [null, [Validators.required, strictDecimalValidator()]],
+      ageOnAdmission: [null, [Validators.required,strictDecimalValidator()]],
       birthWeight: [null, [Validators.required, strictDecimalValidator()]],
       gestationalUnit: [null],
       gestationalAge: [null, strictDecimalValidator()],

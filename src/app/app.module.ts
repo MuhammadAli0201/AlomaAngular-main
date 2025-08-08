@@ -44,6 +44,10 @@ import { ReportHeaderComponent } from './common/report-header/report-header.comp
 import { ReportListingComponent } from './common/report-listing/report-listing.component';
 import { CategoryReportComponent } from './components/category-report/category-report.component';
 import { MortalityReportComponent } from './components/mortality-report/mortality-report.component';
+import { GraphsComponent } from './components/graphs/graphs.component';
+import { PatientStatsComponent } from './components/patient-stats/patient-stats.component';
+import { CalendarComponent } from './components/calendar/calendar.component';
+import { AuditComponent } from './components/audit/audit.component';
 
 registerLocaleData(en);
 
@@ -77,7 +81,11 @@ registerLocaleData(en);
     ReportHeaderComponent,
     ReportListingComponent,
     CategoryReportComponent,
-    MortalityReportComponent
+    MortalityReportComponent,
+    GraphsComponent,
+    PatientStatsComponent,
+    CalendarComponent,
+    AuditComponent
   ],
   imports: [
     BrowserModule,

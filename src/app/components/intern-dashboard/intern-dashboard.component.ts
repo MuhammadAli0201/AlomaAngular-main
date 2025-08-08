@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { ProfileModalComponent } from '../profile-modal/profile-modal.component';
 import { NzModalService } from 'ng-zorro-antd/modal';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-intern-dashboard',
@@ -13,7 +14,8 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 export class InternDashboardComponent implements OnInit {
   private user: any;
   isCollapsed: boolean = false;
-  constructor(private auth: AuthService, private modalService: NzModalService) { }
+  router: any;
+  constructor(private auth: AuthService, private modalService: NzModalService, router: Router) { }
 
   ngOnInit(): void {
     this.auth.getCurrentUser().subscribe({
@@ -40,6 +42,9 @@ export class InternDashboardComponent implements OnInit {
     const instance = modal.componentInstance;
     instance!.user = this.user;
   }
+  navigateToDashboard() {
+  this.router.navigate(['/intern-dashboard']);
+}
 
 }
 

@@ -1,0 +1,65 @@
+<div class="calendar-container">
+  <div class="calendar-header">
+    <button (click)="goToPreviousMonth()">&lt;</button>
+    <div class="month-year">{{ monthYear }}</div>
+    <button (click)="goToNextMonth()">&gt;</button>
+  </div>
+
+  <div class="weekdays">
+    <div *ngFor="let wd of weekDays" class="weekday">{{ wd }}</div>
+  </div>
+
+  <div class="days">
+    <div *ngFor="let _ of emptyStart" class="empty-day"></div>
+    <div
+      *ngFor="let day of daysInMonth"
+      class="day"
+      [style.cursor]="(notesMap[day.dateStr] && notesMap[day.dateStr].length > 0) || !viewOnly ? 'pointer' : 'default'"
+      (click)="maybeOpenModal(day.date, day.dateStr)"
+    >
+      <div class="date-number">{{ day.date.getDate() }}</div>
+      <div class="notes-count" *ngIf="(notesMap[day.dateStr] ?? []).length > 0">
+        {{ notesMap[day.dateStr].length }} note(s)
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal" *ngIf="showModal">
+  <div class="modal-content">
+    <h3>Notes for {{ selectedDate | date: 'fullDate' }}</h3>
+
+    <div *ngIf="(notesMap[selectedDateStr] ?? []).length > 0; else noNotes">
+  ...
+      <ul>
+        <li *ngFor="let note of notesMap[selectedDateStr]">
+          <span (click)="!viewOnly && editNote(note)" [style.cursor]="!viewOnly ? 'pointer' : 'default'">
+            {{ note.noteText }}
+          </span>
+        </li>
+      </ul>
+    </div>
+
+    <ng-template #noNotes>
+      <p>No notes for this day.</p>
+    </ng-template>
+
+    <textarea
+      *ngIf="!viewOnly"
+      [(ngModel)]="noteText"
+      placeholder="Enter note"
+      rows="4"
+    ></textarea>
+
+    <div class="modal-buttons">
+      <ng-container *ngIf="!viewOnly">
+        <button (click)="saveNote()">
+          {{ editingNote ? 'Update' : 'Add' }}
+        </button>
+        <button *ngIf="editingNote" (click)="deleteNote(editingNote)">Delete</button>
+      </ng-container>
+      <button (click)="closeModal()">Close</button>
+    </div>
+  </div>
+</div>

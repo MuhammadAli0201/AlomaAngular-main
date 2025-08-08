@@ -1,6 +1,53 @@
-<div class="border rounded p-4 bg-white shadow-sm mb-4">
-  <h4 class="fw-semibold mb-2">Dashboard Overview</h4>
-  <p class="text-muted mb-0">
-    Select a feature from the sidebar to begin managing the system.
-  </p>
+<div class="container-fluid dashboard-container py-3">
+  <!-- Top Row: Welcome & Patient Stats -->
+  <div class="row g-3 mb-4">
+    <!-- Welcome Admin Card -->
+    <div class="col-md-8">
+      <div class="card shadow-sm rounded p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="fw-semibold mb-0">Welcome, Admin!</h4>
+          <i class="bi bi-shield-lock text-primary fs-3"></i>
+        </div>
+        <div class="date-display mb-2">
+          {{ currentDate | date: 'EEEE, MMMM d' }}
+        </div>
+        <p class="text-muted">
+          This is your system administration dashboard. Manage users, settings, and platform configurations.
+        </p>
+      </div>
+    </div>
+
+    <!-- Patient Stats Card -->
+    <div class="col-md-4">
+      <div class="card shadow-sm rounded p-3 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="fw-semibold mb-0">Patient Count</h5>
+          <i class="bi bi-people-fill text-primary fs-4"></i>
+        </div>
+        <div class="d-flex justify-content-center">
+          <app-patient-stats></app-patient-stats>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Middle Row: Calendar & Graphs Side by Side -->
+  <div class="row g-3">
+    <!-- Graphs Section -->
+    <div class="col-12 col-lg-8 col-xl-9">
+      <div class="card shadow-sm rounded p-3 h-100">
+        <app-graphs></app-graphs>
+      </div>
+    </div>
+
+    <!-- Calendar Section - Adjusted sizing -->
+    <div class="col-12 col-lg-4 col-xl-3">
+      <div class="card shadow-sm rounded p-3 h-100 calendar-card">
+        <!-- Added min-width to prevent squeezing -->
+        <div style="min-width: 300px;">
+          <app-calendar [viewOnly]="false"></app-calendar>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

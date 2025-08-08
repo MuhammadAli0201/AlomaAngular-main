@@ -32,15 +32,40 @@
 @if(report){
     <div class="yearly-totals-section">
         <div>{{totalsTitle}}</div>
-        <div class="totals-and-range-container">
-            <div class="yearly-totals">
-                @for (total of report?.yearTotals; track $index) {
-                    <div>{{`${total.category} : ${total.percentage}%`}}</div>
-                }
-            </div>
+        <div class="totals-and-range-container">            
             <div class="months-range">
                 {{getMonthRange}}
             </div>
         </div>
     </div>
 }
+
+<div *ngIf="reportType === 'outcome'">
+    @for (total of report?.yearTotals; track $index) {
+        <div>{{`${total.category} : ${total.percentage}%`}}</div>
+    }
+</div>
+
+<div *ngIf="reportType === 'sepsis'">
+  <h2>Sepsis Organism Summary</h2>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Organism</th>
+        <th>Cases</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of sepsisOrganismTotals">
+        <td>{{ row.organism }}</td>
+        <td>{{ row.cases }}</td>
+      </tr>
+      <tr>
+        <td colspan="2"><strong>Total Admissions:</strong> {{ sepsisSummary.totalAdmissions }}</td>
+      </tr>
+      <tr>
+        <td colspan="2"><strong>Overall Sepsis Rate:</strong> {{ sepsisSummary.overallSepsisRate | number:'1.2-2' }}%</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

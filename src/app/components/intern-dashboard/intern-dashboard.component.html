@@ -1,11 +1,15 @@
 <nz-layout style="height: 100vh">
   <nz-sider nzCollapsible [(nzCollapsed)]="isCollapsed" [nzTrigger]="null">
     <div class="logo">
-      <a *ngIf="!isCollapsed" class="navbar-brand fw-bold text-white"
+      <a *ngIf="!isCollapsed" class="navbar-brand fw-bold text-white" style="cursor: pointer" (click)="navigateToDashboard()"
         >Intern Dashboard</a
       >
     </div>
     <ul nz-menu nzTheme="dark" nzMode="inline">
+       <li nz-menu-item routerLink="/intern-dashboard" routerLinkActive="active" nzMatchRouter>
+        <nz-icon nzType="dashboard" nzTheme="outline" />
+        <span>Dashboard</span>
+      </li>
       <li nz-submenu nzOpen nzTitle="Patient" nzIcon="user">
         <ul>
           <li

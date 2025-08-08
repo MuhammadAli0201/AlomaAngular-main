@@ -27,6 +27,7 @@ import { ManageSystemComponent } from './components/manage-system/manage-system.
 import { ListReportComponent } from './components/list-report/list-report.component';
 import { CategoryReportComponent } from './components/category-report/category-report.component';
 import { MortalityReportComponent } from './components/mortality-report/mortality-report.component';
+import { AuditComponent } from './components/audit/audit.component';
 
 
 const patientRoutes: Routes = [
@@ -127,6 +128,11 @@ const routes: Routes = [
       },
       {
         path: 'users', component: ManageUsersComponent,
+        canActivate: [authGuard, roleGuard],
+        data: { expectedRole: 'Admin' }
+      },
+      {
+        path: 'audit', component: AuditComponent,
         canActivate: [authGuard, roleGuard],
         data: { expectedRole: 'Admin' }
       },

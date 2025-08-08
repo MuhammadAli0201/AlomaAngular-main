@@ -8,6 +8,10 @@
       >
     </div>
     <ul nz-menu nzTheme="dark" nzMode="inline">
+       <li nz-menu-item routerLink="/admin-dashboard" routerLinkActive="active" nzMatchRouter>
+        <nz-icon nzType="dashboard" nzTheme="outline" />
+        <span>Dashboard</span>
+      </li>
       <li nz-submenu nzOpen nzTitle="Patient" nzIcon="user">
         <ul>
           <li
@@ -27,7 +31,7 @@
         <nz-icon nzType="bell" nzTheme="outline" />
         <span>Notifications</span>
       </li>
-      <li nz-menu-item>
+      <li nz-menu-item routerLink="/admin-dashboard/audit" nzMatchRouter>
         <nz-icon nzType="search" nzTheme="outline" />
         <span>Audit</span>
       </li>
@@ -99,7 +103,9 @@
           [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"
           (click)="isCollapsed = !isCollapsed"
         ></i>
-        <h4 class="fw-bold">Admin Dashboard</h4>
+          <h4 class="fw-bold" style="cursor: pointer" (click)="navigateToDashboard()">
+          Admin Dashboard
+        </h4>
         <a
           class="nav-link me-3"
           (click)="openProfileModal()"
