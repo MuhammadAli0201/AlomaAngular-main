@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { AuthService } from '../../services/auth.service';
+import { SystemSettingService } from '../../services/system-setting.service';
+import { SystemSetting } from '../../models/system-setting';
 
 @Component({
   selector: 'app-manage-system',
@@ -13,16 +15,20 @@ export class ManageSystemComponent implements OnInit {
   otpSettingsForm!: FormGroup;
   loading: boolean = false;
   currentTimer: number = 5; // Default 5 minutes
+  internRemainingDays: number|undefined;
 
   constructor(
     private fb: FormBuilder, 
     private authService: AuthService,
-    private notification: NzNotificationService
+    private notification: NzNotificationService,
+    private systemSettingService: SystemSettingService
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit() {
     this.initializeForm();
     this.loadCurrentOtpTimer();
+    const systemSetting = await this.systemSettingService.getBykey("InternRemainingRotationDays")
+    this.internRemainingDays = parseInt(systemSetting.value);
   }
 
   initializeForm(): void {
@@ -75,6 +81,24 @@ export class ManageSystemComponent implements OnInit {
           control.updateValueAndValidity();
         }
       });
+    }
+  }
+
+  updateInternRemainingDays(){
+    if (this.internRemainingDays !== undefined && this.internRemainingDays > 0) {
+      const systemSetting: SystemSetting = {
+        key: "InternRemainingRotationDays",
+        value: this.internRemainingDays.toString()
+      };
+
+      this.systemSettingService.update("InternRemainingRotationDays", systemSetting).then(() => {
+        this.notification.success('Success', `Intern remaining days updated to ${this.internRemainingDays} days`);
+      }).catch(err => {
+        this.notification.error('Error', 'Failed to update intern remaining days');
+        console.error('Error updating intern remaining days:', err);
+      });
+    } else {
+      this.notification.error('Error', 'Please enter a valid number of days');
     }
   }
 }
