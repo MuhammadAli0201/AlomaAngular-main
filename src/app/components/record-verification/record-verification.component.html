@@ -1,0 +1,35 @@
+
+<nz-table #basicTable [nzData]="patients" [nzLoading]="loading">
+  <thead>
+    <tr>
+      <th>Hospital Number</th>
+      <th>Patient Name</th>
+      <th>Maternal Full Name</th>
+      <th>Admission Date</th>
+      <!--<th>Diagnosis</th>--> 
+      <th>Outcome</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (data of basicTable.data; track data; let i = $index) {
+    <tr>
+      <td>{{ data.hospitalNumber }}</td>
+      <td>{{ data.name + " " + data.surname | uppercase }}</td>
+      <td>{{ data?.maternal?.name + " " + data?.maternal?.surname | uppercase }}</td>
+      <td>{{ data.dateOfAdmission| date }}</td>
+      <!--<td>{{ data. }}</td>--> 
+      <td>{{ data.outcomeStatus }}</td>
+      <td>
+        <button
+          (click)="edit(data.id!)"
+          nz-button
+          nzType="primary"
+        >
+          View
+        </button>
+      </td>
+    </tr>
+    }
+  </tbody>
+</nz-table>

@@ -43,6 +43,9 @@ import { LookupItems } from '../../../models/lookup-items';
 import { LookupCategoryIds } from '../../../constants/lookup-categories';
 import { LookupItemIds } from '../../../constants/lookup-items';
 import { NzUploadFile } from 'ng-zorro-antd/upload';
+import { CONSTANTS } from '../../../constants';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import { RejectPatientComponent } from './reject-patient/reject-patient.component';
 
 @Component({
   selector: 'app-diagnosis-treatment-form',
@@ -91,6 +94,7 @@ export class DiagnosisTreatmentFormComponent implements OnInit {
     doctor: 'doctor-dashboard',
   };
 
+  isVerify: boolean = false;
   currentRolePath: string = '';
 
   constructor(
@@ -108,13 +112,14 @@ export class DiagnosisTreatmentFormComponent implements OnInit {
     private fungalOragnismService: FungalOrganismService,
     private sonarFindingService: SonarFindingService,
     private sharedService: SharedService,
-    private lookupService: LookupService
+    private lookupService: LookupService,
+    private modalService: NzModalService
   ) {}
 
   async ngOnInit(): Promise<void> {
     this.loading = true;
     this.diagnosisForm = this.fb.group({
-       id: [EMPTY_GUID],
+      id: [EMPTY_GUID],
       patientId: [EMPTY_GUID],
 
       neonatalSepsis: [null],
@@ -244,7 +249,7 @@ export class DiagnosisTreatmentFormComponent implements OnInit {
       durationOfStay: [null],
       fileBase64List: this.fb.array([]),
     });
-    
+
     this.loading = true;
     [
       this.yesNoUnknown,
@@ -316,14 +321,14 @@ export class DiagnosisTreatmentFormComponent implements OnInit {
             this.patientCompleteInfoService.getByPatientId(patient.id!)
           ),
           tap((res: PatientCompleteInfo) => {
-            this.setManagedItems(res)
+            this.setManagedItems(res);
             this.patientCompleteInfo = res;
             this.diagnosisForm.patchValue(res);
             if (res?.fileBase64List) {
-                res.fileBase64List.forEach((file: any) => {
-                  this.filesArray.push(this.fb.control(file));
-                });
-              }
+              res.fileBase64List.forEach((file: any) => {
+                this.filesArray.push(this.fb.control(file));
+              });
+            }
             if (!res) {
               this.sharedService.setEditable(true);
             }
@@ -335,6 +340,11 @@ export class DiagnosisTreatmentFormComponent implements OnInit {
             this.nzNotificationService.error('Error', err.message);
           },
         });
+
+      const param = this.activatedRoute.snapshot.queryParams['verify'];
+      if (param) {
+        this.isVerify = param === 'true';
+      }
     }
 
     const dropdownCalls = forkJoin({
@@ -387,110 +397,175 @@ export class DiagnosisTreatmentFormComponent implements OnInit {
     return false; // Prevent automatic upload
   };
 
-  async setManagedItems(patientCompleteInfo: PatientCompleteInfo){
-    if(patientCompleteInfo?.bsOrganism){
-      for(let b of patientCompleteInfo.bsOrganism){
-        let response = await firstValueFrom(this.oragnismService.getById(parseInt(b)))
+  async setManagedItems(patientCompleteInfo: PatientCompleteInfo) {
+    if (patientCompleteInfo?.bsOrganism) {
+      for (let b of patientCompleteInfo.bsOrganism) {
+        let response = await firstValueFrom(
+          this.oragnismService.getById(parseInt(b))
+        );
         this.bacterialOrganisms.push(response);
       }
     }
-    if(patientCompleteInfo?.fungalOrganism){
-      for(let f of patientCompleteInfo.fungalOrganism){
-        let response = await firstValueFrom(this.fungalOragnismService.getById(parseInt(f)))
+    if (patientCompleteInfo?.fungalOrganism) {
+      for (let f of patientCompleteInfo.fungalOrganism) {
+        let response = await firstValueFrom(
+          this.fungalOragnismService.getById(parseInt(f))
+        );
         this.fungalOrganisms.push(response);
       }
     }
-    if(patientCompleteInfo?.earlyAntibiotics){
-      let response = await firstValueFrom(this.antiMicrobialService.getById(parseInt(patientCompleteInfo.earlyAntibiotics)))
+    if (patientCompleteInfo?.earlyAntibiotics) {
+      let response = await firstValueFrom(
+        this.antiMicrobialService.getById(
+          parseInt(patientCompleteInfo.earlyAntibiotics)
+        )
+      );
       this.earlyAbxOptions.push(response);
     }
-    if(patientCompleteInfo?.congenitalInfectionOrganism)
-    for(let c of patientCompleteInfo.congenitalInfectionOrganism){
-      let response = await firstValueFrom(this.congenitalInfectionOrganismService.getById(parseInt(c)))
-      this.congenitalOrganisms.push(response);
-    }
-    if(patientCompleteInfo?.sonarFindings)
-    for(let s of patientCompleteInfo.sonarFindings){
-      let response = await firstValueFrom(this.sonarFindingService.getById(parseInt(s)))
-      this.sonarFindingsOptions.push(response);
-    }
+    if (patientCompleteInfo?.congenitalInfectionOrganism)
+      for (let c of patientCompleteInfo.congenitalInfectionOrganism) {
+        let response = await firstValueFrom(
+          this.congenitalInfectionOrganismService.getById(parseInt(c))
+        );
+        this.congenitalOrganisms.push(response);
+      }
+    if (patientCompleteInfo?.sonarFindings)
+      for (let s of patientCompleteInfo.sonarFindings) {
+        let response = await firstValueFrom(
+          this.sonarFindingService.getById(parseInt(s))
+        );
+        this.sonarFindingsOptions.push(response);
+      }
   }
 
   //UI LOGIC
-  isCongentialInfection(): boolean{
-    return this.diagnosisForm.get('congenitalInfection')?.value === LookupItemIds.yesNoUnknown.Yes;
+  isCongentialInfection(): boolean {
+    return (
+      this.diagnosisForm.get('congenitalInfection')?.value ===
+      LookupItemIds.yesNoUnknown.Yes
+    );
   }
 
   isBacterialSepsisBeforeDay3(): boolean {
-    return this.diagnosisForm.get('bacterialSepsisBeforeDay3')?.value === LookupItemIds.yesNoUnknown.Yes;
+    return (
+      this.diagnosisForm.get('bacterialSepsisBeforeDay3')?.value ===
+      LookupItemIds.yesNoUnknown.Yes
+    );
   }
 
   isSepsisAfterDay3(): boolean {
-    return this.diagnosisForm.get('sepsisAfterDay3')?.value === LookupItemIds.yesNoUnknown.Yes;
+    return (
+      this.diagnosisForm.get('sepsisAfterDay3')?.value ===
+      LookupItemIds.yesNoUnknown.Yes
+    );
   }
 
   isBacterialPathogen(): boolean {
-    return this.diagnosisForm.get('bacterialPathogen')?.value === LookupItemIds.yesNoUnknown.Yes;
+    return (
+      this.diagnosisForm.get('bacterialPathogen')?.value ===
+      LookupItemIds.yesNoUnknown.Yes
+    );
   }
 
   isCons(): boolean {
-    return this.diagnosisForm.get('cons')?.value === LookupItemIds.yesNoUnknown.Yes;
+    return (
+      this.diagnosisForm.get('cons')?.value === LookupItemIds.yesNoUnknown.Yes
+    );
   }
 
   isFungalSepsis(): boolean {
-    return this.diagnosisForm.get('fungalSepsis')?.value === LookupItemIds.yesNoUnknown.Yes;
+    return (
+      this.diagnosisForm.get('fungalSepsis')?.value ===
+      LookupItemIds.yesNoUnknown.Yes
+    );
   }
 
   isAbgAvailable(): boolean {
-    return this.diagnosisForm.get('abgAvailable')?.value === LookupItemIds.yesNoUnknown.Yes;
+    return (
+      this.diagnosisForm.get('abgAvailable')?.value ===
+      LookupItemIds.yesNoUnknown.Yes
+    );
   }
 
   isEosCalcDone(): boolean {
-    return this.diagnosisForm.get('eosCalcDone')?.value === LookupItemIds.yesNoUnknown.Yes;
+    return (
+      this.diagnosisForm.get('eosCalcDone')?.value ===
+      LookupItemIds.yesNoUnknown.Yes
+    );
   }
 
   isIvh(): boolean {
-    return this.diagnosisForm.get('ivh')?.value === LookupItemIds.yesNoUnknown.Yes;
+    return (
+      this.diagnosisForm.get('ivh')?.value === LookupItemIds.yesNoUnknown.Yes
+    );
   }
 
   isWorstIvh(): boolean {
-    return this.diagnosisForm.get('ivh')?.value === LookupItemIds.yesNoUnknown.Yes;
+    return (
+      this.diagnosisForm.get('ivh')?.value === LookupItemIds.yesNoUnknown.Yes
+    );
   }
 
   isPdaLiti(): boolean {
-    return this.diagnosisForm.get('pdaLiti')?.value === LookupItemIds.yesNoUnknown.Yes;
+    return (
+      this.diagnosisForm.get('pdaLiti')?.value ===
+      LookupItemIds.yesNoUnknown.Yes
+    );
   }
 
   isAeeG(): boolean {
-    return this.diagnosisForm.get('aeeG')?.value === LookupItemIds.yesNoUnknown.No;
+    return (
+      this.diagnosisForm.get('aeeG')?.value === LookupItemIds.yesNoUnknown.No
+    );
   }
 
   isCerebralCoolingNo(): boolean {
-    return this.diagnosisForm.get('cerebralCooling')?.value === LookupItemIds.yesNoUnknown.No;
+    return (
+      this.diagnosisForm.get('cerebralCooling')?.value ===
+      LookupItemIds.yesNoUnknown.No
+    );
   }
 
   isCerebralCoolingYes(): boolean {
-    return this.diagnosisForm.get('cerebralCooling')?.value === LookupItemIds.yesNoUnknown.Yes;
-  }
-  
-  isCranialBefore28() : boolean {
-    return this.diagnosisForm.get('cranialBefore28')?.value === LookupItemIds.yesNoUnknown.Yes;
+    return (
+      this.diagnosisForm.get('cerebralCooling')?.value ===
+      LookupItemIds.yesNoUnknown.Yes
+    );
   }
 
-  isHieSection():boolean{
-   return this.diagnosisForm.get('hieSection')?.value === LookupItemIds.yesNoUnknown.Yes;
+  isCranialBefore28(): boolean {
+    return (
+      this.diagnosisForm.get('cranialBefore28')?.value ===
+      LookupItemIds.yesNoUnknown.Yes
+    );
+  }
+
+  isHieSection(): boolean {
+    return (
+      this.diagnosisForm.get('hieSection')?.value ===
+      LookupItemIds.yesNoUnknown.Yes
+    );
   }
 
   isNecSurgery(): boolean {
-    return this.diagnosisForm.get('necSurgery')?.value === LookupItemIds.yesNoUnknown.Yes;
+    return (
+      this.diagnosisForm.get('necSurgery')?.value ===
+      LookupItemIds.yesNoUnknown.Yes
+    );
   }
 
   isRetinopathyPre(): boolean {
-    return this.diagnosisForm.get('retinopathyPre')?.value === LookupItemIds.yesNoUnknown.Yes;
+    return (
+      this.diagnosisForm.get('retinopathyPre')?.value ===
+      LookupItemIds.yesNoUnknown.Yes
+    );
   }
 
   isKangarooCare(): boolean {
-    return this.diagnosisForm.get('kangarooCare')?.value === LookupItemIds.yesNoUnknown.Yes;
+    return (
+      this.diagnosisForm.get('kangarooCare')?.value ===
+      LookupItemIds.yesNoUnknown.Yes
+    );
   }
 
   isOutcomeHospital(): boolean {
@@ -507,30 +582,37 @@ export class DiagnosisTreatmentFormComponent implements OnInit {
       this.currentRolePath = this.rolesPath.admin;
     }
   }
+
   isAdmin = (): boolean => this.currentRolePath === this.rolesPath.admin;
+  isDoctor = (): boolean => this.currentRolePath === this.rolesPath.doctor;
+  canVerify = (): boolean => {
+    return this.isVerify && this.isDoctor();
+  };
+  markedAsCompleted(): boolean {
+    return this.patient?.markAsCompletedId === CONSTANTS.markAsComplete.pending;
+  }
 
   markAsComplete(): void {
     debugger;
     if (this.diagnosisForm.valid) {
       this.btnLoading = true;
-      this.patientCompleteInfoService
-        .createOrUpdate(this.diagnosisForm.getRawValue())
-        .subscribe({
-          next: (res: PatientCompleteInfo) => {
-            this.patientCompleteInfo = res;
-            this.diagnosisForm.patchValue(res);
-            this.sharedService.setEditable(false);
-            this.nzNotificationService.success(
-              'Success',
-              'Patient Form has been saved successfully'
-            );
-            this.btnLoading = false;
-          },
-          error: (err: Error) => {
-            this.nzNotificationService.error('Error', err.message);
-            this.btnLoading = false;
-          },
-        });
+      let data: PatientCompleteInfo = this.diagnosisForm.getRawValue();
+      this.patientCompleteInfoService.createOrUpdate(data).subscribe({
+        next: (res: PatientCompleteInfo) => {
+          this.patientCompleteInfo = res;
+          this.diagnosisForm.patchValue(res);
+          this.sharedService.setEditable(false);
+          this.nzNotificationService.success(
+            'Success',
+            'Patient Form has been saved successfully'
+          );
+          this.btnLoading = false;
+        },
+        error: (err: Error) => {
+          this.nzNotificationService.error('Error', err.message);
+          this.btnLoading = false;
+        },
+      });
     } else {
       this.diagnosisForm.markAllAsTouched();
     }
@@ -538,6 +620,30 @@ export class DiagnosisTreatmentFormComponent implements OnInit {
 
   setEditable() {
     this.sharedService.setEditable(true);
+  }
+
+  verify(): void {
+    this.btnLoading = true;
+    this.patientService.acceptPatient(this.patient.id!).subscribe({
+      next: () => {this.navToReportsVerification()},
+      error: (err: Error) => {
+        this.nzNotificationService.error('Error', err.message);
+      },
+      complete: () => (this.btnLoading = false),
+    });
+  }
+
+  reject(): void {
+    const modal = this.modalService.create({
+      nzContent: RejectPatientComponent,
+      nzFooter: null,
+      nzTitle: 'Rejection Reason',
+      nzCentered: true,
+      nzClosable: false,
+    });
+
+    modal.componentInstance!.patientId = this.patient.id!;
+    modal.afterClose.subscribe(() => this.navToReportsVerification());
   }
 
   //NAVIGATIONS
@@ -548,6 +654,10 @@ export class DiagnosisTreatmentFormComponent implements OnInit {
   close(): void {
     this.router.navigate([this.currentRolePath, 'patients']);
   }
+
+  navToReportsVerification(): void {
+    this.router.navigate(['/doctor-dashboard/verify']);
+  }
 }
 
 const getBase64 = (file: File): Promise<string | ArrayBuffer | null> =>
@@ -555,5 +665,5 @@ const getBase64 = (file: File): Promise<string | ArrayBuffer | null> =>
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
+    reader.onerror = (error) => reject(error);
   });

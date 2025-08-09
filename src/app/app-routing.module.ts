@@ -28,6 +28,7 @@ import { ListReportComponent } from './components/list-report/list-report.compon
 import { CategoryReportComponent } from './components/category-report/category-report.component';
 import { MortalityReportComponent } from './components/mortality-report/mortality-report.component';
 import { AuditComponent } from './components/audit/audit.component';
+import { RecordVerificationComponent } from './components/record-verification/record-verification.component';
 
 
 const patientRoutes: Routes = [
@@ -69,6 +70,7 @@ const routes: Routes = [
     children: [
       { path: '', redirectTo: 'welcome', pathMatch: 'full' },
       { path: 'welcome', component: DoctorWelcomeComponent, },
+      { path: 'verify', component: RecordVerificationComponent, },
       ...patientRoutes
     ]
   },

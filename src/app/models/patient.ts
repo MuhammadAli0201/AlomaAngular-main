@@ -1,5 +1,6 @@
 import { City } from "./city";
 import { Hospital } from "./hospital";
+import { Maternal } from "./maternal";
 import { Province } from "./province";
 import { Suburb } from "./suburb";
 
@@ -38,4 +39,7 @@ export interface Patient {
   diedInDeliveryRoom?: boolean;
   diedWithin12Hours?: boolean;
   initialTemperature?: number;
+  markAsCompletedId?:string;
+  rejectComments?:string;
+  maternal : Maternal;
 }

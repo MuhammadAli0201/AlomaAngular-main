@@ -190,7 +190,7 @@
           (click)="motherForm.disabled ? setEditable() : markAsComplete()"
           nz-button
           nzType="primary"
-          [disabled]="motherForm.invalid  && !isAdmin()"
+          [disabled]="(motherForm.invalid  && !isAdmin()) || markedAsCompleted()"
         >
         {{motherForm.disabled ? "Update" : "Save"}}
         </button>

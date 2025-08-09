@@ -1,6 +1,7 @@
 export interface PatientCompleteInfo {
     id: string;
     patientId: string;
+    markAsCompleteId:string;
 
     neonatalSepsis: string;
     congenitalInfection: string;

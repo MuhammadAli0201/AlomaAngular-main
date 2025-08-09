@@ -12,12 +12,13 @@ import { AuthService } from '../../../services/auth.service';
 import { Location } from '@angular/common';
 import { strictDecimalValidator } from '../../../validators/strict-decimal';
 import { SharedService } from '../../../services/shared.service';
+import { CONSTANTS } from '../../../constants';
 
 @Component({
   selector: 'app-maternal',
   standalone: false,
   templateUrl: './maternal.component.html',
-  styleUrl: './maternal.component.scss'
+  styleUrl: './maternal.component.scss',
 })
 export class MaternalComponent implements OnInit {
   patient!: Patient;
@@ -25,18 +26,19 @@ export class MaternalComponent implements OnInit {
   motherForm!: FormGroup;
   loading: boolean = false;
   btnLoading: boolean = false;
+  isVerify: boolean = false;
 
   yesNoUnknown = [
     { label: 'Yes', value: 'Yes' },
     { label: 'No', value: 'No' },
-    { label: 'Unknown', value: 'Unknown' }
+    { label: 'Unknown', value: 'Unknown' },
   ];
 
   yesNoNaUnknown = [
     { label: 'Yes', value: 'Yes' },
     { label: 'No', value: 'No' },
     { label: 'N/A', value: 'N/A' },
-    { label: 'Unknown', value: 'Unknown' }
+    { label: 'Unknown', value: 'Unknown' },
   ];
 
   raceOptions = [
@@ -44,26 +46,34 @@ export class MaternalComponent implements OnInit {
     { label: 'White', value: 'White' },
     { label: 'Coloured', value: 'Coloured' },
     { label: 'Indian', value: 'Indian' },
-    { label: 'Other', value: 'Other' }
+    { label: 'Other', value: 'Other' },
   ];
 
   multipleGestationOptions = [
     { label: 'Yes', value: 'Yes' },
-    { label: 'No', value: 'No' }
+    { label: 'No', value: 'No' },
   ];
 
   rolesPath = {
     admin: 'admin-dashboard',
     intern: 'intern-dashboard',
-    doctor: 'doctor-dashboard'
-  }
+    doctor: 'doctor-dashboard',
+  };
 
   currentRolePath: string = '';
 
   //LIFE CYCLES
-  constructor(private activatedRoute: ActivatedRoute, private notificationService: NzNotificationService, private location: Location,
-    private fb: FormBuilder, private patientService: PatientService, private maternalService: MaternalService,
-    private router: Router, private authService: AuthService, private sharedService: SharedService) { }
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private notificationService: NzNotificationService,
+    private location: Location,
+    private fb: FormBuilder,
+    private patientService: PatientService,
+    private maternalService: MaternalService,
+    private router: Router,
+    private authService: AuthService,
+    private sharedService: SharedService
+  ) {}
 
   ngOnInit(): void {
     this.motherForm = this.fb.group({
@@ -75,7 +85,7 @@ export class MaternalComponent implements OnInit {
       age: [null, [Validators.required, strictDecimalValidator()]],
       race: ['', [Validators.required]],
       parity: [''],
-      gravidity: [''], 
+      gravidity: [''],
       antenatalCare: [''],
       antenatalSteroid: [''],
       antenatalMgSulfate: [''],
@@ -94,85 +104,101 @@ export class MaternalComponent implements OnInit {
       neonatalAbstinence: [''],
       otherInfo: [''],
       multipleGestations: [''],
-      numberOfBabies: [null, [strictDecimalValidator()]]
+      numberOfBabies: [null, [strictDecimalValidator()]],
     });
 
-    const id = this.activatedRoute.parent?.snapshot.params["id"];
+    const id = this.activatedRoute.parent?.snapshot.params['id'];
     if (id) {
       this.loading = true;
-      this.patientService.getPatientById(id).pipe(
-        tap((patient: Patient) => {
-          this.patient = patient;
-          this.motherForm.patchValue({ patientId: patient.id });
-        }),
-        switchMap((patient: Patient) =>
-          this.maternalService.getMaternalByPatientId(patient.id!)
-        ),
-        tap((maternal: Maternal) => {
-          this.motherForm.patchValue(maternal);
-          this.maternal = maternal;
-          if(!maternal){
-            this.sharedService.setEditable(true);
-          }
-        }),
-        finalize(() => this.loading = false)
-      ).subscribe({
-        error: (err: Error) => {
-          this.notificationService.error("Error", err.message);
-        }
-      });
+      this.patientService
+        .getPatientById(id)
+        .pipe(
+          tap((patient: Patient) => {
+            this.patient = patient;
+            this.motherForm.patchValue({ patientId: patient.id });
+          }),
+          switchMap((patient: Patient) =>
+            this.maternalService.getMaternalByPatientId(patient.id!)
+          ),
+          tap((maternal: Maternal) => {
+            this.motherForm.patchValue(maternal);
+            this.maternal = maternal;
+            if (!maternal) {
+              this.sharedService.setEditable(true);
+            }
+          }),
+          finalize(() => (this.loading = false))
+        )
+        .subscribe({
+          error: (err: Error) => {
+            this.notificationService.error('Error', err.message);
+          },
+        });
+      const param = this.activatedRoute.snapshot.queryParams['verify'];
+      if (param) {
+        this.isVerify = param;
+      }
     }
 
     this.setCurrentRole();
-    this.sharedService.editable$.subscribe(editable => {
+    this.sharedService.editable$.subscribe((editable) => {
       if (editable && !this.isAdmin()) {
         this.motherForm.enable();
       } else {
         this.motherForm.disable();
       }
-    })
+    });
   }
 
   //UI LOGIC
   setCurrentRole(): void {
-    if (this.authService.getRole()?.toLowerCase() === "doctor") {
+    if (this.authService.getRole()?.toLowerCase() === 'doctor') {
       this.currentRolePath = this.rolesPath.doctor;
-    }
-    else if (this.authService.getRole()?.toLowerCase() === "intern") {
+    } else if (this.authService.getRole()?.toLowerCase() === 'intern') {
       this.currentRolePath = this.rolesPath.intern;
-    }
-    else if (this.authService.getRole()?.toLowerCase() === 'admin') {
+    } else if (this.authService.getRole()?.toLowerCase() === 'admin') {
       this.currentRolePath = this.rolesPath.admin;
     }
   }
   isAdmin = (): boolean => this.currentRolePath === this.rolesPath.admin;
 
+  markedAsCompleted(): boolean {
+    return this.patient?.markAsCompletedId === CONSTANTS.markAsComplete.pending;
+  }
+
   markAsComplete(): void {
     if (this.motherForm.valid) {
       this.btnLoading = true;
-      this.maternalService.createOrUpdateMaternal(this.motherForm.getRawValue()).subscribe({
-        next: res => {
-          this.motherForm.patchValue(res)
-          this.sharedService.setEditable(false);
-          this.btnLoading = false;
-        },
-        error: err => {
-          this.notificationService.error('Error', err.message),
+      this.maternalService
+        .createOrUpdateMaternal(this.motherForm.getRawValue())
+        .subscribe({
+          next: (res) => {
+            this.motherForm.patchValue(res);
+            this.sharedService.setEditable(false);
             this.btnLoading = false;
-        }
-      });
+          },
+          error: (err) => {
+            this.notificationService.error('Error', err.message),
+              (this.btnLoading = false);
+          },
+        });
     } else {
       this.motherForm.markAllAsTouched();
       this.btnLoading = false;
     }
   }
 
-  setEditable(){
+  setEditable() {
     this.sharedService.setEditable(true);
   }
 
-  navToNext(){
-    this.router.navigate([this.currentRolePath, "patient", this.patient.id, "full"]);
+  navToNext() {
+    setTimeout(() => {
+      this.router.navigate(
+        [this.currentRolePath, 'patient', this.patient.id, 'full'],
+        { queryParams: { verify: this.isVerify } }
+      );
+    }, 0);
   }
 
   //NAVIGATION
