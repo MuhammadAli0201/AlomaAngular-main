@@ -75,6 +75,74 @@
               </div>
             </div>
 
+            <!-- OTP Timer Settings Section -->
+            <div class="card mb-4">
+              <div class="card-header">
+                <h5 class="mb-0">
+                  <i class="fas fa-clock me-2"></i>
+                  Intern Remaining Days Settings
+                </h5>
+              </div>
+              <div class="card-body">
+                <div class="alert alert-info" role="alert">
+                  <i class="fas fa-info-circle me-2"></i>
+                  Configure the days before the intern rotation ends to send email notification.
+                  Current setting: <strong>{{ internRemainingDays }} Days</strong>
+                </div>
+                
+                <form (ngSubmit)="updateInternRemainingDays()">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <nz-form-item>
+                        <nz-form-label [nzRequired]="true">Intern Remaining Days</nz-form-label>
+                        <nz-form-control [nzErrorTip]="timerErrorTpl">
+                          <nz-input-number
+                            [(ngModel)]="internRemainingDays"
+                            name="internRemainingDays"
+                            [nzMin]="1"
+                            [nzMax]="30"
+                            [nzStep]="1"
+                            class="w-100"
+                            placeholder="Enter minutes (1-30)">
+                          </nz-input-number>
+                          
+                          <ng-template #timerErrorTpl let-control>
+                            <ng-container *ngIf="control.hasError('required')">
+                              <span class="text-danger">Timer duration is required</span>
+                            </ng-container>
+                            <ng-container *ngIf="control.hasError('min')">
+                              <span class="text-danger">Minimum timer is 1 minute</span>
+                            </ng-container>
+                            <ng-container *ngIf="control.hasError('max')">
+                              <span class="text-danger">Maximum timer is 30 minutes</span>
+                            </ng-container>
+                          </ng-template>
+                        </nz-form-control>
+                      </nz-form-item>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                      <button
+                        type="submit"
+                        [disabled]="loading || otpSettingsForm.invalid"
+                        class="btn btn-primary"
+                        [class.loading]="loading">
+                        <i class="fas fa-save me-2" *ngIf="!loading"></i>
+                        <i class="fas fa-spinner fa-spin me-2" *ngIf="loading"></i>
+                        {{ loading ? 'Updating...' : 'Update Timer' }}
+                      </button>
+                    </div>
+                  </div>
+                </form>
+                
+                <div class="mt-3">
+                  <small class="text-muted">
+                    <i class="fas fa-lightbulb me-1"></i>
+                    <strong>Recommendation:</strong> Set between 3-5 days for optimal security and user experience.
+                  </small>
+                </div>
+              </div>
+            </div>
+
             <!-- Usage Information -->
             <div class="card">
               <div class="card-header">
