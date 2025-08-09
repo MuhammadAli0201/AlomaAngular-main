@@ -122,6 +122,7 @@ export class PatientsComponent implements OnInit {
       this.modalService.create({
         nzContent: patient.rejectComments,
         nzCentered:true,
+        nzTitle:"Rejection Reason",
         nzOkText: null,
         nzCancelText: "Close"
       });
