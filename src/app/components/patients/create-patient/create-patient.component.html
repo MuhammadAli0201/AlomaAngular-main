@@ -577,7 +577,7 @@
           (click)="patientForm.disabled ? setEditable() : markAsComplete()"
           nz-button
           nzType="primary"
-          [disabled]="patientForm.invalid"
+          [disabled]="patientForm.invalid || markedAsCompleted()"
         >
         {{patientForm.disabled ? "Update" : "Save"}}
         </button>

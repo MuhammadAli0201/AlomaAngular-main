@@ -1570,26 +1570,49 @@
       <div>
         <button nz-button (click)="close()">Close</button>
         <button
-          *ngIf="!isAdmin()"
+          *ngIf="!isAdmin() && this.patient"
           class="ms-2"
           [nzLoading]="btnLoading"
-          (click)="diagnosisForm.disabled ? setEditable() : markAsComplete()"
+          (click)="setEditable()"
           nz-button
           nzType="primary"
-          [disabled]="diagnosisForm.invalid  && !isAdmin()"
+          [disabled]="(diagnosisForm.invalid  && !isAdmin()) || markedAsCompleted() || !diagnosisForm.disabled"
         >
-        {{diagnosisForm.disabled ? "Update" : "Mark as Complete"}}
+        Update
         </button>
         <button
           class="ms-2"
           nz-button
           nzType="primary"
-          (click)="close()"
+          (click)="markAsComplete()"
           [nzLoading]="btnLoading"
-          [disabled]="!diagnosisForm.disabled"
+          [disabled]="diagnosisForm.disabled || markedAsCompleted()"
         >
           Save
         </button>
+        @if(canVerify()){
+          <button
+            class="ms-2"
+            nz-button
+            nzType="primary"
+            (click)="verify()"
+            [nzLoading]="btnLoading"
+            [disabled]="!diagnosisForm.disabled"
+          >
+            Verify
+          </button>
+          <button
+            class="ms-2"
+            nz-button
+            nzDanger
+            nzType="primary"
+            (click)="reject()"
+            [nzLoading]="btnLoading"
+            [disabled]="!diagnosisForm.disabled"
+          >
+            Reject
+          </button>
+        }
       </div>
     </div>
   </form>

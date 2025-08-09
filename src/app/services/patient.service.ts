@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Patient } from '../models/patient';
@@ -54,5 +54,20 @@ export class PatientService {
     return this.http.get<Patient[]>(`${this.baseUrl}/search/${text}`, {
       headers: this.getAuthHeaders()
     })
+  }
+
+  rejectPatient(id: string, rejectComments: string): Observable<any> {
+    const params = new HttpParams().set('rejectComments', rejectComments);
+    return this.http.get(`${this.baseUrl}/reject/${id}`, { params, headers: this.getAuthHeaders() });
+  }
+
+  // 2. Accept Patient
+  acceptPatient(id: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/accept/${id}`, {headers: this.getAuthHeaders()});
+  }
+
+  // 3. Mark as Complete
+  markAsComplete(id: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/mark-as-complete/${id}`, {headers: this.getAuthHeaders()});
   }
 }

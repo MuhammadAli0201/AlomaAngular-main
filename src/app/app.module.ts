@@ -48,6 +48,8 @@ import { GraphsComponent } from './components/graphs/graphs.component';
 import { PatientStatsComponent } from './components/patient-stats/patient-stats.component';
 import { CalendarComponent } from './components/calendar/calendar.component';
 import { AuditComponent } from './components/audit/audit.component';
+import { RecordVerificationComponent } from './components/record-verification/record-verification.component';
+import { RejectPatientComponent } from './components/patients/diagnosis-treatment-form/reject-patient/reject-patient.component';
 
 registerLocaleData(en);
 
@@ -69,8 +71,10 @@ registerLocaleData(en);
     VerifyOtpComponent,
     NewPasswordComponent,
     PatientsComponent,
+    RecordVerificationComponent,
     PatientComponent, 
     MaternalComponent,
+    RejectPatientComponent,
     CreatePatientComponent,
     DiagnosisTreatmentFormComponent,
     InternWelcomeComponent,
@@ -85,6 +89,7 @@ registerLocaleData(en);
     GraphsComponent,
     PatientStatsComponent,
     CalendarComponent,
+    RecordVerificationComponent,
     AuditComponent
   ],
   imports: [

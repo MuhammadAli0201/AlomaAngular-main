@@ -22,6 +22,7 @@
       <th>Patient Name</th>
       <th>Admission Date</th>
       <!--<th>Diagnosis</th>-->
+      <th>Form Status</th>
       <th>Outcome</th>
       <th>Action</th>
     </tr>
@@ -33,6 +34,7 @@
       <td>{{ data.name + " " + data.surname | uppercase }}</td>
       <td>{{ data.dateOfAdmission| date }}</td>
       <!--<td>{{ data. }}</td>-->
+      <td>{{ getStatus(data.markAsCompletedId!) }}</td>
       <td>{{ data.outcomeStatus }}</td>
       <td>
         <button
@@ -43,6 +45,27 @@
         >
           View
         </button>
+        <button
+        class="ms-2"
+          (click)="markAsComplete(data.id!)"
+          nz-button
+          nzType="primary"
+          [disabled]="isDisabled(data.id!)"
+          [nzLoading]="btnLoading[i]"
+        >
+          Mark As Complete
+        </button>
+        @if(isRejected(data.id!)){
+          <button
+          class="ms-2"
+            (click)="rejectReason(data.id!)"
+            nz-button
+            nzType="dashed"
+            [nzLoading]="btnLoading[i]"
+          >
+            Rejection Reason
+          </button>
+        }
       </td>
     </tr>
     }
