@@ -589,7 +589,7 @@ export class DiagnosisTreatmentFormComponent implements OnInit {
     return this.isVerify && this.isDoctor();
   };
   markedAsCompleted(): boolean {
-    return this.patient?.markAsCompletedId === CONSTANTS.markAsComplete.pending;
+    return this.patient?.markAsCompletedId === CONSTANTS.markAsComplete.pending && !this.isDoctor();
   }
 
   markAsComplete(): void {
@@ -643,7 +643,11 @@ export class DiagnosisTreatmentFormComponent implements OnInit {
     });
 
     modal.componentInstance!.patientId = this.patient.id!;
-    modal.afterClose.subscribe(() => this.navToReportsVerification());
+    modal.afterClose.subscribe((value) => {
+      if(!value){
+        this.navToReportsVerification()
+      }
+    });
   }
 
   //NAVIGATIONS

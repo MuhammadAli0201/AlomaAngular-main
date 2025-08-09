@@ -1597,6 +1597,7 @@
             nzType="primary"
             (click)="verify()"
             [nzLoading]="btnLoading"
+            [disabled]="!diagnosisForm.disabled"
           >
             Verify
           </button>
@@ -1607,6 +1608,7 @@
             nzType="primary"
             (click)="reject()"
             [nzLoading]="btnLoading"
+            [disabled]="!diagnosisForm.disabled"
           >
             Reject
           </button>

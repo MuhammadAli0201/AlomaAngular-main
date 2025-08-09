@@ -32,13 +32,13 @@ export class RejectPatientComponent {
       .subscribe({
         complete: () => {
           this.loading = false;
-          this.close();
+          this.close(false);
         },
       });
   }
 
   //NAVIGATIONS
-  close(): void {
-    this.nzModalRef.close();
+  close(param:boolean = true): void {
+    this.nzModalRef.close(param);
   }
 }

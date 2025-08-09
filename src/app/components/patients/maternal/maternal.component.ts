@@ -161,9 +161,10 @@ export class MaternalComponent implements OnInit {
     }
   }
   isAdmin = (): boolean => this.currentRolePath === this.rolesPath.admin;
+  isDoctor = (): boolean => this.currentRolePath === this.rolesPath.doctor;
 
   markedAsCompleted(): boolean {
-    return this.patient?.markAsCompletedId === CONSTANTS.markAsComplete.pending;
+    return this.patient?.markAsCompletedId === CONSTANTS.markAsComplete.pending && !this.isDoctor();
   }
 
   markAsComplete(): void {

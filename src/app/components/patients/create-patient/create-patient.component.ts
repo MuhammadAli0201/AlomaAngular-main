@@ -295,11 +295,13 @@ export class CreatePatientComponent {
 
   disableDate = (date: Date): boolean => date > new Date();
   isAdmin = (): boolean => this.currentRolePath === this.rolesPath.admin;
+  isDoctor = (): boolean => this.currentRolePath === this.rolesPath.doctor;
 
   markedAsCompleted(): boolean {
     return (
       this.patient?.markAsCompletedId != undefined &&
       this.patient?.markAsCompletedId === CONSTANTS.markAsComplete.pending
+      && !this.isDoctor()
     );
   }
 

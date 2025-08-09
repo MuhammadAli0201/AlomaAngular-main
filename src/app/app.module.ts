@@ -89,7 +89,7 @@ registerLocaleData(en);
     GraphsComponent,
     PatientStatsComponent,
     CalendarComponent,
-    RecordVerificationComponent
+    RecordVerificationComponent,
     AuditComponent
   ],
   imports: [
